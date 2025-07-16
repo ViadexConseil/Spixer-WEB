@@ -57,7 +57,7 @@ const Navbar = () => {
           <img 
             src="/lovable-uploads/ea09aba0-54c8-4977-ac16-dc239a0a7184.png" 
             alt="Spixer Logo" 
-            className="h-12 sm:h-16 lg:h-20" 
+            className="h-16 sm:h-20 lg:h-24" 
           />
         </a>
 
@@ -71,9 +71,9 @@ const Navbar = () => {
               scrollToTop();
             }}
           >
-            Home
+            Accueil
           </a>
-          <a href="#features" className="nav-link">About</a>
+          <a href="#features" className="nav-link">À Propos</a>
           <a href="#details" className="nav-link">Contact</a>
         </nav>
 
@@ -103,7 +103,7 @@ const Navbar = () => {
               document.body.style.overflow = '';
             }}
           >
-            Home
+            Accueil
           </a>
           <a 
             href="#features" 
@@ -113,7 +113,7 @@ const Navbar = () => {
               document.body.style.overflow = '';
             }}
           >
-            About
+            À Propos
           </a>
           <a 
             href="#details" 

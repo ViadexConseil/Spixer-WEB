@@ -10,20 +10,18 @@ const HumanIntuitionSection = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div className="text-left">
             <div className="pulse-chip mb-4">
-              <span>Human-Like Intuition</span>
+              <span>Intelligence Sportive</span>
             </div>
-            <h2 className="section-title mb-6">Beyond algorithms to true understanding</h2>
+            <h2 className="section-title mb-6">Au-delà de la mesure : une compréhension intelligente</h2>
             <p className="text-lg text-gray-700 mb-6">
-              Atlas goes beyond programmed responses to develop contextual awareness and
-              adaptive learning patterns that mirror human intuition. This enables natural
-              interactions that feel like working with a human colleague rather than a machine.
+              Spixer dépasse les simples algorithmes de chronométrage pour développer une compréhension contextuelle des événements sportifs. Notre IA adapte ses patterns d'apprentissage pour chaque type de course et environnement.
             </p>
             <ul className="space-y-4">
               {[
-                "Learns from human demonstrations and refines its approach over time",
-                "Anticipates needs based on situational awareness and past interactions",
-                "Adapts to changing environments without explicit reprogramming",
-                "Makes decisions with nuanced understanding of human preferences"
+                "Apprend des patterns de course et affine sa précision au fil du temps",
+                "Anticipe les besoins spécifiques selon le type d'événement et les conditions",
+                "S'adapte aux nouveaux environnements sans reconfiguration manuelle",
+                "Prend des décisions intelligentes basées sur l'historique des performances"
               ].map((item, index) => (
                 <li key={index} className="flex items-start">
                   <div className="mr-3 text-pulse-500">
