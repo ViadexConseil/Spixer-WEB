@@ -57,7 +57,7 @@ const Navbar = () => {
           <img 
             src="/lovable-uploads/ea09aba0-54c8-4977-ac16-dc239a0a7184.png" 
             alt="Spixer Logo" 
-            className="h-7 sm:h-8" 
+            className="h-12 sm:h-16 lg:h-20" 
           />
         </a>
 
