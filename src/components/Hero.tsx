@@ -106,21 +106,21 @@ const Hero = () => {
               style={{ animationDelay: "0.1s" }}
             >
               <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pulse-500 text-white mr-2">01</span>
-              <span>Purpose</span>
+              <span>Innovation</span>
             </div>
             
             <h1 
               className="section-title text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-tight opacity-0 animate-fade-in" 
               style={{ animationDelay: "0.3s" }}
             >
-              Atlas: Where Code<br className="hidden sm:inline" />Meets Motion
+              Spixer: L'IA au Service<br className="hidden sm:inline" />du Chronométrage
             </h1>
             
             <p 
               style={{ animationDelay: "0.5s" }} 
               className="section-subtitle mt-3 sm:mt-6 mb-4 sm:mb-8 leading-relaxed opacity-0 animate-fade-in text-gray-950 font-normal text-base sm:text-lg text-left"
             >
-              The humanoid companion that learns and adapts alongside you.
+              Révolutionnez vos événements sportifs avec notre technologie de chronométrage intelligente et précise.
             </p>
             
             <div 
@@ -164,9 +164,9 @@ const Hero = () => {
               <div className="relative transition-all duration-500 ease-out overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
                 <img 
                   ref={imageRef} 
-                  src="/lovable-uploads/5663820f-6c97-4492-9210-9eaa1a8dc415.png" 
-                  alt="Atlas Robot" 
-                  className="w-full h-auto object-cover transition-transform duration-500 ease-out" 
+                  src="/lovable-uploads/ea09aba0-54c8-4977-ac16-dc239a0a7184.png" 
+                  alt="Spixer Logo" 
+                  className="w-full h-auto object-contain transition-transform duration-500 ease-out bg-white p-8" 
                   style={{ transformStyle: 'preserve-3d' }} 
                 />
                 <div className="absolute inset-0" style={{ backgroundImage: 'url("/hero-image.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', mixBlendMode: 'overlay', opacity: 0.5 }}></div>
