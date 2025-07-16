@@ -164,12 +164,11 @@ const Hero = () => {
               <div className="relative transition-all duration-500 ease-out overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
                 <img 
                   ref={imageRef} 
-                  src="/lovable-uploads/ea09aba0-54c8-4977-ac16-dc239a0a7184.png" 
-                  alt="Spixer Logo" 
-                  className="w-full h-auto object-contain transition-transform duration-500 ease-out bg-white p-8" 
+                  src="/lovable-uploads/fcd4b855-00c6-447e-b4c2-249ed6a92807.png" 
+                  alt="Robot Spixer en course" 
+                  className="w-full h-auto object-cover transition-transform duration-500 ease-out" 
                   style={{ transformStyle: 'preserve-3d' }} 
                 />
-                <div className="absolute inset-0" style={{ backgroundImage: 'url("/hero-image.jpg")', backgroundSize: 'cover', backgroundPosition: 'center', mixBlendMode: 'overlay', opacity: 0.5 }}></div>
               </div>
               </>
             )}
