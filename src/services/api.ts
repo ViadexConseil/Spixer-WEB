@@ -122,7 +122,8 @@ export const authAPI = {
 // Events API
 export const eventsAPI = {
   list: async (): Promise<Event[]> => {
-    return apiCall('/v1/events');
+    const response = await apiCall('/v1/events');
+    return response.events || [];
   },
 
   get: async (id: string): Promise<Event> => {
