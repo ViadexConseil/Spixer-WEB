@@ -204,9 +204,9 @@ const Hero = () => {
             <div className="relative transition-all duration-500 ease-out overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
               <img 
                 ref={imageRef} 
-                src="/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png" 
-                alt="Cyclistes en course Spixer" 
-                className="w-full h-auto object-cover transition-transform duration-500 ease-out" 
+                src="/lovable-uploads/77a7ef3b-a09f-4099-8c96-d468f4ded307.png" 
+                alt="Cyclistes en course avec suivi temps réel Spixer" 
+                className="w-full h-auto object-cover transition-transform duration-500 ease-out"
                 style={{ transformStyle: 'preserve-3d' }} 
               />
             </div>
