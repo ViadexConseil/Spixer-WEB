@@ -7,6 +7,7 @@ import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Courses from "./pages/Courses";
 import CourseDetail from "./pages/CourseDetail";
+import Inscription from "./pages/Inscription";
 import Login from "./pages/Login";
 import Profil from "./pages/Profil";
 import CreateCourse from "./pages/CreateCourse";
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/courses" element={<Courses />} />
           <Route path="/courses/:id" element={<CourseDetail />} />
+          <Route path="/courses/:id/participer" element={<Inscription />} />
           <Route path="/login" element={<Login />} />
           <Route path="/profil" element={<Profil />} />
           <Route path="/create" element={<CreateCourse />} />

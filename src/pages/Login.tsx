@@ -36,7 +36,7 @@ const Login = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-20">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           {/* Left side - Form */}

@@ -45,7 +45,7 @@ const CourseDetail = () => {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gray-50 pt-20">
+      <div className="min-h-screen bg-gray-50 page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
@@ -95,8 +95,8 @@ const CourseDetail = () => {
                   <Share2 className="w-4 h-4" />
                   Partager
                 </Button>
-                <Button className="bg-spixer-orange hover:bg-spixer-orange-dark">
-                  Participer
+                <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
+                  <a href={`/courses/${course.id}/participer`}>Participer</a>
                 </Button>
               </div>
             </div>
