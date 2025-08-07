@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Navbar from "@/components/Navbar";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -42,7 +43,9 @@ const CourseDetail = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}
         <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
@@ -246,8 +249,9 @@ const CourseDetail = () => {
             </div>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

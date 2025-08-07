@@ -56,7 +56,7 @@ const CTAFinal = () => {
   };
   
   return (
-    <section className="py-16 md:py-20 bg-gradient-to-br from-pulse-500 to-pulse-600 text-white relative overflow-hidden" id="cta-final" ref={sectionRef}>
+    <section className="py-16 md:py-20 bg-gradient-to-br from-spixer-orange to-spixer-orange-dark text-white relative overflow-hidden" id="cta-final" ref={sectionRef}>
       {/* Background decorative elements */}
       <div className="absolute -top-20 -left-20 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
       <div className="absolute -bottom-20 -right-20 w-60 h-60 bg-white/5 rounded-full blur-3xl"></div>
@@ -76,11 +76,11 @@ const CTAFinal = () => {
           <div className="opacity-0 fade-in-element">
             <a
               href="/login"
-              className="block w-full bg-white text-spixer-blue rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg text-center"
+              className="block w-full bg-spixer-orange text-white rounded-2xl p-6 hover:bg-spixer-orange-dark transition-all duration-300 hover:scale-105 shadow-lg text-center"
             >
               <Users size={32} className="mx-auto mb-3" />
               <h3 className="text-lg font-semibold mb-2">Créer un compte</h3>
-              <p className="text-sm opacity-70">Rejoignez la communauté Spixer</p>
+              <p className="text-sm opacity-90">Rejoignez la communauté Spixer</p>
             </a>
           </div>
 
@@ -88,11 +88,11 @@ const CTAFinal = () => {
           <div className="opacity-0 fade-in-element">
             <button
               onClick={handleDownloadClick}
-              className="w-full bg-white text-spixer-blue rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
+              className="w-full bg-spixer-orange text-white rounded-2xl p-6 hover:bg-spixer-orange-dark transition-all duration-300 hover:scale-105 shadow-lg"
             >
               <Download size={32} className="mx-auto mb-3" />
               <h3 className="text-lg font-semibold mb-2">Télécharger l'application</h3>
-              <p className="text-sm opacity-70">
+              <p className="text-sm opacity-90">
                 {isIOS ? "Disponible sur l'App Store" : isAndroid ? "Disponible sur Google Play" : "Bientôt disponible"}
               </p>
             </button>
@@ -102,11 +102,11 @@ const CTAFinal = () => {
           <div className="opacity-0 fade-in-element">
             <a
               href="/pricing"
-              className="block w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-lg text-center"
+              className="block w-full bg-spixer-orange text-white rounded-2xl p-6 hover:bg-spixer-orange-dark transition-all duration-300 hover:scale-105 shadow-lg text-center"
             >
               <ArrowRight size={32} className="mx-auto mb-3" />
               <h3 className="text-lg font-semibold mb-2">Voir les offres</h3>
-              <p className="text-sm opacity-70">Découvrez nos plans tarifaires</p>
+              <p className="text-sm opacity-90">Découvrez nos plans tarifaires</p>
             </a>
           </div>
         </div>
@@ -120,7 +120,7 @@ const CTAFinal = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <button 
               onClick={handleDownloadClick}
-              className="flex items-center justify-center group bg-white text-pulse-600 font-semibold py-4 px-8 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
+              className="flex items-center justify-center group bg-white text-spixer-orange font-semibold py-4 px-8 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
             >
               {isIOS ? "Télécharger sur iOS" : isAndroid ? "Télécharger sur Android" : "Demander un accès"}
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />

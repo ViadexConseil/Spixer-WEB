@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Check, Star } from "lucide-react";
+import Navbar from "@/components/Navbar";
 
 const Pricing = () => {
   const plans = [
@@ -60,7 +61,9 @@ const Pricing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -179,8 +182,9 @@ const Pricing = () => {
             <a href="#" className="text-spixer-orange hover:underline ml-1">Politique de confidentialité</a>
           </p>
         </div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

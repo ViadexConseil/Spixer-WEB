@@ -1,11 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Star, Check, Zap } from "lucide-react";
-import NotifyModal from "./NotifyModal";
 
 const PourquoiNous = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showEmailForm, setShowEmailForm] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -137,16 +138,60 @@ const PourquoiNous = () => {
             <p className="text-lg mb-6 opacity-90 max-w-3xl mx-auto">
               Soyez parmi les premiers à tester notre plateforme révolutionnaire de chronométrage sportif.
             </p>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-white text-spixer-blue font-semibold py-3 px-8 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
-            >
-              Me notifier du lancement
-            </button>
+            {!showEmailForm ? (
+              <button 
+                onClick={() => setShowEmailForm(true)}
+                className="bg-white text-spixer-blue font-semibold py-3 px-8 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
+              >
+                Me notifier du lancement
+              </button>
+            ) : (
+              <div className="w-full max-w-md mx-auto bg-white/10 backdrop-blur-sm rounded-2xl p-6">
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  if (!email || !email.includes("@")) return;
+                  setIsSubmitting(true);
+                  setTimeout(() => {
+                    setIsSubmitting(false);
+                    setEmail("");
+                    setShowEmailForm(false);
+                  }, 1000);
+                }}>
+                  <div className="space-y-4">
+                    <input
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="votre@email.com"
+                      className="w-full px-4 py-3 rounded-lg border-0 text-gray-900 placeholder-gray-500 focus:ring-2 focus:ring-white focus:outline-none"
+                      disabled={isSubmitting}
+                      autoFocus
+                    />
+                    <div className="flex gap-3">
+                      <button
+                        type="submit"
+                        disabled={isSubmitting || !email}
+                        className="flex-1 bg-white text-spixer-blue font-semibold py-3 px-6 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+                      >
+                        {isSubmitting ? "Envoi..." : "Valider"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowEmailForm(false);
+                          setEmail("");
+                        }}
+                        className="px-4 py-3 text-white hover:bg-white/10 rounded-lg transition-colors"
+                      >
+                        Annuler
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            )}
           </div>
         </div>
-        
-        <NotifyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
     </section>
   );

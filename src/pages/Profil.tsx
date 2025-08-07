@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart } from "lucide-react";
+import Navbar from "@/components/Navbar";
 
 const Profil = () => {
   const [userRole] = useState<'coureur' | 'organisateur'>('coureur'); // Can be dynamic
@@ -68,7 +69,9 @@ const Profil = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <>
+      <Navbar />
+      <div className="min-h-screen bg-gray-50 pt-20">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="bg-white rounded-2xl shadow-elegant p-6 md:p-8 mb-8">
@@ -261,8 +264,9 @@ const Profil = () => {
             </Card>
           </TabsContent>
         </Tabs>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
