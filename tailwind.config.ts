@@ -63,19 +63,27 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Custom colors for Pulse Robot
+				// Spixer brand colors
+				spixer: {
+					orange: "#FC6820",
+					blue: "#00A3FE",
+					"orange-light": "#FE8C4B",
+					"orange-dark": "#D65410",
+					"blue-light": "#3BB7FF",
+					"blue-dark": "#0085CC",
+				},
 				pulse: {
-					"50": "#fff7ed",
-					"100": "#ffedd5",
-					"200": "#fed7aa",
-					"300": "#fdba74",
-					"400": "#fb923c",
-					"500": "#f97316", // Primary orange
-					"600": "#ea580c",
-					"700": "#c2410c",
-					"800": "#9a3412",
-					"900": "#7c2d12",
-					"950": "#431407",
+					"50": "#fff4ed",
+					"100": "#ffe5d0",
+					"200": "#ffc8a1",
+					"300": "#ff9c67",
+					"400": "#fe8c4b",
+					"500": "#FC6820", // Spixer orange
+					"600": "#d65410",
+					"700": "#b4420c",
+					"800": "#933511",
+					"900": "#782d11",
+					"950": "#421606",
 				},
 				dark: {
 					"900": "#121212", // Almost black

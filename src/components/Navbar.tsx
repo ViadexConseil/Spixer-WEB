@@ -73,14 +73,15 @@ const Navbar = () => {
           >
             Accueil
           </a>
+          <a href="/courses" className="nav-link">Courses</a>
           <a href="#services" className="nav-link">À Propos</a>
           <a href="#partenaires" className="nav-link">Contact</a>
-          <button className="bg-pulse-500 hover:bg-pulse-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+          <a href="/login" className="bg-spixer-orange hover:bg-spixer-orange-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
             Se connecter
-          </button>
-          <button className="border border-pulse-500 text-pulse-500 hover:bg-pulse-500 hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+          </a>
+          <a href="/login" className="border border-spixer-orange text-spixer-orange hover:bg-spixer-orange hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
             Créer un compte
-          </button>
+          </a>
         </nav>
 
         {/* Mobile menu button - increased touch target */}
@@ -112,6 +113,16 @@ const Navbar = () => {
             Accueil
           </a>
           <a 
+            href="/courses" 
+            className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
+            onClick={() => {
+              setIsMenuOpen(false);
+              document.body.style.overflow = '';
+            }}
+          >
+            Courses
+          </a>
+          <a 
             href="#services" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
@@ -132,12 +143,12 @@ const Navbar = () => {
             Contact
           </a>
           <div className="flex flex-col space-y-4 w-full mt-8">
-            <button className="bg-pulse-500 hover:bg-pulse-600 text-white py-3 px-6 rounded-full font-medium transition-colors">
+            <a href="/login" className="bg-spixer-orange hover:bg-spixer-orange-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
               Se connecter
-            </button>
-            <button className="border border-pulse-500 text-pulse-500 hover:bg-pulse-500 hover:text-white py-3 px-6 rounded-full font-medium transition-colors">
+            </a>
+            <a href="/login" className="border border-spixer-orange text-spixer-orange hover:bg-spixer-orange hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
               Créer un compte
-            </button>
+            </a>
           </div>
         </nav>
       </div>

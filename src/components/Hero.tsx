@@ -149,29 +149,15 @@ const Hero = () => {
           </div>
           
           <div className="w-full lg:w-1/2 relative mt-6 lg:mt-0">
-            {lottieData ? (
-              <div className="relative z-10 animate-fade-in" style={{ animationDelay: "0.9s" }}>
-                <LottieAnimation 
-                  animationPath={lottieData} 
-                  className="w-full h-auto max-w-lg mx-auto"
-                  loop={true}
-                  autoplay={true}
-                />
-              </div>
-            ) : (
-              <>
-              <div className="absolute inset-0 bg-dark-900 rounded-2xl sm:rounded-3xl -z-10 shadow-xl"></div>
-              <div className="relative transition-all duration-500 ease-out overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
-                <img 
-                  ref={imageRef} 
-                  src="/lovable-uploads/fcd4b855-00c6-447e-b4c2-249ed6a92807.png" 
-                  alt="Robot Spixer en course" 
-                  className="w-full h-auto object-cover transition-transform duration-500 ease-out" 
-                  style={{ transformStyle: 'preserve-3d' }} 
-                />
-              </div>
-              </>
-            )}
+            <div className="relative transition-all duration-500 ease-out overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl">
+              <img 
+                ref={imageRef} 
+                src="/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png" 
+                alt="Cyclistes en course Spixer" 
+                className="w-full h-auto object-cover transition-transform duration-500 ease-out" 
+                style={{ transformStyle: 'preserve-3d' }} 
+              />
+            </div>
           </div>
         </div>
       </div>
