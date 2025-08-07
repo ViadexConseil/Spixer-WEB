@@ -12,6 +12,12 @@ const ScreenshotsApp = () => {
   
   const screenshots = [
     {
+      id: "nouvelle-interface",
+      title: "Interface moderne",
+      description: "Une interface utilisateur repensée pour une meilleure expérience",
+      image: "/lovable-uploads/45a86609-bd8a-42eb-8be1-602ed7e90824.png"
+    },
+    {
       id: "classement",
       title: "Classement en temps réel",
       description: "Suivez les positions en direct avec mise à jour instantanée",
