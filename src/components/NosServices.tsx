@@ -41,12 +41,12 @@ const ServiceCard = ({ icon, title, description, index }: ServiceCardProps) => {
       ref={cardRef}
       className={cn(
         "feature-card glass-card opacity-0 p-6",
-        "lg:hover:bg-gradient-to-br lg:hover:from-white lg:hover:to-pulse-50",
+        "lg:hover:bg-gradient-to-br lg:hover:from-white lg:hover:to-spixer-orange/5",
         "transition-all duration-300"
       )}
       style={{ animationDelay: `${0.1 * index}s` }}
     >
-      <div className="rounded-full bg-pulse-50 w-12 h-12 flex items-center justify-center text-pulse-500 mb-5">
+      <div className="rounded-full bg-spixer-orange/10 w-12 h-12 flex items-center justify-center text-spixer-orange mb-5">
         {icon}
       </div>
       <h3 className="text-xl font-semibold mb-3">{title}</h3>

@@ -1,7 +1,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Smartphone, Apple } from "lucide-react";
 import LottieAnimation from "./LottieAnimation";
 
 const Hero = () => {
@@ -9,17 +9,29 @@ const Hero = () => {
   const imageRef = useRef<HTMLImageElement>(null);
   const [lottieData, setLottieData] = useState<any>(null);
   const [isMobile, setIsMobile] = useState(false);
+  const [deviceType, setDeviceType] = useState<'ios' | 'android' | 'other'>('other');
 
   useEffect(() => {
-    // Check if mobile on mount and when window resizes
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
+    // Check if mobile and device type on mount and when window resizes
+    const checkDevice = () => {
+      const width = window.innerWidth;
+      setIsMobile(width < 768);
+      
+      // Detect device type
+      const userAgent = navigator.userAgent || navigator.vendor;
+      if (/iPad|iPhone|iPod/.test(userAgent)) {
+        setDeviceType('ios');
+      } else if (/android/i.test(userAgent)) {
+        setDeviceType('android');
+      } else {
+        setDeviceType('other');
+      }
     };
     
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
+    checkDevice();
+    window.addEventListener('resize', checkDevice);
     
-    return () => window.removeEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkDevice);
   }, []);
 
   useEffect(() => {
@@ -105,7 +117,7 @@ const Hero = () => {
               className="pulse-chip mb-3 sm:mb-6 opacity-0 animate-fade-in" 
               style={{ animationDelay: "0.1s" }}
             >
-              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-pulse-500 text-white mr-2">01</span>
+              <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-spixer-orange text-white mr-2">01</span>
               <span>Innovation</span>
             </div>
             
@@ -127,24 +139,64 @@ const Hero = () => {
               className="flex flex-col sm:flex-row gap-4 opacity-0 animate-fade-in" 
               style={{ animationDelay: "0.7s" }}
             >
-              <a 
-                href="#get-access" 
-                className="flex items-center justify-center group w-full sm:w-auto text-center" 
-                style={{
-                  backgroundColor: '#FE5C02',
-                  borderRadius: '1440px',
-                  boxSizing: 'border-box',
-                  color: '#FFFFFF',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  lineHeight: '20px',
-                  padding: '16px 24px', // Slightly reduced padding for mobile
-                  border: '1px solid white',
-                }}
-              >
-                Request Access
-                <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
-              </a>
+              {deviceType === 'ios' ? (
+                <a 
+                  href="https://apps.apple.com/app/spixer" 
+                  className="flex items-center justify-center group w-full sm:w-auto text-center" 
+                  style={{
+                    backgroundColor: '#FC6820',
+                    borderRadius: '1440px',
+                    boxSizing: 'border-box',
+                    color: '#FFFFFF',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    padding: '16px 24px',
+                    border: '1px solid white',
+                  }}
+                >
+                  <Apple className="mr-2 w-4 h-4" />
+                  Télécharger sur iOS
+                </a>
+              ) : deviceType === 'android' ? (
+                <a 
+                  href="https://play.google.com/store/apps/details?id=com.spixer" 
+                  className="flex items-center justify-center group w-full sm:w-auto text-center" 
+                  style={{
+                    backgroundColor: '#FC6820',
+                    borderRadius: '1440px',
+                    boxSizing: 'border-box',
+                    color: '#FFFFFF',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    padding: '16px 24px',
+                    border: '1px solid white',
+                  }}
+                >
+                  <Smartphone className="mr-2 w-4 h-4" />
+                  Télécharger sur Android
+                </a>
+              ) : (
+                <a 
+                  href="#get-access" 
+                  className="flex items-center justify-center group w-full sm:w-auto text-center" 
+                  style={{
+                    backgroundColor: '#FC6820',
+                    borderRadius: '1440px',
+                    boxSizing: 'border-box',
+                    color: '#FFFFFF',
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    lineHeight: '20px',
+                    padding: '16px 24px',
+                    border: '1px solid white',
+                  }}
+                >
+                  Demander un accès bêta
+                  <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                </a>
+              )}
             </div>
           </div>
           
@@ -162,7 +214,7 @@ const Hero = () => {
         </div>
       </div>
       
-      <div className="hidden lg:block absolute bottom-0 left-1/4 w-64 h-64 bg-pulse-100/30 rounded-full blur-3xl -z-10 parallax" data-speed="0.05"></div>
+      <div className="hidden lg:block absolute bottom-0 left-1/4 w-64 h-64 bg-spixer-orange/30 rounded-full blur-3xl -z-10 parallax" data-speed="0.05"></div>
     </section>
   );
 };
