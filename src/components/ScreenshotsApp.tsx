@@ -1,10 +1,14 @@
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const ScreenshotsApp = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [showEmailField, setShowEmailField] = useState(false);
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const screenshots = [
     {
@@ -71,6 +75,35 @@ const ScreenshotsApp = () => {
 
   const prevSlide = () => {
     setCurrentIndex((prev) => (prev - 1 + screenshots.length) % screenshots.length);
+  };
+
+  const handleNotifyClick = () => {
+    setShowEmailField(true);
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email) {
+      toast({
+        title: "Erreur",
+        description: "Veuillez saisir votre adresse email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      toast({
+        title: "Merci !",
+        description: "Vous serez notifié dès que l'application sera disponible.",
+      });
+      setEmail("");
+      setShowEmailField(false);
+      setIsSubmitting(false);
+    }, 1000);
   };
   
   return (
@@ -177,9 +210,33 @@ const ScreenshotsApp = () => {
                 L'application Spixer sera disponible sur iOS et Android. 
                 Inscrivez-vous pour être notifié du lancement !
               </p>
-              <button className="bg-white text-pulse-600 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors">
-                Me notifier
-              </button>
+              {!showEmailField ? (
+                <button 
+                  onClick={handleNotifyClick}
+                  className="bg-white text-pulse-600 px-4 py-2 rounded-full text-sm font-medium hover:bg-gray-100 transition-colors"
+                >
+                  Me notifier
+                </button>
+              ) : (
+                <form onSubmit={handleEmailSubmit} className="flex gap-2 items-center">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="Votre email"
+                    className="flex-1 px-3 py-2 rounded-full text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/50"
+                    disabled={isSubmitting}
+                    autoFocus
+                  />
+                  <button
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors disabled:opacity-50"
+                  >
+                    {isSubmitting ? "..." : "Valider"}
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </div>
