@@ -162,7 +162,8 @@ export const stagesAPI = {
   },
 
   getByEvent: async (eventId: string): Promise<Stage[]> => {
-    return apiCall(`/v1/events/${eventId}/stages`);
+    const response = await apiCall(`/v1/events/${eventId}/stages`);
+    return response.stages || [];
   },
 
   create: async (stage: Omit<Stage, 'id' | 'created_at' | 'updated_at'>): Promise<Stage> => {
