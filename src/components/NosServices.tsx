@@ -103,21 +103,12 @@ const NosServices = () => {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
-          <div className="lg:col-span-2 space-y-6">
-            <ServiceCard
-              icon={<Video size={24} />}
-              title="Suivi vidéo intelligent"
-              description="Reconnaissance automatique des participants et suivi en temps réel grâce à l'IA avancée."
-              index={0}
-            />
-            <div className="glass-card p-6 rounded-lg">
-              <img 
-                src="/lovable-uploads/45a86609-bd8a-42eb-8be1-602ed7e90824.png" 
-                alt="Interface de suivi vidéo intelligent en temps réel d'un coureur"
-                className="w-full h-auto rounded-lg shadow-md"
-              />
-            </div>
-          </div>
+          <ServiceCard
+            icon={<Video size={24} />}
+            title="Suivi vidéo intelligent"
+            description="Reconnaissance automatique des participants et suivi en temps réel grâce à l'IA avancée."
+            index={0}
+          />
           <ServiceCard
             icon={<Trophy size={24} />}
             title="Classements en direct"
