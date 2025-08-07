@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Calendar, MapPin, Users, Share2, Heart, Trophy, Video, Info, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -6,24 +6,74 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
+import { eventsAPI, stagesAPI, rankingsAPI, Event, Stage, Ranking } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 const CourseDetail = () => {
   const { id } = useParams();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [stages, setStages] = useState<Stage[]>([]);
+  const [rankings, setRankings] = useState<Ranking[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock data for the course
-  const course = {
-    id: id,
-    title: "Marathon de Paris",
-    date: "2024-04-07",
-    lieu: "Paris, France",
-    participants: 50000,
-    status: "À venir",
-    distance: "42.2 km",
-    description: "Le Marathon de Paris est l'un des événements de course à pied les plus prestigieux au monde.",
-    image: "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png",
-    partnerLogo: "/logo.svg"
-  };
+  useEffect(() => {
+    const fetchCourseData = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        // Fetch event details
+        const eventData = await eventsAPI.get(id);
+        setEvent(eventData);
+        
+        // Fetch stages for this event
+        const stagesData = await stagesAPI.getByEvent(id);
+        setStages(stagesData);
+        
+        // Fetch rankings for the first stage if available
+        if (stagesData.length > 0) {
+          const rankingsData = await rankingsAPI.getByStage(stagesData[0].id);
+          setRankings(rankingsData);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des données:", error);
+        toast({
+          title: "Information",
+          description: "Connexion à l'API en cours, affichage des données de démonstration.",
+        });
+        
+        // Fallback to demo data
+        setEvent({
+          id: id || "1",
+          name: "Marathon de Paris",
+          description: "Le Marathon de Paris est l'un des événements de course à pied les plus prestigieux au monde.",
+          start_time: "2024-04-07T09:00:00",
+          postal_code: 75001,
+          city: "Paris",
+          country: "France",
+          created_at: "2024-01-01T00:00:00",
+          updated_at: "2024-01-01T00:00:00"
+        });
+        
+        setStages([
+          {
+            id: "stage1",
+            event_id: id || "1",
+            name: "Marathon 42km",
+            description: "Course marathon complète",
+            max_participants: 30000,
+            created_at: "2024-01-01T00:00:00",
+            updated_at: "2024-01-01T00:00:00"
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCourseData();
+  }, [id]);
 
   const mockClassement = [
     { position: 1, nom: "Jean Dupont", temps: "2:15:34", dossard: "001" },
@@ -33,14 +83,52 @@ const CourseDetail = () => {
     { position: 5, nom: "Antoine Moreau", temps: "2:28:07", dossard: "005" }
   ];
 
-  const getStatusBadge = (status: string) => {
-    const variants = {
-      "Live": "bg-red-500 text-white",
-      "À venir": "bg-spixer-blue text-white",
-      "Terminé": "bg-gray-500 text-white"
-    };
-    return variants[status as keyof typeof variants] || "bg-gray-500 text-white";
+  const getStatusBadge = (dateString: string) => {
+    const eventDate = new Date(dateString);
+    const now = new Date();
+    const daysDiff = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
+    
+    if (daysDiff < 0) return { text: "Terminé", class: "bg-gray-500 text-white" };
+    if (daysDiff === 0) return { text: "Aujourd'hui", class: "bg-red-500 text-white" };
+    if (daysDiff <= 7) return { text: "Cette semaine", class: "bg-orange-500 text-white" };
+    return { text: "À venir", class: "bg-spixer-blue text-white" };
   };
+
+  if (loading) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 page-content">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-gray-600">Chargement des détails...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  if (!event) {
+    return (
+      <>
+        <Navbar />
+        <div className="min-h-screen bg-gray-50 page-content">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-20">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">Événement non trouvé</h1>
+              <Button asChild>
+                <a href="/courses">Retour aux événements</a>
+              </Button>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  const status = getStatusBadge(event.start_time);
 
   return (
     <>
@@ -51,28 +139,28 @@ const CourseDetail = () => {
         <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
           <div className="relative h-64 md:h-80">
             <img 
-              src={course.image} 
-              alt={course.title}
+              src="/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png" 
+              alt={event.name}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
               <div className="p-6 md:p-8 text-white">
-                <Badge className={`mb-4 ${getStatusBadge(course.status)}`}>
-                  {course.status}
+                <Badge className={`mb-4 ${status.class}`}>
+                  {status.text}
                 </Badge>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">{course.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold mb-2">{event.name}</h1>
                 <div className="flex flex-wrap gap-4 text-sm md:text-base">
                   <div className="flex items-center gap-2">
                     <Calendar className="w-4 h-4" />
-                    <span>{new Date(course.date).toLocaleDateString('fr-FR')}</span>
+                    <span>{new Date(event.start_time).toLocaleDateString('fr-FR')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <MapPin className="w-4 h-4" />
-                    <span>{course.lieu}</span>
+                    <span>{event.city}, {event.country}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Users className="w-4 h-4" />
-                    <span>{course.participants.toLocaleString()} participants</span>
+                    <span>{stages.reduce((total, stage) => total + stage.max_participants, 0)} places max</span>
                   </div>
                 </div>
               </div>
@@ -81,7 +169,7 @@ const CourseDetail = () => {
           
           <div className="p-6 md:p-8">
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
-              <p className="text-gray-600 flex-1">{course.description}</p>
+              <p className="text-gray-600 flex-1">{event.description}</p>
               <div className="flex gap-3">
                 <Button 
                   variant={isFollowing ? "default" : "outline"} 
@@ -96,7 +184,7 @@ const CourseDetail = () => {
                   Partager
                 </Button>
                 <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                  <a href={`/courses/${course.id}/participer`}>Participer</a>
+                  <a href={`/courses/${event.id}/participer`}>Participer</a>
                 </Button>
               </div>
             </div>
@@ -192,60 +280,52 @@ const CourseDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Épreuves</CardTitle>
+                  <CardTitle>Épreuves disponibles</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
-                    <div className="flex justify-between">
-                      <span>Marathon</span>
-                      <span className="font-semibold">42.2 km</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Semi-marathon</span>
-                      <span className="font-semibold">21.1 km</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>10km</span>
-                      <span className="font-semibold">10 km</span>
-                    </div>
+                    {stages.map((stage) => (
+                      <div key={stage.id} className="flex justify-between">
+                        <span>{stage.name}</span>
+                        <span className="font-semibold">{stage.max_participants} places</span>
+                      </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
-                  <CardTitle>Horaires</CardTitle>
+                  <CardTitle>Informations pratiques</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
                     <div className="flex justify-between">
-                      <span>Départ Marathon</span>
-                      <span className="font-semibold">08:00</span>
+                      <span>Date</span>
+                      <span className="font-semibold">{new Date(event.start_time).toLocaleDateString('fr-FR')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Départ Semi</span>
-                      <span className="font-semibold">09:00</span>
+                      <span>Heure</span>
+                      <span className="font-semibold">{new Date(event.start_time).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Départ 10km</span>
-                      <span className="font-semibold">10:00</span>
+                      <span>Lieu</span>
+                      <span className="font-semibold">{event.city}</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
-              {course.partnerLogo && (
-                <Card className="md:col-span-2">
-                  <CardHeader>
-                    <CardTitle>Partenaire officiel</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center justify-center p-8">
-                      <img src={course.partnerLogo} alt="Partenaire" className="h-16" />
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
+              <Card className="md:col-span-2">
+                <CardHeader>
+                  <CardTitle>Partenaire officiel</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-center p-8">
+                    <img src="/logo.svg" alt="Partenaire" className="h-16" />
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </TabsContent>
         </Tabs>

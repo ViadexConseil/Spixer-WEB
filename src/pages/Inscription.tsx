@@ -56,34 +56,37 @@ const Inscription = () => {
     setIsLoading(true);
 
     try {
-      // Simulate API call
+      // Note: L'API Spixer actuelle ne gère que l'auth, pas les inscriptions aux courses
+      // Il faudrait utiliser registrationsAPI.create() quand l'endpoint sera disponible
+      
+      // Simulation d'inscription avec validation
+      if (!formData.firstName || !formData.lastName || !formData.email || !formData.birthDate || !formData.gender) {
+        throw new Error("Veuillez remplir tous les champs obligatoires");
+      }
+
+      // Simulation d'appel API
       await new Promise(resolve => setTimeout(resolve, 2000));
 
-      // TODO: Replace with actual API call to /v1/registrations
-      // const response = await fetch(`${API_BASE_URL}/v1/registrations`, {
-      //   method: 'POST',
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //     'Authorization': `Bearer ${userToken}`
-      //   },
-      //   body: JSON.stringify({
-      //     stage_id: id,
-      //     type: 'runner',
-      //     user_data: formData
-      //   })
+      // TODO: Remplacer par l'appel API réel quand disponible
+      // const response = await registrationsAPI.create({
+      //   stage_id: stageId || id,
+      //   user_id: "current-user-id", // À récupérer depuis le token JWT
+      //   type: "runner",
+      //   ...formData
       // });
 
       toast({
         title: "Inscription réussie !",
-        description: "Votre inscription a été confirmée. Vous recevrez un email de confirmation.",
+        description: `Merci ${formData.firstName} ${formData.lastName}, votre inscription a été confirmée.`,
       });
 
       // Redirect back to course detail
       navigate(`/courses/${id}`);
     } catch (error) {
+      console.error("Erreur lors de l'inscription:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de l'inscription. Veuillez réessayer.",
+        description: error instanceof Error ? error.message : "Impossible de finaliser votre inscription. Veuillez réessayer.",
         variant: "destructive",
       });
     } finally {

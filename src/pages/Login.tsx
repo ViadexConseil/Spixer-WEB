@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -6,31 +7,71 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { authAPI, setAuthToken } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [registerData, setRegisterData] = useState({ 
+    firstName: "", 
+    lastName: "", 
+    email: "", 
+    password: "" 
+  });
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login
-    setTimeout(() => {
+
+    try {
+      const { user, token } = await authAPI.login(loginData.email, loginData.password);
+      setAuthToken(token);
+      
+      toast({
+        title: "Connexion réussie",
+        description: `Bienvenue ${user.email} !`,
+      });
+      
+      navigate('/profil');
+    } catch (error) {
+      console.error("Erreur de connexion:", error);
+      toast({
+        title: "Erreur de connexion",
+        description: error instanceof Error ? error.message : "Email ou mot de passe incorrect",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Redirect to profile page
-      window.location.href = '/profil';
-    }, 2000);
+    }
   };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate registration
-    setTimeout(() => {
+
+    try {
+      const { user, token } = await authAPI.register(registerData.email, registerData.password);
+      setAuthToken(token);
+      
+      toast({
+        title: "Inscription réussie",
+        description: `Bienvenue ${user.email} ! Votre compte a été créé.`,
+      });
+      
+      navigate('/profil');
+    } catch (error) {
+      console.error("Erreur d'inscription:", error);
+      toast({
+        title: "Erreur d'inscription",
+        description: error instanceof Error ? error.message : "Une erreur est survenue lors de l'inscription",
+        variant: "destructive",
+      });
+    } finally {
       setIsLoading(false);
-      // Redirect to profile page
-      window.location.href = '/profil';
-    }, 2000);
+    }
   };
 
   return (
@@ -71,6 +112,8 @@ const Login = () => {
                             type="email" 
                             placeholder="votre@email.com" 
                             className="pl-10"
+                            value={loginData.email}
+                            onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
                             required 
                           />
                         </div>
@@ -83,6 +126,8 @@ const Login = () => {
                             id="password" 
                             type={showPassword ? "text" : "password"} 
                             className="pl-10 pr-10"
+                            value={loginData.password}
+                            onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
                             required 
                           />
                           <button
@@ -125,6 +170,8 @@ const Login = () => {
                               id="firstName" 
                               placeholder="Prénom" 
                               className="pl-10"
+                              value={registerData.firstName}
+                              onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
                               required 
                             />
                           </div>
@@ -134,6 +181,8 @@ const Login = () => {
                           <Input 
                             id="lastName" 
                             placeholder="Nom" 
+                            value={registerData.lastName}
+                            onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
                             required 
                           />
                         </div>
@@ -147,6 +196,8 @@ const Login = () => {
                             type="email" 
                             placeholder="votre@email.com" 
                             className="pl-10"
+                            value={registerData.email}
+                            onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                             required 
                           />
                         </div>
@@ -159,6 +210,8 @@ const Login = () => {
                             id="registerPassword" 
                             type={showPassword ? "text" : "password"} 
                             className="pl-10 pr-10"
+                            value={registerData.password}
+                            onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                             required 
                           />
                           <button
