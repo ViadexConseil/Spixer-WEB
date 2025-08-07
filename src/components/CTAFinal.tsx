@@ -67,58 +67,47 @@ const CTAFinal = () => {
             Prêt à révolutionner vos courses ?
           </h2>
           <p className="text-xl opacity-90 max-w-3xl mx-auto mb-8 opacity-0 fade-in-element">
-            Rejoignez des milliers d'organisateurs qui ont choisi Spixer pour leurs événements sportifs.
+            Rejoignez la révolution du chronométrage sportif avec Spixer.
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-          {/* Bouton iOS */}
-          {isIOS && (
-            <div className="opacity-0 fade-in-element">
-              <button
-                onClick={handleDownloadClick}
-                className="w-full bg-white text-pulse-600 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                <Smartphone size={32} className="mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Télécharger pour iOS</h3>
-                <p className="text-sm opacity-70">Disponible sur l'App Store</p>
-              </button>
-            </div>
-          )}
-
-          {/* Bouton Android */}
-          {isAndroid && (
-            <div className="opacity-0 fade-in-element">
-              <button
-                onClick={handleDownloadClick}
-                className="w-full bg-white text-pulse-600 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
-              >
-                <Download size={32} className="mx-auto mb-3" />
-                <h3 className="text-lg font-semibold mb-2">Télécharger pour Android</h3>
-                <p className="text-sm opacity-70">Disponible sur Google Play</p>
-              </button>
-            </div>
-          )}
-
-          {/* Bouton Accès Bêta (toujours affiché) */}
+          {/* Bouton Créer un compte */}
           <div className="opacity-0 fade-in-element">
-            <button
-              onClick={() => document.getElementById("beta-access")?.scrollIntoView({ behavior: "smooth" })}
-              className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-lg"
+            <a
+              href="/login"
+              className="block w-full bg-white text-spixer-blue rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg text-center"
             >
               <Users size={32} className="mx-auto mb-3" />
-              <h3 className="text-lg font-semibold mb-2">Demander un accès bêta</h3>
-              <p className="text-sm opacity-70">Rejoignez notre programme pilote</p>
+              <h3 className="text-lg font-semibold mb-2">Créer un compte</h3>
+              <p className="text-sm opacity-70">Rejoignez la communauté Spixer</p>
+            </a>
+          </div>
+
+          {/* Bouton Télécharger l'app */}
+          <div className="opacity-0 fade-in-element">
+            <button
+              onClick={handleDownloadClick}
+              className="w-full bg-white text-spixer-blue rounded-2xl p-6 hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              <Download size={32} className="mx-auto mb-3" />
+              <h3 className="text-lg font-semibold mb-2">Télécharger l'application</h3>
+              <p className="text-sm opacity-70">
+                {isIOS ? "Disponible sur l'App Store" : isAndroid ? "Disponible sur Google Play" : "Bientôt disponible"}
+              </p>
             </button>
           </div>
 
-          {/* Bouton Se connecter */}
+          {/* Bouton Voir les offres */}
           <div className="opacity-0 fade-in-element">
-            <button className="w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-lg">
+            <a
+              href="/pricing"
+              className="block w-full bg-white/10 backdrop-blur-sm border border-white/20 text-white rounded-2xl p-6 hover:bg-white/20 transition-all duration-300 hover:scale-105 shadow-lg text-center"
+            >
               <ArrowRight size={32} className="mx-auto mb-3" />
-              <h3 className="text-lg font-semibold mb-2">Se connecter</h3>
-              <p className="text-sm opacity-70">Accédez à votre compte</p>
-            </button>
+              <h3 className="text-lg font-semibold mb-2">Voir les offres</h3>
+              <p className="text-sm opacity-70">Découvrez nos plans tarifaires</p>
+            </a>
           </div>
         </div>
 

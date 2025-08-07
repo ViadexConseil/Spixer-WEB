@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { Star, Check, Zap } from "lucide-react";
+import NotifyModal from "./NotifyModal";
 
 const PourquoiNous = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -56,12 +58,14 @@ const PourquoiNous = () => {
   ];
 
   const advantages = [
-    "Précision millimétrique garantie",
-    "Installation rapide en 15 minutes",
-    "Compatible tous sports et terrains",
-    "Interface intuitive et moderne",
+    "Aucune installation physique requise",
+    "Précision garantie à 85%",
+    "Compatible tous sports & tous terrains",
+    "Interface moderne et intuitive",
     "Support technique 24h/24",
-    "Analyses détaillées post-course"
+    "Analyse post-course détaillée",
+    "Technologie propriétaire",
+    "Simplicité de déploiement"
   ];
 
   return (
@@ -100,52 +104,49 @@ const PourquoiNous = () => {
             </div>
           </div>
 
-          {/* Témoignages */}
+          {/* Section données techniques */}
           <div className="opacity-0 fade-in-element">
-            <h3 className="text-2xl font-semibold mb-6">Ce que disent nos clients</h3>
-            <div className="space-y-4">
-              {testimonials.map((testimonial, index) => (
-                <div key={index} className="bg-white rounded-2xl p-6 shadow-lg">
-                  <div className="flex items-center mb-3">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} size={16} className="text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-gray-700 mb-4 italic">"{testimonial.content}"</p>
-                  <div>
-                    <p className="font-semibold text-gray-800">{testimonial.name}</p>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
-                  </div>
+            <h3 className="text-2xl font-semibold mb-6 flex items-center">
+              <div className="w-2 h-2 bg-spixer-blue rounded-full mr-3 animate-pulse"></div>
+              Technologie Spixer
+            </h3>
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-l-4 border-spixer-blue">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="text-center p-4 bg-spixer-blue/5 rounded-xl">
+                  <div className="text-3xl font-bold text-spixer-blue mb-2">87%</div>
+                  <div className="text-sm text-gray-600">Précision maximale</div>
                 </div>
-              ))}
+                <div className="text-center p-4 bg-spixer-orange/5 rounded-xl">
+                  <div className="text-3xl font-bold text-spixer-orange mb-2">&lt; 50ms</div>
+                  <div className="text-sm text-gray-600">Latence système</div>
+                </div>
+              </div>
+              <div className="mt-6 p-4 bg-gradient-to-r from-spixer-blue/10 to-spixer-orange/10 rounded-xl">
+                <p className="text-center text-gray-700 font-medium">
+                  Intelligence artificielle propriétaire développée spécifiquement pour le chronométrage sportif
+                </p>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Section technologie propriétaire */}
+        {/* Bouton Me notifier avec modal */}
         <div className="mt-16 text-center opacity-0 fade-in-element">
-          <div className="bg-gradient-to-r from-pulse-500 to-pulse-600 rounded-3xl p-8 md:p-12 text-white">
-            <h3 className="text-3xl font-bold mb-4">Technologie propriétaire</h3>
+          <div className="bg-gradient-to-r from-spixer-blue to-spixer-orange rounded-3xl p-8 md:p-12 text-white">
+            <h3 className="text-3xl font-bold mb-4">Spixer arrive bientôt !</h3>
             <p className="text-lg mb-6 opacity-90 max-w-3xl mx-auto">
-              Notre IA développée en interne analyse plus de 1000 points de données par seconde 
-              pour une précision inégalée dans le chronométrage sportif.
+              Soyez parmi les premiers à tester notre plateforme révolutionnaire de chronométrage sportif.
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-              <div className="text-center">
-                <div className="text-3xl font-bold mb-2">99.9%</div>
-                <div className="text-sm opacity-80">Précision garantie</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold mb-2">&lt; 1ms</div>
-                <div className="text-sm opacity-80">Latence système</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold mb-2">50k+</div>
-                <div className="text-sm opacity-80">Événements traités</div>
-              </div>
-            </div>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-white text-spixer-blue font-semibold py-3 px-8 rounded-full hover:bg-gray-100 transition-all duration-300 hover:scale-105 shadow-lg"
+            >
+              Me notifier du lancement
+            </button>
           </div>
         </div>
+        
+        <NotifyModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       </div>
     </section>
   );

@@ -55,6 +55,10 @@ const Partenaires = () => {
     }
   ];
   
+  const showTrustedPartners = false; // Variable pour contrôler l'affichage
+  
+  if (!showTrustedPartners) return null;
+  
   return (
     <section className="py-16 md:py-20 bg-gray-50" id="partenaires" ref={sectionRef}>
       <div className="section-container">

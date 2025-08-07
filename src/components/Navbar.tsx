@@ -40,8 +40,8 @@ const Navbar = () => {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 py-2 sm:py-3 md:py-4 transition-all duration-300",
         isScrolled 
-          ? "bg-white/80 backdrop-blur-md shadow-sm" 
-          : "bg-transparent"
+          ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-spixer-blue/10" 
+          : "bg-white/90 backdrop-blur-sm shadow-sm"
       )}
     >
       <div className="container flex items-center justify-between px-4 sm:px-6 lg:px-8">
@@ -73,13 +73,13 @@ const Navbar = () => {
           >
             Accueil
           </a>
-          <a href="/courses" className="nav-link">Courses</a>
-          <a href="#services" className="nav-link">À Propos</a>
-          <a href="#partenaires" className="nav-link">Contact</a>
-          <a href="/login" className="bg-spixer-orange hover:bg-spixer-orange-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+          <a href="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</a>
+          <a href="#services" className="nav-link hover:text-spixer-blue transition-colors">À Propos</a>
+          <a href="#partenaires" className="nav-link hover:text-spixer-blue transition-colors">Contact</a>
+          <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
             Se connecter
           </a>
-          <a href="/login" className="border border-spixer-orange text-spixer-orange hover:bg-spixer-orange hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+          <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
             Créer un compte
           </a>
         </nav>
@@ -143,10 +143,10 @@ const Navbar = () => {
             Contact
           </a>
           <div className="flex flex-col space-y-4 w-full mt-8">
-            <a href="/login" className="bg-spixer-orange hover:bg-spixer-orange-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
+            <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
               Se connecter
             </a>
-            <a href="/login" className="border border-spixer-orange text-spixer-orange hover:bg-spixer-orange hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
+            <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
               Créer un compte
             </a>
           </div>
