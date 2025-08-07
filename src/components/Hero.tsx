@@ -113,14 +113,14 @@ const Hero = () => {
               className="section-title text-3xl sm:text-4xl lg:text-5xl xl:text-6xl leading-tight opacity-0 animate-fade-in" 
               style={{ animationDelay: "0.3s" }}
             >
-              Spixer: L'IA au Service<br className="hidden sm:inline" />du Chronométrage
+              Suivez, vivez, mesurez<br className="hidden sm:inline" />vos courses autrement
             </h1>
             
             <p 
               style={{ animationDelay: "0.5s" }} 
               className="section-subtitle mt-3 sm:mt-6 mb-4 sm:mb-8 leading-relaxed opacity-0 animate-fade-in text-gray-950 font-normal text-base sm:text-lg text-left"
             >
-              Révolutionnez vos événements sportifs avec notre technologie de chronométrage intelligente et précise.
+              Découvrez une nouvelle façon de vivre vos événements sportifs avec Spixer.
             </p>
             
             <div 

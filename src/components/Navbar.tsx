@@ -73,8 +73,14 @@ const Navbar = () => {
           >
             Accueil
           </a>
-          <a href="#features" className="nav-link">À Propos</a>
-          <a href="#details" className="nav-link">Contact</a>
+          <a href="#services" className="nav-link">À Propos</a>
+          <a href="#partenaires" className="nav-link">Contact</a>
+          <button className="bg-pulse-500 hover:bg-pulse-600 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            Se connecter
+          </button>
+          <button className="border border-pulse-500 text-pulse-500 hover:bg-pulse-500 hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+            Créer un compte
+          </button>
         </nav>
 
         {/* Mobile menu button - increased touch target */}
@@ -106,7 +112,7 @@ const Navbar = () => {
             Accueil
           </a>
           <a 
-            href="#features" 
+            href="#services" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
@@ -116,7 +122,7 @@ const Navbar = () => {
             À Propos
           </a>
           <a 
-            href="#details" 
+            href="#partenaires" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
@@ -125,6 +131,14 @@ const Navbar = () => {
           >
             Contact
           </a>
+          <div className="flex flex-col space-y-4 w-full mt-8">
+            <button className="bg-pulse-500 hover:bg-pulse-600 text-white py-3 px-6 rounded-full font-medium transition-colors">
+              Se connecter
+            </button>
+            <button className="border border-pulse-500 text-pulse-500 hover:bg-pulse-500 hover:text-white py-3 px-6 rounded-full font-medium transition-colors">
+              Créer un compte
+            </button>
+          </div>
         </nav>
       </div>
     </header>
