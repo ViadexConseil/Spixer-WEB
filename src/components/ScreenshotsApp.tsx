@@ -129,7 +129,7 @@ const ScreenshotsApp = () => {
               <div className="relative bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
                 <div className="bg-black rounded-[2.5rem] overflow-hidden">
                   {/* Screenshot Display */}
-                  <div className="relative h-[600px] overflow-hidden">
+                  <div className="relative h-[650px] overflow-hidden">
                     {screenshots.map((screenshot, index) => (
                       <div
                         key={screenshot.id}
