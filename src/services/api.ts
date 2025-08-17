@@ -94,17 +94,17 @@ const apiCall = async (endpoint: string, options: RequestInit = {}): Promise<any
 
 // Authentication API
 export const authAPI = {
-  register: async (email: string, password: string): Promise<{ user: User; token: string }> => {
+  register: async (email: string, username: string, password: string): Promise<{ user: User; token: string }> => {
     return apiCall('/v1/auth/register', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, username, password }),
     });
   },
 
-  login: async (email: string, password: string): Promise<{ user: User; token: string }> => {
+  login: async (identifier: string, password: string): Promise<{ user: User; token: string }> => {
     return apiCall('/v1/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ identifier, password }),
     });
   },
 

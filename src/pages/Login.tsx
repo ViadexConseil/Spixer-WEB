@@ -14,7 +14,7 @@ const Login = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [loginData, setLoginData] = useState({ email: "", password: "" });
+  const [loginData, setLoginData] = useState({ identifier: "", password: "" });
   const [registerData, setRegisterData] = useState({ 
     firstName: "", 
     lastName: "", 
@@ -27,7 +27,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await authAPI.login(loginData.email, loginData.password);
+      const { user, token } = await authAPI.login(loginData.identifier, loginData.password);
       setAuthToken(token);
       
       toast({
@@ -53,7 +53,8 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await authAPI.register(registerData.email, registerData.password);
+      const username = `${registerData.firstName} ${registerData.lastName}`;
+      const { user, token } = await authAPI.register(registerData.email, username, registerData.password);
       setAuthToken(token);
       
       toast({
@@ -104,16 +105,16 @@ const Login = () => {
                   <CardContent>
                     <form onSubmit={handleLogin} className="space-y-4">
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email</Label>
+                        <Label htmlFor="identifier">Email ou nom d'utilisateur</Label>
                         <div className="relative">
                           <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                           <Input 
-                            id="email" 
-                            type="email" 
-                            placeholder="votre@email.com" 
+                            id="identifier" 
+                            type="text" 
+                            placeholder="votre@email.com ou nom d'utilisateur" 
                             className="pl-10"
-                            value={loginData.email}
-                            onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
+                            value={loginData.identifier}
+                            onChange={(e) => setLoginData({ ...loginData, identifier: e.target.value })}
                             required 
                           />
                         </div>
