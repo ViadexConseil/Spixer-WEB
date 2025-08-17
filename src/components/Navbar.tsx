@@ -1,11 +1,31 @@
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, Settings, Shield, LogOut, UserCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { getAuthToken, removeAuthToken } from "@/services/api";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { toast } from "@/hooks/use-toast";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in
+    const token = getAuthToken();
+    setIsLoggedIn(!!token);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +53,16 @@ const Navbar = () => {
       setIsMenuOpen(false);
       document.body.style.overflow = '';
     }
+  };
+
+  const handleLogout = () => {
+    removeAuthToken();
+    setIsLoggedIn(false);
+    navigate('/');
+    toast({
+      title: "Déconnexion réussie",
+      description: "Vous avez été déconnecté avec succès.",
+    });
   };
 
   return (
@@ -72,12 +102,53 @@ const Navbar = () => {
           <a href="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</a>
           <a href="#services" className="nav-link hover:text-spixer-blue transition-colors">À Propos</a>
           <a href="#partenaires" className="nav-link hover:text-spixer-blue transition-colors">Contact</a>
-          <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-            Se connecter
-          </a>
-          <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-            Créer un compte
-          </a>
+          
+          {!isLoggedIn ? (
+            <>
+              <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+                Se connecter
+              </a>
+              <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+                Créer un compte
+              </a>
+            </>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                  <UserCircle className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">Mon compte</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      Gérer vos paramètres
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/profil')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profil</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Paramètres</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate('/privacy')}>
+                  <Shield className="mr-2 h-4 w-4" />
+                  <span>Confidentialité</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Se déconnecter</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </nav>
 
         {/* Mobile menu button - increased touch target */}
@@ -137,12 +208,39 @@ const Navbar = () => {
             Contact
           </a>
           <div className="flex flex-col space-y-4 w-full mt-8">
-            <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
-              Se connecter
-            </a>
-            <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
-              Créer un compte
-            </a>
+            {!isLoggedIn ? (
+              <>
+                <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
+                  Se connecter
+                </a>
+                <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
+                  Créer un compte
+                </a>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={() => {
+                    navigate('/profil');
+                    setIsMenuOpen(false);
+                    document.body.style.overflow = '';
+                  }}
+                  className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center"
+                >
+                  Mon Profil
+                </button>
+                <button 
+                  onClick={() => {
+                    handleLogout();
+                    setIsMenuOpen(false);
+                    document.body.style.overflow = '';
+                  }}
+                  className="bg-red-500 hover:bg-red-600 text-white py-3 px-6 rounded-full font-medium transition-colors text-center"
+                >
+                  Se déconnecter
+                </button>
+              </>
+            )}
           </div>
         </nav>
       </div>
