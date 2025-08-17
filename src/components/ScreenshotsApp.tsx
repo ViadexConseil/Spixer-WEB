@@ -12,28 +12,22 @@ const ScreenshotsApp = () => {
   
   const screenshots = [
     {
-      id: "nouvelle-interface",
-      title: "Interface moderne",
-      description: "Une interface utilisateur repensée pour une meilleure expérience",
-      image: "/lovable-uploads/45a86609-bd8a-42eb-8be1-602ed7e90824.png"
+      id: "event-detail",
+      title: "Détails des événements",
+      description: "Consultez toutes les informations sur vos courses avec statut en temps réel",
+      image: "/lovable-uploads/62c5c1e4-dbde-497d-886c-fee818178bf0.png"
     },
     {
-      id: "classement",
-      title: "Classement en temps réel",
-      description: "Suivez les positions en direct avec mise à jour instantanée",
-      image: "/lovable-uploads/22d31f51-c174-40a7-bd95-00e4ad00eaf3.png"
+      id: "carte-parcours",
+      title: "Carte et suivi GPS",
+      description: "Suivez les participants en temps réel avec overlays vidéo intégrés",
+      image: "/lovable-uploads/9bdc128b-ce3d-44ef-a8e4-2686ae6af174.png"
     },
     {
-      id: "video",
-      title: "Suivi vidéo intelligent",
-      description: "Reconnaissance automatique et suivi des participants",
-      image: "/lovable-uploads/5663820f-6c97-4492-9210-9eaa1a8dc415.png"
-    },
-    {
-      id: "carte",
-      title: "Carte interactive",
-      description: "Visualisation du parcours et positions GPS en temps réel",
-      image: "/lovable-uploads/af412c03-21e4-4856-82ff-d1a975dc84a9.png"
+      id: "gestion-clubs",
+      title: "Gestion des clubs",
+      description: "Créez et rejoignez des clubs sportifs pour organiser vos événements",
+      image: "/lovable-uploads/a069284e-33c0-4ace-833a-1745a3518c5e.png"
     }
   ];
   
