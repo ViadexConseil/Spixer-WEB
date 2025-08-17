@@ -124,12 +124,12 @@ const ScreenshotsApp = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Screenshots Carousel */}
           <div className="relative order-2 lg:order-1 opacity-0 fade-in-element">
-            <div className="relative w-full max-w-sm mx-auto">
+            <div className="relative w-full max-w-xs mx-auto">
               {/* Phone Frame */}
               <div className="relative bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
                 <div className="bg-black rounded-[2.5rem] overflow-hidden">
                   {/* Screenshot Display */}
-                  <div className="relative h-[650px] overflow-hidden">
+                  <div className="relative h-[700px] overflow-hidden">
                     {screenshots.map((screenshot, index) => (
                       <div
                         key={screenshot.id}
