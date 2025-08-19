@@ -23,68 +23,6 @@ const CourseDetail = () => {
       
       setLoading(true);
       
-      // Temporarily use demo data until API is deployed
-      // TODO: Replace with real API call when backend is ready
-      toast({
-        title: "Mode démonstration",
-        description: "Affichage des données de démonstration en attendant le déploiement de l'API.",
-      });
-      
-      // Find specific event data based on ID
-      const demoEvents = [
-        {
-          id: "1",
-          name: "Marathon de Paris",
-          description: "Le Marathon de Paris est l'un des événements de course à pied les plus prestigieux au monde.",
-          start_time: "2024-04-07T09:00:00",
-          postal_code: 75001,
-          city: "Paris",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        },
-        {
-          id: "b73788e3-fbbe-4abd-9cb0-d006bb35f0c3",
-          name: "Semi-marathon de Lyon",
-          description: "Course de semi-marathon dans les rues historiques de Lyon avec un parcours spectaculaire.",
-          start_time: "2024-05-15T08:30:00",
-          postal_code: 69000,
-          city: "Lyon",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        },
-        {
-          id: "2",
-          name: "Trail du Mont-Blanc",
-          description: "Course de trail mythique autour du Mont-Blanc avec des paysages à couper le souffle.",
-          start_time: "2024-08-25T06:00:00",
-          postal_code: 74400,
-          city: "Chamonix",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        }
-      ];
-      
-      const eventData = demoEvents.find(event => event.id === id) || demoEvents[0];
-      setEvent(eventData);
-      
-      setStages([
-        {
-          id: "stage1",
-          event_id: eventData.id,
-          name: eventData.name.includes("Semi") ? "Semi-marathon 21km" : eventData.name.includes("Trail") ? "Trail 42km" : "Marathon 42km",
-          description: "Course principale",
-          max_participants: eventData.name.includes("Semi") ? 15000 : eventData.name.includes("Trail") ? 5000 : 30000,
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        }
-      ]);
-      
-      setLoading(false);
-      
-      /* TODO: Uncomment when API is ready
       try {
         // Fetch event details
         const eventData = await eventsAPI.get(id);
@@ -109,7 +47,6 @@ const CourseDetail = () => {
       } finally {
         setLoading(false);
       }
-      */
     };
 
     fetchCourseData();

@@ -19,74 +19,6 @@ const Courses = () => {
     const fetchEvents = async () => {
       setLoading(true);
       
-      // Temporarily use demo data until API is deployed
-      // TODO: Replace with real API call when backend is ready
-      toast({
-        title: "Mode démonstration",
-        description: "Affichage des données de démonstration en attendant le déploiement de l'API.",
-      });
-      
-      setEvents([
-        {
-          id: "1",
-          name: "Marathon de Paris",
-          description: "Le plus grand marathon de France avec plus de 50 000 participants",
-          start_time: "2024-04-07T09:00:00",
-          postal_code: 75001,
-          city: "Paris",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        },
-        {
-          id: "2", 
-          name: "Trail du Mont-Blanc",
-          description: "Course de trail mythique autour du Mont-Blanc",
-          start_time: "2024-08-25T06:00:00",
-          postal_code: 74400,
-          city: "Chamonix",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        },
-        {
-          id: "3",
-          name: "10km de Marseille",
-          description: "Parcours urbain au cœur de la ville de Marseille",
-          start_time: "2024-03-15T09:30:00",
-          postal_code: 13000,
-          city: "Marseille",
-          country: "France", 
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        },
-        {
-          id: "b73788e3-fbbe-4abd-9cb0-d006bb35f0c3",
-          name: "Semi-marathon de Lyon",
-          description: "Course de semi-marathon dans les rues de Lyon",
-          start_time: "2024-05-15T08:30:00",
-          postal_code: 69000,
-          city: "Lyon",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        },
-        {
-          id: "5",
-          name: "Trail des Vosges",
-          description: "Trail nature dans les montagnes des Vosges",
-          start_time: "2024-06-20T07:00:00",
-          postal_code: 88000,
-          city: "Épinal",
-          country: "France",
-          created_at: "2024-01-01T00:00:00",
-          updated_at: "2024-01-01T00:00:00"
-        }
-      ]);
-      
-      setLoading(false);
-      
-      /* TODO: Uncomment when API is ready
       try {
         const fetchedEvents = await eventsAPI.list();
         setEvents(fetchedEvents);
@@ -97,12 +29,10 @@ const Courses = () => {
           description: "Impossible de charger les événements depuis l'API.",
           variant: "destructive"
         });
-        // Use demo data as fallback
-        setEvents(demoEvents);
+        setEvents([]);
       } finally {
         setLoading(false);
       }
-      */
     };
 
     fetchEvents();
