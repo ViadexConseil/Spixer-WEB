@@ -136,10 +136,10 @@ export const authAPI = {
     });
   },
 
-  login: async (identifier: string, password: string): Promise<{ user: User; token: string }> => {
+  login: async (email: string, password: string): Promise<{ user: User; token: string }> => {
     return apiCall('/v1/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ identifier, password }),
+      body: JSON.stringify({ email, password }),
     });
   },
 
