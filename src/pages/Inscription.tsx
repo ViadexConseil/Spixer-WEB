@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, User, Mail, Phone, Calendar, Hash } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,22 +9,44 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
+import { eventsAPI, stagesAPI, registrationsAPI, authAPI, Event, Stage, getAuthToken } from "@/services/api";
 
 const Inscription = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const [event, setEvent] = useState<Event | null>(null);
+  const [stages, setStages] = useState<Stage[]>([]);
+  const [selectedStage, setSelectedStage] = useState<string>("");
 
-  // Mock data for the course
-  const course = {
-    id: id,
-    title: "Marathon de Paris",
-    date: "2024-04-07",
-    lieu: "Paris, France",
-    distance: "42.2 km",
-    image: "/lovable-uploads/77a7ef3b-a09f-4099-8c96-d468f4ded307.png"
-  };
+  useEffect(() => {
+    const fetchEventData = async () => {
+      if (!id) return;
+      
+      try {
+        const eventData = await eventsAPI.get(id);
+        setEvent(eventData);
+        
+        const stagesData = await stagesAPI.getByEvent(id);
+        setStages(stagesData);
+        
+        if (stagesData.length > 0) {
+          setSelectedStage(stagesData[0].id);
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement de l'événement:", error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de charger les détails de l'événement.",
+          variant: "destructive",
+        });
+        navigate('/courses');
+      }
+    };
+
+    fetchEventData();
+  }, [id, navigate, toast]);
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -56,32 +78,51 @@ const Inscription = () => {
     setIsLoading(true);
 
     try {
-      // Note: L'API Spixer actuelle ne gère que l'auth, pas les inscriptions aux courses
-      // Il faudrait utiliser registrationsAPI.create() quand l'endpoint sera disponible
-      
-      // Simulation d'inscription avec validation
+      // Check if user is authenticated
+      const token = getAuthToken();
+      if (!token) {
+        toast({
+          title: "Connexion requise",
+          description: "Veuillez vous connecter pour vous inscrire à une course.",
+          variant: "destructive",
+        });
+        navigate('/login');
+        return;
+      }
+
+      // Validation
       if (!formData.firstName || !formData.lastName || !formData.email || !formData.birthDate || !formData.gender) {
         throw new Error("Veuillez remplir tous les champs obligatoires");
       }
 
-      // Simulation d'appel API
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      if (!selectedStage) {
+        throw new Error("Veuillez sélectionner une épreuve");
+      }
 
-      // TODO: Remplacer par l'appel API réel quand disponible
-      // const response = await registrationsAPI.create({
-      //   stage_id: stageId || id,
-      //   user_id: "current-user-id", // À récupérer depuis le token JWT
-      //   type: "runner",
-      //   ...formData
-      // });
+      // Get current user
+      const user = await authAPI.getProfile();
+
+      // Create registration
+      const registration = await registrationsAPI.create({
+        stage_id: selectedStage,
+        user_id: user.id,
+        type: "runner"
+      });
 
       toast({
         title: "Inscription réussie !",
         description: `Merci ${formData.firstName} ${formData.lastName}, votre inscription a été confirmée.`,
       });
 
-      // Redirect back to course detail
-      navigate(`/courses/${id}`);
+      // Redirect to checkout for payment
+      navigate(`/checkout`, { 
+        state: { 
+          event,
+          stage: stages.find(s => s.id === selectedStage),
+          registration,
+          price: 25 // Base price, should be configured per event
+        }
+      });
     } catch (error) {
       console.error("Erreur lors de l'inscription:", error);
       toast({
@@ -110,25 +151,29 @@ const Inscription = () => {
           </Button>
 
           {/* Course info header */}
-          <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
-            <div className="relative h-32 md:h-40">
-              <img 
-                src={course.image} 
-                alt={course.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
-                <div className="p-6 text-white">
-                  <h1 className="text-2xl md:text-3xl font-bold mb-2">{course.title}</h1>
-                  <div className="flex gap-4 text-sm">
-                    <span>{new Date(course.date).toLocaleDateString('fr-FR')}</span>
-                    <span>{course.lieu}</span>
-                    <Badge className="bg-spixer-orange">{course.distance}</Badge>
+          {event && (
+            <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
+              <div className="relative h-32 md:h-40">
+                <img 
+                  src="/lovable-uploads/77a7ef3b-a09f-4099-8c96-d468f4ded307.png" 
+                  alt={event.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-black bg-opacity-40 flex items-end">
+                  <div className="p-6 text-white">
+                    <h1 className="text-2xl md:text-3xl font-bold mb-2">{event.name}</h1>
+                    <div className="flex gap-4 text-sm">
+                      <span>{new Date(event.start_time).toLocaleDateString('fr-FR')}</span>
+                      <span>{event.city}, {event.country}</span>
+                      {stages.length > 0 && (
+                        <Badge className="bg-spixer-orange">{stages.length} épreuve(s)</Badge>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Registration form */}
           <div className="max-w-2xl mx-auto">
@@ -191,7 +236,7 @@ const Inscription = () => {
                     />
                   </div>
 
-                  {/* Birth Date and Gender */}
+                   {/* Birth Date and Gender */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="birthDate" className="flex items-center gap-2">
@@ -222,6 +267,25 @@ const Inscription = () => {
                       </Select>
                     </div>
                   </div>
+
+                  {/* Stage Selection */}
+                  {stages.length > 0 && (
+                    <div className="space-y-2">
+                      <Label>Épreuve *</Label>
+                      <Select value={selectedStage} onValueChange={setSelectedStage} required>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionner une épreuve" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {stages.map((stage) => (
+                            <SelectItem key={stage.id} value={stage.id}>
+                              {stage.name} - {stage.description}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
 
                   {/* Optional fields */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

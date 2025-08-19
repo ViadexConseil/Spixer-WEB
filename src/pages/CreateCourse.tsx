@@ -7,9 +7,28 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Upload, Eye, Save, Plus } from "lucide-react";
 import Navbar from "@/components/Navbar";
+import { eventsAPI, stagesAPI, authAPI, Event, Stage, getAuthToken } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const CreateCourse = () => {
+  const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+  const [eventData, setEventData] = useState({
+    name: "",
+    description: "",
+    start_time: "",
+    city: "",
+    country: "France",
+    postal_code: ""
+  });
+  const [stages, setStages] = useState([{
+    name: "",
+    description: "",
+    max_participants: 100,
+    id: Date.now().toString()
+  }]);
 
   const steps = [
     { id: 1, title: "Détails de l'événement", description: "Informations générales" },
@@ -30,10 +49,70 @@ const CreateCourse = () => {
     }
   };
 
-  const handlePublish = () => {
-    // Publish the course
-    alert('Course publiée avec succès !');
-    window.location.href = '/profil';
+  const handlePublish = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Check if user is authenticated
+      const token = getAuthToken();
+      if (!token) {
+        toast({
+          title: "Connexion requise",
+          description: "Veuillez vous connecter pour créer une course.",
+          variant: "destructive",
+        });
+        navigate('/login');
+        return;
+      }
+
+      // Validation
+      if (!eventData.name || !eventData.start_time || !eventData.city) {
+        toast({
+          title: "Champs manquants",
+          description: "Veuillez remplir tous les champs obligatoires.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Create event
+      const createdEvent = await eventsAPI.create({
+        name: eventData.name,
+        description: eventData.description,
+        start_time: eventData.start_time,
+        city: eventData.city,
+        country: eventData.country,
+        postal_code: parseInt(eventData.postal_code) || 0
+      });
+
+      // Create stages for the event
+      for (const stage of stages) {
+        if (stage.name) {
+          await stagesAPI.create({
+            event_id: createdEvent.id,
+            name: stage.name,
+            description: stage.description,
+            max_participants: stage.max_participants
+          });
+        }
+      }
+
+      toast({
+        title: "Course créée !",
+        description: "Votre course a été publiée avec succès.",
+      });
+
+      navigate('/profil');
+    } catch (error) {
+      console.error("Erreur lors de la publication:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de publier la course. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const renderStepContent = () => {
@@ -50,23 +129,63 @@ const CreateCourse = () => {
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="title">Titre de la course</Label>
-                  <Input id="title" placeholder="Marathon de votre ville" />
+                  <Label htmlFor="title">Titre de la course *</Label>
+                  <Input 
+                    id="title" 
+                    placeholder="Marathon de votre ville" 
+                    value={eventData.name}
+                    onChange={(e) => setEventData({...eventData, name: e.target.value})}
+                    required
+                  />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="date">Date</Label>
+                  <Label htmlFor="date">Date *</Label>
                   <div className="relative">
                     <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input id="date" type="date" className="pl-10" />
+                    <Input 
+                      id="date" 
+                      type="datetime-local" 
+                      className="pl-10" 
+                      value={eventData.start_time}
+                      onChange={(e) => setEventData({...eventData, start_time: e.target.value})}
+                      required
+                    />
                   </div>
                 </div>
               </div>
               
-              <div className="space-y-2">
-                <Label htmlFor="location">Lieu</Label>
-                <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                  <Input id="location" placeholder="Ville, Pays" className="pl-10" />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="city">Ville *</Label>
+                  <div className="relative">
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input 
+                      id="city" 
+                      placeholder="Paris" 
+                      className="pl-10" 
+                      value={eventData.city}
+                      onChange={(e) => setEventData({...eventData, city: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="country">Pays</Label>
+                  <Input 
+                    id="country" 
+                    placeholder="France" 
+                    value={eventData.country}
+                    onChange={(e) => setEventData({...eventData, country: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="postal_code">Code postal</Label>
+                  <Input 
+                    id="postal_code" 
+                    placeholder="75001" 
+                    value={eventData.postal_code}
+                    onChange={(e) => setEventData({...eventData, postal_code: e.target.value})}
+                  />
                 </div>
               </div>
               
@@ -76,6 +195,8 @@ const CreateCourse = () => {
                   id="description" 
                   placeholder="Décrivez votre événement..." 
                   rows={4}
+                  value={eventData.description}
+                  onChange={(e) => setEventData({...eventData, description: e.target.value})}
                 />
               </div>
               
@@ -284,8 +405,12 @@ const CreateCourse = () => {
                 Suivant
               </Button>
             ) : (
-              <Button onClick={handlePublish} className="bg-spixer-orange hover:bg-spixer-orange-dark">
-                Publier la course
+              <Button 
+                onClick={handlePublish} 
+                className="bg-spixer-orange hover:bg-spixer-orange-dark"
+                disabled={isLoading}
+              >
+                {isLoading ? "Publication..." : "Publier la course"}
               </Button>
             )}
           </div>
