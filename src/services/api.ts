@@ -56,6 +56,41 @@ export interface Category {
   updated_at: string;
 }
 
+export interface UserInformations {
+  id: string;
+  user_id: string;
+  first_name?: string;
+  last_name?: string;
+  phone?: string;
+  birth_date?: string;
+  address?: string;
+  city?: string;
+  postal_code?: string;
+  country?: string;
+  emergency_contact?: string;
+  emergency_phone?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaymentIntent {
+  client_secret: string;
+  amount: number;
+  currency: string;
+}
+
+export interface RankingRecord {
+  id: string;
+  ranking_id: string;
+  face_signature?: string;
+  ocr_label?: string;
+  latitude?: number;
+  longitude?: number;
+  source?: string;
+  created_at: string;
+  updated_at: string;
+}
+
 // Auth helpers
 export const getAuthToken = (): string | null => {
   return localStorage.getItem('spixer_token');
@@ -256,11 +291,11 @@ export const rankingsAPI = {
     });
   },
 
-  getRecords: async (rankingId: string): Promise<any[]> => {
+  getRecords: async (rankingId: string): Promise<RankingRecord[]> => {
     return apiCall(`/v1/rankings/${rankingId}/records`);
   },
 
-  createRecord: async (rankingId: string, record: any): Promise<any> => {
+  createRecord: async (rankingId: string, record: Omit<RankingRecord, 'id' | 'ranking_id' | 'created_at' | 'updated_at'>): Promise<RankingRecord> => {
     return apiCall(`/v1/rankings/${rankingId}/records`, {
       method: 'POST',
       body: JSON.stringify(record),
@@ -295,6 +330,47 @@ export const categoriesAPI = {
   delete: async (id: string): Promise<void> => {
     return apiCall(`/v1/categories/${id}`, {
       method: 'DELETE',
+    });
+  },
+};
+
+// User Informations API
+export const userInformationsAPI = {
+  get: async (): Promise<UserInformations> => {
+    return apiCall('/v1/user/informations');
+  },
+
+  create: async (informations: Omit<UserInformations, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<UserInformations> => {
+    return apiCall('/v1/user/informations', {
+      method: 'POST',
+      body: JSON.stringify(informations),
+    });
+  },
+
+  update: async (informations: Partial<Omit<UserInformations, 'id' | 'user_id' | 'created_at' | 'updated_at'>>): Promise<UserInformations> => {
+    return apiCall('/v1/user/informations', {
+      method: 'PUT',
+      body: JSON.stringify(informations),
+    });
+  },
+};
+
+// Payments API
+export const paymentsAPI = {
+  createIntent: async (amount: number, currency: string = 'eur'): Promise<PaymentIntent> => {
+    return apiCall('/v1/payments/intent', {
+      method: 'POST',
+      body: JSON.stringify({ amount, currency }),
+    });
+  },
+
+  webhook: async (payload: any, signature: string): Promise<void> => {
+    return apiCall('/v1/payments/webhook', {
+      method: 'POST',
+      headers: {
+        'Stripe-Signature': signature,
+      },
+      body: JSON.stringify(payload),
     });
   },
 };
