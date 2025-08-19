@@ -20,11 +20,12 @@ const Checkout = () => {
   const location = useLocation();
   const { id } = useParams();
   const [loading, setLoading] = useState(false);
-  const [commissionLoading, setCommissionLoading] = useState(true);
   const [event, setEvent] = useState<Event | null>(null);
   const [coursePrice, setCoursePrice] = useState(0);
-  const [commission, setCommission] = useState(0);
   const [email, setEmail] = useState("");
+  
+  // Flat commission fee of 2 EUR
+  const commission = 2;
 
   // Get course data from location state or fetch it
   useEffect(() => {
@@ -45,20 +46,6 @@ const Checkout = () => {
         }
         
         setEvent(courseData);
-        
-        // Fetch commission from API (you'll need to create this endpoint)
-        try {
-          const response = await fetch('/api/commission');
-          if (response.ok) {
-            const { commission: commissionRate } = await response.json();
-            setCommission(commissionRate);
-          } else {
-            setCommission(5); // Default commission rate
-          }
-        } catch (error) {
-          console.error("Failed to fetch commission:", error);
-          setCommission(5); // Default commission rate
-        }
       } catch (error) {
         console.error("Failed to load course data:", error);
         toast({
@@ -67,8 +54,6 @@ const Checkout = () => {
           variant: "destructive",
         });
         navigate(-1);
-      } finally {
-        setCommissionLoading(false);
       }
     };
 
@@ -138,7 +123,7 @@ const Checkout = () => {
     }
   };
 
-  if (commissionLoading || !event) {
+  if (!event) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
