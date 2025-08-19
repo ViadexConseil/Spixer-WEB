@@ -30,6 +30,27 @@ const CreateCourse = () => {
     id: Date.now().toString()
   }]);
 
+  const addStage = () => {
+    setStages([...stages, {
+      name: "",
+      description: "",
+      max_participants: 100,
+      id: Date.now().toString()
+    }]);
+  };
+
+  const removeStage = (stageId: string) => {
+    if (stages.length > 1) {
+      setStages(stages.filter(stage => stage.id !== stageId));
+    }
+  };
+
+  const updateStage = (stageId: string, field: string, value: any) => {
+    setStages(stages.map(stage => 
+      stage.id === stageId ? { ...stage, [field]: value } : stage
+    ));
+  };
+
   const steps = [
     { id: 1, title: "Détails de l'événement", description: "Informations générales" },
     { id: 2, title: "Import OnePlan", description: "Zones logistiques" },
@@ -86,8 +107,19 @@ const CreateCourse = () => {
       });
 
       // Create stages for the event
-      for (const stage of stages) {
-        if (stage.name) {
+      const stagesToCreate = stages.filter(stage => stage.name.trim() !== "");
+      
+      // If no stages were added, create a default stage with the event name
+      if (stagesToCreate.length === 0) {
+        await stagesAPI.create({
+          event_id: createdEvent.id,
+          name: eventData.name,
+          description: "Épreuve principale",
+          max_participants: 1000
+        });
+      } else {
+        // Create the specified stages
+        for (const stage of stagesToCreate) {
           await stagesAPI.create({
             event_id: createdEvent.id,
             name: stage.name,
@@ -252,49 +284,78 @@ const CreateCourse = () => {
             <CardHeader>
               <CardTitle>Épreuves et parcours</CardTitle>
               <CardDescription>
-                Ajoutez les différentes épreuves avec leurs parcours GPX
+                Ajoutez les différentes épreuves avec leurs parcours GPX (optionnel - si aucune épreuve n'est ajoutée, une épreuve par défaut sera créée)
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold">Épreuves</h3>
-                <Button size="sm" className="flex items-center gap-2">
+                <Button size="sm" className="flex items-center gap-2" onClick={addStage}>
                   <Plus className="w-4 h-4" />
                   Ajouter une épreuve
                 </Button>
               </div>
               
               <div className="space-y-4">
-                <Card className="border">
-                  <CardContent className="p-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <Label htmlFor="epreuve1">Nom de l'épreuve</Label>
-                        <Input id="epreuve1" placeholder="Marathon" />
-                      </div>
-                      <div>
-                        <Label htmlFor="distance1">Distance</Label>
-                        <Input id="distance1" placeholder="42.2 km" />
-                      </div>
-                      <div>
-                        <Label htmlFor="heure1">Heure de départ</Label>
-                        <Input id="heure1" type="time" />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <Label>Fichier GPX</Label>
-                      <div className="border border-gray-300 rounded-lg p-3 mt-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Aucun fichier sélectionné</span>
-                          <Button size="sm" variant="outline">
-                            Parcourir
+                {stages.map((stage, index) => (
+                  <Card key={stage.id} className="border">
+                    <CardContent className="p-4">
+                      <div className="flex justify-between items-start mb-4">
+                        <h4 className="text-sm font-semibold text-gray-700">Épreuve {index + 1}</h4>
+                        {stages.length > 1 && (
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            onClick={() => removeStage(stage.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            Supprimer
                           </Button>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor={`epreuve-${stage.id}`}>Nom de l'épreuve</Label>
+                          <Input 
+                            id={`epreuve-${stage.id}`} 
+                            placeholder="Ex: Marathon, Semi-marathon..." 
+                            value={stage.name}
+                            onChange={(e) => updateStage(stage.id, 'name', e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`participants-${stage.id}`}>Nombre max de participants</Label>
+                          <Input 
+                            id={`participants-${stage.id}`} 
+                            type="number"
+                            placeholder="100" 
+                            value={stage.max_participants}
+                            onChange={(e) => updateStage(stage.id, 'max_participants', parseInt(e.target.value) || 100)}
+                          />
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                      <div className="mt-4">
+                        <Label htmlFor={`description-${stage.id}`}>Description</Label>
+                        <Textarea 
+                          id={`description-${stage.id}`}
+                          placeholder="Description de l'épreuve..."
+                          rows={2}
+                          value={stage.description}
+                          onChange={(e) => updateStage(stage.id, 'description', e.target.value)}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
               </div>
+              
+              {stages.every(stage => !stage.name.trim()) && (
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Info:</strong> Si aucune épreuve n'est configurée, une épreuve par défaut sera automatiquement créée avec le nom de votre événement.
+                  </p>
+                </div>
+              )}
             </CardContent>
           </Card>
         );
