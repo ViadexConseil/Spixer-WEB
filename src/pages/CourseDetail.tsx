@@ -24,19 +24,42 @@ const CourseDetail = () => {
       setLoading(true);
       
       try {
-        // Fetch event details
-        const eventData = await eventsAPI.get(id);
+        // First try to get all events and find the specific one
+        const allEvents = await eventsAPI.list();
+        const eventData = allEvents.find(event => event.id === id);
+        
+        if (!eventData) {
+          throw new Error('Event not found');
+        }
+        
         setEvent(eventData);
         
-        // Fetch stages for this event
-        const stagesData = await stagesAPI.getByEvent(id);
-        setStages(stagesData);
-        
-        // Fetch rankings for the first stage if available
-        if (stagesData.length > 0) {
-          const rankingsData = await rankingsAPI.getByStage(stagesData[0].id);
-          setRankings(rankingsData);
+        // Try to fetch stages for this event
+        try {
+          const stagesData = await stagesAPI.getByEvent(id);
+          setStages(stagesData);
+          
+          // Fetch rankings for the first stage if available
+          if (stagesData.length > 0) {
+            const rankingsData = await rankingsAPI.getByStage(stagesData[0].id);
+            setRankings(rankingsData);
+          }
+        } catch (stagesError) {
+          console.log("No stages found for this event, using default");
+          // Create a default stage based on event name
+          setStages([
+            {
+              id: "default-stage",
+              event_id: eventData.id,
+              name: eventData.name,
+              description: "Épreuve principale",
+              max_participants: 1000,
+              created_at: eventData.created_at,
+              updated_at: eventData.updated_at
+            }
+          ]);
         }
+        
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
         toast({
