@@ -370,7 +370,7 @@ const FAQ = () => {
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="border-white text-white hover:bg-white hover:text-spixer-blue"
+                      className="border-2 border-white/80 text-white bg-white/10 hover:bg-white hover:text-spixer-blue backdrop-blur-sm"
                     >
                       <Mail className="w-5 h-5 mr-2" />
                       support@spixer.fr
