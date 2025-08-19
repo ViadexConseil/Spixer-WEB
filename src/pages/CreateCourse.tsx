@@ -10,7 +10,6 @@ import Navbar from "@/components/Navbar";
 
 const CreateCourse = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [hasSubscription, setHasSubscription] = useState(false); // Simulate subscription status
 
   const steps = [
     { id: 1, title: "Détails de l'événement", description: "Informations générales" },
@@ -32,14 +31,9 @@ const CreateCourse = () => {
   };
 
   const handlePublish = () => {
-    if (!hasSubscription) {
-      // Redirect to pricing page
-      window.location.href = '/pricing';
-    } else {
-      // Publish the course
-      alert('Course publiée avec succès !');
-      window.location.href = '/profil';
-    }
+    // Publish the course
+    alert('Course publiée avec succès !');
+    window.location.href = '/profil';
   };
 
   const renderStepContent = () => {
@@ -212,18 +206,6 @@ const CreateCourse = () => {
                   </div>
                 </div>
               </div>
-              
-              {!hasSubscription && (
-                <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
-                  <h4 className="font-semibold text-yellow-800 mb-2">Abonnement requis</h4>
-                  <p className="text-sm text-yellow-700 mb-3">
-                    Pour publier votre course, vous devez souscrire à un abonnement Spixer.
-                  </p>
-                  <Button size="sm" asChild>
-                    <a href="/pricing">Voir les tarifs</a>
-                  </Button>
-                </div>
-              )}
             </CardContent>
           </Card>
         );

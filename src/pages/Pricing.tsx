@@ -10,7 +10,7 @@ const Pricing = () => {
     {
       name: "Gratuit",
       price: "0€",
-      period: "/mois",
+      period: "",
       description: "Pour découvrir Spixer",
       popular: false,
       features: [
@@ -27,7 +27,7 @@ const Pricing = () => {
     {
       name: "Pro",
       price: "29€",
-      period: "/mois",
+      period: "",
       description: "Pour les organisateurs réguliers",
       popular: true,
       features: [
@@ -44,7 +44,7 @@ const Pricing = () => {
     {
       name: "Élite",
       price: "99€",
-      period: "/mois",
+      period: "",
       description: "Pour les grands événements",
       popular: false,
       features: [
@@ -67,9 +67,9 @@ const Pricing = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="section-title mb-4">Choisissez votre plan</h1>
+          <h1 className="section-title mb-4">Tarifs par course</h1>
           <p className="section-subtitle mx-auto">
-            Sélectionnez l'abonnement qui correspond le mieux à vos besoins
+            Tarification simple et transparente pour vos événements sportifs
           </p>
         </div>
 
@@ -116,7 +116,7 @@ const Pricing = () => {
                       : 'bg-spixer-blue hover:bg-spixer-blue-dark'
                   }`}
                 >
-                  {plan.price === "0€" ? "Commencer gratuitement" : "S'abonner"}
+                  {plan.price === "0€" ? "Commencer gratuitement" : "Choisir ce plan"}
                 </Button>
               </CardContent>
             </Card>
@@ -176,7 +176,7 @@ const Pricing = () => {
         {/* Legal Info */}
         <div className="text-center mt-12 text-sm text-gray-600">
           <p>
-            Tous les prix sont hors taxes. Résiliation possible à tout moment.
+            Tous les prix sont hors taxes.
             <br />
             <a href="#" className="text-spixer-orange hover:underline">Conditions générales</a> • 
             <a href="#" className="text-spixer-orange hover:underline ml-1">Politique de confidentialité</a>
