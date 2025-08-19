@@ -100,8 +100,7 @@ const Navbar = () => {
           Accueil
         </a>
           <a href="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</a>
-          <a href="#services" className="nav-link hover:text-spixer-blue transition-colors">À Propos</a>
-          <a href="#partenaires" className="nav-link hover:text-spixer-blue transition-colors">Contact</a>
+          <a href="/contact" className="nav-link hover:text-spixer-blue transition-colors">Contact</a>
           
           {!isLoggedIn ? (
             <>
@@ -188,17 +187,7 @@ const Navbar = () => {
             Courses
           </a>
           <a 
-            href="#services" 
-            className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
-            onClick={() => {
-              setIsMenuOpen(false);
-              document.body.style.overflow = '';
-            }}
-          >
-            À Propos
-          </a>
-          <a 
-            href="#partenaires" 
+            href="/contact" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
