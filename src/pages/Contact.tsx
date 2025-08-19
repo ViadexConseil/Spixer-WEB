@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const Contact = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -334,9 +335,12 @@ const Contact = () => {
                   <Button 
                     variant="outline" 
                     className="w-full border-2 border-spixer-orange text-spixer-orange hover:bg-spixer-orange hover:text-white transition-all duration-300"
+                    asChild
                   >
-                    Voir la FAQ
-                    <ArrowRight className="w-4 h-4 ml-2" />
+                    <Link to="/faq">
+                      Voir la FAQ
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Link>
                   </Button>
                 </CardContent>
               </Card>
