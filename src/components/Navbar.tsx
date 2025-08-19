@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Menu, X, User, Settings, Shield, LogOut, UserCircle } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAuthToken, removeAuthToken } from "@/services/api";
 import {
   DropdownMenu,
@@ -93,23 +93,23 @@ const Navbar = () => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8">
-        <a 
-          href="/" 
+        <Link 
+          to="/" 
           className="nav-link"
         >
           Accueil
-        </a>
-          <a href="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</a>
-          <a href="/contact" className="nav-link hover:text-spixer-blue transition-colors">Contact</a>
+        </Link>
+          <Link to="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</Link>
+          <Link to="/contact" className="nav-link hover:text-spixer-blue transition-colors">Contact</Link>
           
           {!isLoggedIn ? (
             <>
-              <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+              <Link to="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
                 Se connecter
-              </a>
-              <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+              </Link>
+              <Link to="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
                 Créer un compte
-              </a>
+              </Link>
             </>
           ) : (
             <DropdownMenu>
@@ -166,8 +166,8 @@ const Navbar = () => {
         isMenuOpen ? "opacity-100 translate-x-0" : "opacity-0 translate-x-full pointer-events-none"
       )}>
         <nav className="flex flex-col space-y-8 items-center mt-8">
-          <a 
-            href="/" 
+          <Link 
+            to="/" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
@@ -175,9 +175,9 @@ const Navbar = () => {
             }}
           >
             Accueil
-          </a>
-          <a 
-            href="/courses" 
+          </Link>
+          <Link 
+            to="/courses" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
@@ -185,9 +185,9 @@ const Navbar = () => {
             }}
           >
             Courses
-          </a>
-          <a 
-            href="/contact" 
+          </Link>
+          <Link 
+            to="/contact" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
@@ -195,16 +195,30 @@ const Navbar = () => {
             }}
           >
             Contact
-          </a>
+          </Link>
           <div className="flex flex-col space-y-4 w-full mt-8">
             {!isLoggedIn ? (
               <>
-                <a href="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
+                <button 
+                  onClick={() => {
+                    navigate('/login');
+                    setIsMenuOpen(false);
+                    document.body.style.overflow = '';
+                  }}
+                  className="bg-spixer-blue hover:bg-spixer-blue-dark text-white py-3 px-6 rounded-full font-medium transition-colors text-center"
+                >
                   Se connecter
-                </a>
-                <a href="/login" className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center">
+                </button>
+                <button 
+                  onClick={() => {
+                    navigate('/login');
+                    setIsMenuOpen(false);
+                    document.body.style.overflow = '';
+                  }}
+                  className="border border-spixer-blue text-spixer-blue hover:bg-spixer-blue hover:text-white py-3 px-6 rounded-full font-medium transition-colors text-center"
+                >
                   Créer un compte
-                </a>
+                </button>
               </>
             ) : (
               <>
