@@ -4,16 +4,58 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart } from "lucide-react";
+import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart, Award, Star, Zap, Target, Crown, Shield, Medal, Flame, Clock, MapPin as Location } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { authAPI, ProfileUser, Event } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
+interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+  rarity: 'common' | 'rare' | 'epic' | 'legendary';
+}
+
+const allBadges: Badge[] = [
+  { id: '1', name: 'Premier Pas', description: 'Première course terminée', icon: Play, color: 'bg-green-500', rarity: 'common' },
+  { id: '2', name: 'Sprinter', description: 'Course de moins de 5km terminée', icon: Zap, color: 'bg-yellow-500', rarity: 'common' },
+  { id: '3', name: 'Marathonien', description: 'Marathon terminé', icon: Trophy, color: 'bg-purple-500', rarity: 'legendary' },
+  { id: '4', name: 'Régulier', description: '10 courses terminées', icon: Target, color: 'bg-blue-500', rarity: 'rare' },
+  { id: '5', name: 'Vétéran', description: '50 courses terminées', icon: Crown, color: 'bg-orange-500', rarity: 'epic' },
+  { id: '6', name: 'Lève-tôt', description: 'Course matinale (avant 7h)', icon: Clock, color: 'bg-indigo-500', rarity: 'common' },
+  { id: '7', name: 'Noctambule', description: 'Course nocturne (après 20h)', icon: Star, color: 'bg-purple-600', rarity: 'common' },
+  { id: '8', name: 'Démon de Vitesse', description: 'Temps sous les 20min/5km', icon: Flame, color: 'bg-red-500', rarity: 'rare' },
+  { id: '9', name: 'Organisateur', description: 'Première course créée', icon: Users, color: 'bg-teal-500', rarity: 'common' },
+  { id: '10', name: 'Mentor', description: '10 courses organisées', icon: Shield, color: 'bg-emerald-500', rarity: 'epic' },
+  { id: '11', name: 'Explorateur', description: 'Courses dans 5 villes différentes', icon: Location, color: 'bg-cyan-500', rarity: 'rare' },
+  { id: '12', name: 'Podium', description: 'Top 3 dans une course', icon: Medal, color: 'bg-amber-500', rarity: 'rare' },
+  { id: '13', name: 'Champion', description: '1ère place dans une course', icon: Crown, color: 'bg-yellow-600', rarity: 'epic' },
+  { id: '14', name: 'Social', description: '100 participants dans une course créée', icon: Heart, color: 'bg-pink-500', rarity: 'epic' },
+  { id: '15', name: 'Perfectionniste', description: 'Course sans aucun arrêt', icon: Target, color: 'bg-slate-500', rarity: 'rare' },
+  { id: '16', name: 'Endurant', description: 'Course de plus de 2h', icon: Clock, color: 'bg-stone-500', rarity: 'rare' },
+  { id: '17', name: 'Météo Extrême', description: 'Course sous la pluie', icon: Shield, color: 'bg-gray-600', rarity: 'common' },
+  { id: '18', name: 'Collectionneur', description: '20 courses différentes', icon: Award, color: 'bg-violet-500', rarity: 'epic' },
+  { id: '19', name: 'Fondateur', description: 'Membre depuis le lancement', icon: Star, color: 'bg-gradient-to-r from-purple-500 to-pink-500', rarity: 'legendary' },
+  { id: '20', name: 'VIP', description: 'Compte premium actif', icon: Crown, color: 'bg-gradient-to-r from-yellow-400 to-orange-500', rarity: 'legendary' },
+  { id: '21', name: 'Team Player', description: 'Course en équipe terminée', icon: Users, color: 'bg-green-600', rarity: 'common' },
+  { id: '22', name: 'Aventurier', description: 'Trail ou course nature', icon: MapPin, color: 'bg-lime-600', rarity: 'common' },
+  { id: '23', name: 'Motivé', description: '7 jours consécutifs d\'activité', icon: Flame, color: 'bg-red-600', rarity: 'rare' },
+  { id: '24', name: 'Influenceur', description: '1000+ vues sur une course', icon: Star, color: 'bg-rose-500', rarity: 'epic' }
+];
+
+const getRandomBadges = (badges: Badge[], count: number): Badge[] => {
+  const shuffled = [...badges].sort(() => 0.5 - Math.random());
+  return shuffled.slice(0, count);
+};
+
 const Profil = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userBadges, setUserBadges] = useState<Badge[]>([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -25,6 +67,10 @@ const Profil = () => {
         // Extract the first user from the array
         const userProfile = profileResponse.user[0];
         setUser(userProfile);
+        
+        // Assign 5 random badges to the user
+        const randomBadges = getRandomBadges(allBadges, 5);
+        setUserBadges(randomBadges);
         
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
@@ -151,15 +197,15 @@ const Profil = () => {
               <div className="text-sm text-gray-600">Courses créées</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">-</div>
-              <div className="text-sm text-gray-600">Temps total</div>
+              <div className="text-2xl font-bold text-green-600">{userBadges.length}</div>
+              <div className="text-sm text-gray-600">Badges débloqués</div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
         <Tabs defaultValue="courses-participees" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="courses-participees" className="flex items-center gap-2">
               <Heart className="w-4 h-4" />
               Mes participations
@@ -167,6 +213,10 @@ const Profil = () => {
             <TabsTrigger value="courses-creees" className="flex items-center gap-2">
               <Trophy className="w-4 h-4" />
               Mes courses
+            </TabsTrigger>
+            <TabsTrigger value="badges" className="flex items-center gap-2">
+              <Award className="w-4 h-4" />
+              Mes badges
             </TabsTrigger>
             <TabsTrigger value="profil" className="flex items-center gap-2">
               <Settings className="w-4 h-4" />
@@ -283,6 +333,110 @@ const Profil = () => {
                 </Button>
               </div>
             )}
+          </TabsContent>
+
+          <TabsContent value="badges">
+            <div className="space-y-4 mb-6">
+              <div className="flex justify-between items-center">
+                <h2 className="text-xl font-semibold">Mes badges</h2>
+                <div className="text-sm text-gray-600">
+                  {userBadges.length} badge{userBadges.length > 1 ? 's' : ''} débloqué{userBadges.length > 1 ? 's' : ''}
+                </div>
+              </div>
+            </div>
+            
+            {userBadges.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {userBadges.map((badge) => {
+                  const IconComponent = badge.icon;
+                  const rarityColors = {
+                    common: 'border-gray-300',
+                    rare: 'border-blue-400',
+                    epic: 'border-purple-400',
+                    legendary: 'border-yellow-400'
+                  };
+                  
+                  return (
+                    <Card key={badge.id} className={`hover-lift cursor-pointer border-2 ${rarityColors[badge.rarity]}`}>
+                      <CardContent className="p-4 text-center">
+                        <div className={`w-12 h-12 rounded-full ${badge.color} flex items-center justify-center mx-auto mb-3`}>
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="font-semibold text-sm mb-1">{badge.name}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{badge.description}</p>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs capitalize ${
+                            badge.rarity === 'legendary' ? 'text-yellow-600 border-yellow-300' :
+                            badge.rarity === 'epic' ? 'text-purple-600 border-purple-300' :
+                            badge.rarity === 'rare' ? 'text-blue-600 border-blue-300' :
+                            'text-gray-600 border-gray-300'
+                          }`}
+                        >
+                          {badge.rarity}
+                        </Badge>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Award className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun badge débloqué</h3>
+                <p className="text-gray-600 mb-4">Participez à des courses pour débloquer vos premiers badges !</p>
+                <Button asChild>
+                  <a href="/courses">Découvrir les courses</a>
+                </Button>
+              </div>
+            )}
+            
+            {/* All Available Badges Section */}
+            <div className="mt-8 pt-6 border-t">
+              <h3 className="text-lg font-semibold mb-4">Tous les badges disponibles</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {allBadges.map((badge) => {
+                  const IconComponent = badge.icon;
+                  const isUnlocked = userBadges.some(userBadge => userBadge.id === badge.id);
+                  const rarityColors = {
+                    common: 'border-gray-300',
+                    rare: 'border-blue-400',
+                    epic: 'border-purple-400',
+                    legendary: 'border-yellow-400'
+                  };
+                  
+                  return (
+                    <Card key={badge.id} className={`border-2 ${rarityColors[badge.rarity]} ${!isUnlocked ? 'opacity-50' : ''}`}>
+                      <CardContent className="p-4 text-center">
+                        <div className={`w-12 h-12 rounded-full ${isUnlocked ? badge.color : 'bg-gray-400'} flex items-center justify-center mx-auto mb-3`}>
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="font-semibold text-sm mb-1">{badge.name}</h3>
+                        <p className="text-xs text-gray-600 mb-2">{badge.description}</p>
+                        <Badge 
+                          variant="outline" 
+                          className={`text-xs capitalize ${
+                            badge.rarity === 'legendary' ? 'text-yellow-600 border-yellow-300' :
+                            badge.rarity === 'epic' ? 'text-purple-600 border-purple-300' :
+                            badge.rarity === 'rare' ? 'text-blue-600 border-blue-300' :
+                            'text-gray-600 border-gray-300'
+                          }`}
+                        >
+                          {badge.rarity}
+                        </Badge>
+                        {isUnlocked && (
+                          <div className="mt-2">
+                            <Badge className="bg-green-500 text-white text-xs">
+                              Débloqué
+                            </Badge>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </div>
           </TabsContent>
 
           <TabsContent value="profil">
