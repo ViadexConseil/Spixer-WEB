@@ -44,9 +44,7 @@ export interface ProfileUser {
   email: string;
   username: string;
   user_created_at: string;
-  first_name?: string;
-  last_name?: string;
-  name: string;
+  name: string; // Merged field containing first_name + last_name
   bio?: string;
   avatar_url?: string;
   birthdate?: string;

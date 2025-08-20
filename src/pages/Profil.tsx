@@ -79,9 +79,7 @@ const Profil = () => {
     );
   }
 
-  const displayName = user.first_name && user.last_name 
-    ? `${user.first_name} ${user.last_name}`.trim() 
-    : user.name || user.username || user.email;
+  const displayName = user.name || user.username || user.email;
   const userRole = userEvents.length > 0 ? 'organisateur' : 'coureur';
 
   // Mock data for demonstration - replace with real API data when available
@@ -301,7 +299,7 @@ const Profil = () => {
                     </div>
                     <div>
                       <label className="text-sm font-medium">Nom complet</label>
-                      <p className="text-lg">{displayName}</p>
+                      <p className="text-lg">{user.name || 'Non renseigné'}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium">Email</label>
