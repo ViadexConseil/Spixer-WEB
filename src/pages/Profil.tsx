@@ -6,14 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { authAPI, eventsAPI, ProfileUser, Event } from "@/services/api";
+import { authAPI, ProfileUser, Event } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Profil = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<ProfileUser | null>(null);
-  const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -26,10 +25,6 @@ const Profil = () => {
         // Extract the first user from the array
         const userProfile = profileResponse.user[0];
         setUser(userProfile);
-        
-        // Get user events
-        const events = await eventsAPI.list();
-        setUserEvents(events);
         
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
@@ -80,7 +75,7 @@ const Profil = () => {
   }
 
   const displayName = user.name || user.username || user.email;
-  const userRole = userEvents.length > 0 ? 'organisateur' : 'coureur';
+  const userRole = user.events?.length > 0 ? 'organisateur' : 'coureur';
 
   // Use actual registration data from user profile
   const mesCoursesParticipant = user.registrations?.map(registration => ({
@@ -94,13 +89,13 @@ const Profil = () => {
     temps: null // No total_time field available in current API structure
   })) || [];
 
-  const mesCoursesOrganisateur = userEvents.map(event => ({
+  const mesCoursesOrganisateur = user.events?.map(event => ({
     id: event.id,
     title: event.name,
     date: event.start_time ? event.start_time.split('T')[0] : 'Date inconnue',
     participants: 0, // Would be calculated from registrations
     status: "Publié"
-  }));
+  })) || [];
 
   const getStatusBadge = (status: string) => {
     const variants = {
@@ -157,7 +152,7 @@ const Profil = () => {
           </div>
             {userRole === 'organisateur' && (
               <div className="text-center">
-                <div className="text-2xl font-bold text-spixer-blue">{userEvents.length}</div>
+                <div className="text-2xl font-bold text-spixer-blue">{user.events?.length || 0}</div>
                 <div className="text-sm text-gray-600">Courses créées</div>
               </div>
             )}

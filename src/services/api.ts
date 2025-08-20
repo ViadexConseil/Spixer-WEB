@@ -52,6 +52,7 @@ export interface ProfileUser {
   is_premium?: boolean;
   registrations: UserRegistration[];
   favorite_sports: FavoriteSport[];
+  events: Event[];
 }
 
 export interface AuthUser {
