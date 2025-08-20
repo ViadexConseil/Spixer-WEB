@@ -118,7 +118,7 @@ const Profil = () => {
   const mesCoursesOrganisateur = userEvents.map(event => ({
     id: event.id,
     title: event.name,
-    date: event.start_time.split('T')[0],
+    date: event.start_time ? event.start_time.split('T')[0] : 'Date inconnue',
     participants: 0, // Would be calculated from registrations
     status: "Publié"
   }));
