@@ -16,8 +16,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ identifier: "", password: "" });
   const [registerData, setRegisterData] = useState({ 
-    firstName: "", 
-    lastName: "", 
+    username: "", 
     email: "", 
     password: "" 
   });
@@ -53,8 +52,7 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const username = `${registerData.firstName} ${registerData.lastName}`;
-      const { user, token } = await authAPI.register(registerData.email, username, registerData.password);
+      const { user, token } = await authAPI.register(registerData.email, registerData.username, registerData.password);
       setAuthToken(token);
       
       toast({
@@ -162,28 +160,16 @@ const Login = () => {
                   </CardHeader>
                   <CardContent>
                     <form onSubmit={handleRegister} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">Prénom</Label>
-                          <div className="relative">
-                            <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                            <Input 
-                              id="firstName" 
-                              placeholder="Prénom" 
-                              className="pl-10"
-                              value={registerData.firstName}
-                              onChange={(e) => setRegisterData({ ...registerData, firstName: e.target.value })}
-                              required 
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Nom</Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="username">Nom d'utilisateur</Label>
+                        <div className="relative">
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                           <Input 
-                            id="lastName" 
-                            placeholder="Nom" 
-                            value={registerData.lastName}
-                            onChange={(e) => setRegisterData({ ...registerData, lastName: e.target.value })}
+                            id="username" 
+                            placeholder="Nom d'utilisateur" 
+                            className="pl-10"
+                            value={registerData.username}
+                            onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
                             required 
                           />
                         </div>
