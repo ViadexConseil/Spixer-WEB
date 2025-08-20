@@ -6,6 +6,16 @@ export interface User {
   email: string;
   created_at: string;
   updated_at: string;
+  // Extended profile data from joined tables
+  user_informations?: UserInformations;
+  registrations?: Registration[];
+  rankings?: Ranking[];
+  favorite_sport?: {
+    id: string;
+    name: string;
+    created_at: string;
+    updated_at: string;
+  };
 }
 
 export interface Event {
@@ -336,10 +346,6 @@ export const categoriesAPI = {
 
 // User Informations API
 export const userInformationsAPI = {
-  get: async (): Promise<UserInformations> => {
-    return apiCall('/v1/user/informations');
-  },
-
   create: async (informations: Omit<UserInformations, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<UserInformations> => {
     return apiCall('/v1/user/informations', {
       method: 'POST',

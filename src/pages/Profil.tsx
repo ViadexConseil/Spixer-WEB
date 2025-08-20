@@ -6,16 +6,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { authAPI, userInformationsAPI, eventsAPI, registrationsAPI, User, UserInformations, Event, Registration } from "@/services/api";
+import { authAPI, eventsAPI, registrationsAPI, User, UserInformations, Event, Registration } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Profil = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
-  const [userInfos, setUserInfos] = useState<UserInformations | null>(null);
   const [userEvents, setUserEvents] = useState<Event[]>([]);
-  const [userRegistrations, setUserRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,26 +21,13 @@ const Profil = () => {
       try {
         setLoading(true);
         
-        // Get user profile
+        // Get user profile with complete data
         const userProfile = await authAPI.getProfile();
         setUser(userProfile);
         
-        // Try to get extended user informations
-        try {
-          const userInformations = await userInformationsAPI.get();
-          setUserInfos(userInformations);
-        } catch (error) {
-          console.log("No extended user informations found");
-        }
-        
-        // Get user events and registrations
-        const [events, registrations] = await Promise.all([
-          eventsAPI.list(),
-          registrationsAPI.list()
-        ]);
-        
+        // Get user events
+        const events = await eventsAPI.list();
         setUserEvents(events);
-        setUserRegistrations(registrations);
         
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
@@ -92,7 +77,7 @@ const Profil = () => {
     );
   }
 
-  const displayName = userInfos ? `${userInfos.first_name || ''} ${userInfos.last_name || ''}`.trim() : user.email;
+  const displayName = user.user_informations ? `${user.user_informations.first_name || ''} ${user.user_informations.last_name || ''}`.trim() : user.email;
   const userRole = userEvents.length > 0 ? 'organisateur' : 'coureur';
 
   // Mock data for demonstration - replace with real API data when available
@@ -172,10 +157,10 @@ const Profil = () => {
           
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 pt-6 border-t">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-spixer-orange">{userRegistrations.length}</div>
-              <div className="text-sm text-gray-600">Courses participées</div>
-            </div>
+          <div className="text-center">
+            <div className="text-2xl font-bold text-spixer-orange">{user.registrations?.length || 0}</div>
+            <div className="text-sm text-gray-600">Courses participées</div>
+          </div>
             {userRole === 'organisateur' && (
               <div className="text-center">
                 <div className="text-2xl font-bold text-spixer-blue">{userEvents.length}</div>
@@ -318,18 +303,18 @@ const Profil = () => {
                       <label className="text-sm font-medium">Rôle</label>
                       <p className="text-lg capitalize">{userRole}</p>
                     </div>
-                    {userInfos?.phone && (
-                      <div>
-                        <label className="text-sm font-medium">Téléphone</label>
-                        <p className="text-lg">{userInfos.phone}</p>
-                      </div>
-                    )}
-                    {userInfos?.city && (
-                      <div>
-                        <label className="text-sm font-medium">Ville</label>
-                        <p className="text-lg">{userInfos.city}</p>
-                      </div>
-                    )}
+                     {user.user_informations?.phone && (
+                       <div>
+                         <label className="text-sm font-medium">Téléphone</label>
+                         <p className="text-lg">{user.user_informations.phone}</p>
+                       </div>
+                     )}
+                     {user.user_informations?.city && (
+                       <div>
+                         <label className="text-sm font-medium">Ville</label>
+                         <p className="text-lg">{user.user_informations.city}</p>
+                       </div>
+                     )}
                   </div>
                   <div className="pt-4 border-t">
                     <Button className="bg-spixer-orange hover:bg-spixer-orange-dark">
