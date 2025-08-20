@@ -82,25 +82,17 @@ const Profil = () => {
   const displayName = user.name || user.username || user.email;
   const userRole = userEvents.length > 0 ? 'organisateur' : 'coureur';
 
-  // Mock data for demonstration - replace with real API data when available
-  const mesCoursesParticipant = [
-    {
-      id: "1",
-      title: "Marathon de Paris",
-      date: "2024-04-07",
-      status: "À venir",
-      position: null,
-      temps: null
-    },
-    {
-      id: "2",
-      title: "10km de Marseille",
-      date: "2024-03-15",
-      status: "Terminé",
-      position: 42,
-      temps: "45:23"
-    }
-  ];
+  // Use actual registration data from user profile
+  const mesCoursesParticipant = user.registrations?.map(registration => ({
+    id: registration.registration_id,
+    title: registration.stage?.event?.event_name || 'Course inconnue',
+    date: registration.stage?.event?.event_start || '',
+    status: registration.stage?.event?.event_start ? 
+      (new Date(registration.stage.event.event_start) > new Date() ? 'À venir' : 'Terminé') : 
+      'Date inconnue',
+    position: registration.ranking?.rank_position || null,
+    temps: null // No total_time field available in current API structure
+  })) || [];
 
   const mesCoursesOrganisateur = userEvents.map(event => ({
     id: event.id,
@@ -194,8 +186,9 @@ const Profil = () => {
           </TabsList>
 
           <TabsContent value="courses-participees">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mesCoursesParticipant.map((course) => (
+            {mesCoursesParticipant.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {mesCoursesParticipant.map((course) => (
                 <Card key={course.id} className="hover-lift cursor-pointer">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -229,8 +222,18 @@ const Profil = () => {
                     </Button>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Trophy className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune participation</h3>
+                <p className="text-gray-600 mb-4">Vous n'avez participé à aucune course pour le moment.</p>
+                <Button asChild>
+                  <a href="/courses">Découvrir les courses</a>
+                </Button>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="courses-creees">
@@ -246,8 +249,9 @@ const Profil = () => {
               </div>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {mesCoursesOrganisateur.map((course) => (
+            {mesCoursesOrganisateur.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {mesCoursesOrganisateur.map((course) => (
                 <Card key={course.id} className="hover-lift cursor-pointer">
                   <CardHeader>
                     <div className="flex justify-between items-start">
@@ -278,8 +282,18 @@ const Profil = () => {
                     </div>
                   </CardContent>
                 </Card>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12">
+                <Plus className="w-12 h-12 mx-auto text-gray-400 mb-4" />
+                <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune course créée</h3>
+                <p className="text-gray-600 mb-4">Vous n'avez pas encore créé de course.</p>
+                <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
+                  <a href="/create">Créer ma première course</a>
+                </Button>
+              </div>
+            )}
           </TabsContent>
 
           <TabsContent value="profil">
