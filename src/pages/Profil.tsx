@@ -75,7 +75,6 @@ const Profil = () => {
   }
 
   const displayName = user.name || user.username || user.email;
-  const userRole = user.events?.length > 0 ? 'organisateur' : 'coureur';
 
   // Use actual registration data from user profile
   const mesCoursesParticipant = user.registrations?.map(registration => ({
@@ -125,9 +124,6 @@ const Profil = () => {
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold mb-2">{displayName}</h1>
                 <p className="text-gray-600 mb-2">{user.email}</p>
-                <Badge variant="outline" className="capitalize">
-                  {userRole}
-                </Badge>
               </div>
             </div>
             <div className="flex gap-3">
@@ -150,12 +146,10 @@ const Profil = () => {
             <div className="text-2xl font-bold text-spixer-orange">{user.registrations?.length || 0}</div>
             <div className="text-sm text-gray-600">Courses participées</div>
           </div>
-            {userRole === 'organisateur' && (
-              <div className="text-center">
-                <div className="text-2xl font-bold text-spixer-blue">{user.events?.length || 0}</div>
-                <div className="text-sm text-gray-600">Courses créées</div>
-              </div>
-            )}
+            <div className="text-center">
+              <div className="text-2xl font-bold text-spixer-blue">{user.events?.length || 0}</div>
+              <div className="text-sm text-gray-600">Courses créées</div>
+            </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">-</div>
               <div className="text-sm text-gray-600">Temps total</div>
@@ -313,10 +307,6 @@ const Profil = () => {
                     <div>
                       <label className="text-sm font-medium">Email</label>
                       <p className="text-lg">{user.email}</p>
-                    </div>
-                    <div>
-                      <label className="text-sm font-medium">Rôle</label>
-                      <p className="text-lg capitalize">{userRole}</p>
                     </div>
                      {user.location && (
                        <div>
