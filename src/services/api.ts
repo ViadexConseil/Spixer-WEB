@@ -1,12 +1,90 @@
 const API_BASE_URL = 'https://api.spixer.fr';
 
-// Types
+// Types for new API structure
+export interface FavoriteSport {
+  id: string;
+  label: string;
+}
+
+export interface UserRegistration {
+  registration_id: string;
+  registration_type?: string;
+  registration_status?: string;
+  registration_date?: string;
+  stage: {
+    stage_id: string;
+    stage_name?: string;
+    stage_description?: string;
+    category_label?: string;
+    event: {
+      event_id: string;
+      event_name?: string;
+      event_start?: string;
+      event_city?: string;
+      event_country?: string;
+    };
+  };
+  ranking: {
+    ranking_id: string;
+    rank_position?: number;
+    bib_number?: string;
+    ranking_date?: string;
+    records: Array<{
+      ocr_label?: string;
+      face_signature?: string;
+      latitude?: number;
+      longitude?: number;
+      captured_at?: string;
+    }>;
+  };
+}
+
+export interface ProfileUser {
+  user_id: string;
+  email: string;
+  username: string;
+  user_created_at: string;
+  first_name?: string;
+  last_name?: string;
+  name: string;
+  bio?: string;
+  avatar_url?: string;
+  birthdate?: string;
+  location?: string;
+  is_premium?: boolean;
+  registrations: UserRegistration[];
+  favorite_sports: FavoriteSport[];
+}
+
+export interface AuthUser {
+  id: string;
+  email: string;
+  username: string;
+  email_verified: boolean;
+}
+
+export interface AuthResponse {
+  message: string;
+  token: string;
+  user: AuthUser;
+}
+
+export interface RegisterResponse {
+  message: string;
+  user: AuthUser;
+}
+
+export interface ProfileResponse {
+  user: ProfileUser[];
+  favorite_sports: FavoriteSport[];
+}
+
+// Legacy interfaces for backward compatibility
 export interface User {
   id: string;
   email: string;
   created_at: string;
   updated_at: string;
-  // Extended profile data from joined tables
   user_informations?: UserInformations;
   registrations?: Registration[];
   rankings?: Ranking[];
@@ -130,8 +208,10 @@ const apiCall = async (endpoint: string, options: RequestInit = {}): Promise<any
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
   
   if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
-    throw new Error(error.message || `HTTP ${response.status}: ${response.statusText}`);
+    const errorData = await response.json().catch(() => ({}));
+    // Handle new error structure: { "error": { "message": "<reason>" } }
+    const errorMessage = errorData.error?.message || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+    throw new Error(errorMessage);
   }
 
   return response.json();
@@ -139,27 +219,27 @@ const apiCall = async (endpoint: string, options: RequestInit = {}): Promise<any
 
 // Authentication API
 export const authAPI = {
-  register: async (email: string, username: string, password: string): Promise<{ user: User; token: string }> => {
+  register: async (email: string, username: string, password: string): Promise<RegisterResponse> => {
     return apiCall('/v1/auth/register', {
       method: 'POST',
       body: JSON.stringify({ email, username, password }),
     });
   },
 
-  login: async (identifier: string, password: string): Promise<{ user: User; token: string }> => {
+  login: async (identifier: string, password: string): Promise<AuthResponse> => {
     return apiCall('/v1/auth/login', {
       method: 'POST',
       body: JSON.stringify({ identifier, password }),
     });
   },
 
-  logout: async (): Promise<void> => {
+  logout: async (): Promise<{ message: string }> => {
     return apiCall('/v1/auth/logout', {
       method: 'POST',
     });
   },
 
-  getProfile: async (): Promise<User> => {
+  getProfile: async (): Promise<ProfileResponse> => {
     return apiCall('/v1/auth/me');
   },
 };

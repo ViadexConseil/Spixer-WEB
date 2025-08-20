@@ -26,12 +26,12 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await authAPI.login(loginData.identifier, loginData.password);
-      setAuthToken(token);
+      const loginResponse = await authAPI.login(loginData.identifier, loginData.password);
+      setAuthToken(loginResponse.token);
       
       toast({
         title: "Connexion réussie",
-        description: `Bienvenue ${user.email} !`,
+        description: `Bienvenue ${loginResponse.user.email} !`,
       });
       
       navigate('/profil');
@@ -52,13 +52,16 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await authAPI.register(registerData.email, registerData.username, registerData.password);
-      setAuthToken(token);
+      const registerResponse = await authAPI.register(registerData.email, registerData.username, registerData.password);
       
       toast({
         title: "Inscription réussie",
-        description: `Bienvenue ${user.email} ! Votre compte a été créé.`,
+        description: `Bienvenue ${registerResponse.user.email} ! Votre compte a été créé.`,
       });
+      
+      // Since registration doesn't return a token, we need to login automatically
+      const loginResponse = await authAPI.login(registerData.email, registerData.password);
+      setAuthToken(loginResponse.token);
       
       navigate('/profil');
     } catch (error) {

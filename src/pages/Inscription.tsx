@@ -100,12 +100,13 @@ const Inscription = () => {
       }
 
       // Get current user
-      const user = await authAPI.getProfile();
+      const profileResponse = await authAPI.getProfile();
+      const user = profileResponse.user[0];
 
       // Create registration
       const registration = await registrationsAPI.create({
         stage_id: selectedStage,
-        user_id: user.id,
+        user_id: user.user_id,
         type: "runner"
       });
 

@@ -6,13 +6,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { authAPI, eventsAPI, registrationsAPI, User, UserInformations, Event, Registration } from "@/services/api";
+import { authAPI, eventsAPI, ProfileUser, Event } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const Profil = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<ProfileUser | null>(null);
   const [userEvents, setUserEvents] = useState<Event[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +22,9 @@ const Profil = () => {
         setLoading(true);
         
         // Get user profile with complete data
-        const userProfile = await authAPI.getProfile();
+        const profileResponse = await authAPI.getProfile();
+        // Extract the first user from the array
+        const userProfile = profileResponse.user[0];
         setUser(userProfile);
         
         // Get user events
@@ -77,7 +79,9 @@ const Profil = () => {
     );
   }
 
-  const displayName = user.user_informations ? `${user.user_informations.first_name || ''} ${user.user_informations.last_name || ''}`.trim() : user.email;
+  const displayName = user.first_name && user.last_name 
+    ? `${user.first_name} ${user.last_name}`.trim() 
+    : user.name || user.username || user.email;
   const userRole = userEvents.length > 0 ? 'organisateur' : 'coureur';
 
   // Mock data for demonstration - replace with real API data when available
@@ -127,14 +131,14 @@ const Profil = () => {
         <div className="bg-white rounded-2xl shadow-elegant p-6 md:p-8 mb-8">
           <div className="flex flex-col md:flex-row gap-6 items-start md:items-center justify-between">
             <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-              <Avatar className="w-20 h-20">
-                <AvatarImage src="" />
+                <Avatar className="w-20 h-20">
+                <AvatarImage src={user.avatar_url || ""} />
                 <AvatarFallback className="text-lg font-semibold bg-spixer-orange text-white">
                   {displayName.split(' ').map(n => n[0]).join('') || user.email[0].toUpperCase()}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold mb-2">{displayName || user.email}</h1>
+                <h1 className="text-2xl md:text-3xl font-bold mb-2">{displayName}</h1>
                 <p className="text-gray-600 mb-2">{user.email}</p>
                 <Badge variant="outline" className="capitalize">
                   {userRole}
@@ -292,8 +296,12 @@ const Profil = () => {
                 <div className="space-y-6">
                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
+                      <label className="text-sm font-medium">Nom d'utilisateur</label>
+                      <p className="text-lg">{user.username}</p>
+                    </div>
+                    <div>
                       <label className="text-sm font-medium">Nom complet</label>
-                      <p className="text-lg">{displayName || user.email}</p>
+                      <p className="text-lg">{displayName}</p>
                     </div>
                     <div>
                       <label className="text-sm font-medium">Email</label>
@@ -303,16 +311,16 @@ const Profil = () => {
                       <label className="text-sm font-medium">Rôle</label>
                       <p className="text-lg capitalize">{userRole}</p>
                     </div>
-                     {user.user_informations?.phone && (
+                     {user.location && (
                        <div>
-                         <label className="text-sm font-medium">Téléphone</label>
-                         <p className="text-lg">{user.user_informations.phone}</p>
+                         <label className="text-sm font-medium">Localisation</label>
+                         <p className="text-lg">{user.location}</p>
                        </div>
                      )}
-                     {user.user_informations?.city && (
+                     {user.birthdate && (
                        <div>
-                         <label className="text-sm font-medium">Ville</label>
-                         <p className="text-lg">{user.user_informations.city}</p>
+                         <label className="text-sm font-medium">Date de naissance</label>
+                         <p className="text-lg">{new Date(user.birthdate).toLocaleDateString('fr-FR')}</p>
                        </div>
                      )}
                   </div>
