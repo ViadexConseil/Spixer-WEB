@@ -251,7 +251,14 @@ export const eventsAPI = {
   },
 
   get: async (id: string): Promise<Event> => {
-    return apiCall(`/v1/events/${id}`);
+    // Workaround: API individual event endpoint has UUID format issues
+    // Fetch all events and find the specific one
+    const allEvents = await eventsAPI.list();
+    const event = allEvents.find(e => e.id === id);
+    if (!event) {
+      throw new Error('Event not found');
+    }
+    return event;
   },
 
   create: async (event: Omit<Event, 'id' | 'created_at' | 'updated_at'>): Promise<Event> => {
@@ -286,8 +293,14 @@ export const stagesAPI = {
   },
 
   getByEvent: async (eventId: string): Promise<Stage[]> => {
-    const response = await apiCall(`/v1/events/${eventId}/stages`);
-    return response.stages || [];
+    try {
+      const response = await apiCall(`/v1/events/${eventId}/stages`);
+      return response.stages || [];
+    } catch (error) {
+      // API endpoint may have UUID format issues, return empty array for now
+      console.warn(`Could not fetch stages for event ${eventId}:`, error);
+      return [];
+    }
   },
 
   create: async (stage: Omit<Stage, 'id' | 'created_at' | 'updated_at'>): Promise<Stage> => {
