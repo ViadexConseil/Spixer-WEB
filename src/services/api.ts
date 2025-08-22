@@ -325,7 +325,7 @@ export const registrationsAPI = {
     return apiCall(`/v1/stages/${stageId}/registrations`);
   },
 
-  create: async (registration: Omit<Registration, 'id' | 'created_at' | 'updated_at'>): Promise<Registration> => {
+  create: async (registration: { stage_id: string; type: string }): Promise<{ message: string; registration_id: string }> => {
     return apiCall('/v1/registrations', {
       method: 'POST',
       body: JSON.stringify(registration),
@@ -425,14 +425,33 @@ export const categoriesAPI = {
 
 // User Informations API
 export const userInformationsAPI = {
-  create: async (informations: Omit<UserInformations, 'id' | 'user_id' | 'created_at' | 'updated_at'>): Promise<UserInformations> => {
+  create: async (informations: {
+    first_name?: string;
+    last_name?: string;
+    bio?: string;
+    avatar_url?: string;
+    birthdate?: string;
+    location?: string;
+    is_premium_member?: boolean;
+    favorite_categories?: number[];
+  }): Promise<{ message: string }> => {
     return apiCall('/v1/user/informations', {
       method: 'POST',
       body: JSON.stringify(informations),
     });
   },
 
-  update: async (informations: Partial<Omit<UserInformations, 'id' | 'user_id' | 'created_at' | 'updated_at'>>): Promise<UserInformations> => {
+  update: async (informations: {
+    first_name?: string;
+    last_name?: string;
+    bio?: string;
+    avatar_url?: string;
+    birthdate?: string;
+    location?: string;
+    is_premium_member?: boolean;
+    favorite_categories?: number[];
+    phone?: string;
+  }): Promise<{ message: string }> => {
     return apiCall('/v1/user/informations', {
       method: 'PUT',
       body: JSON.stringify(informations),

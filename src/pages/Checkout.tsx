@@ -87,7 +87,7 @@ const Checkout = () => {
         return;
       }
 
-      // Calculate total amount in cents (course price + commission)
+      // Calculate total amount in cents for Stripe (API expects amount in cents)
       const totalAmountCents = Math.round(totalAmount * 100);
 
       // Create Stripe payment intent using the API

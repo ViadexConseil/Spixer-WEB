@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import { useToast } from "@/hooks/use-toast";
-import { eventsAPI, stagesAPI, registrationsAPI, authAPI, Event, Stage, getAuthToken } from "@/services/api";
+import { eventsAPI, stagesAPI, registrationsAPI, userInformationsAPI, Event, Stage, getAuthToken } from "@/services/api";
 
 const Inscription = () => {
   const { id } = useParams();
@@ -99,14 +99,19 @@ const Inscription = () => {
         throw new Error("Veuillez sélectionner une épreuve");
       }
 
-      // Get current user
-      const profileResponse = await authAPI.getProfile();
-      const user = profileResponse.user[0];
+      // Update user information first if provided
+      if (formData.firstName || formData.lastName || formData.birthDate || formData.phone) {
+        await userInformationsAPI.update({
+          first_name: formData.firstName,
+          last_name: formData.lastName,
+          birthdate: formData.birthDate,
+          phone: formData.phone,
+        });
+      }
 
-      // Create registration
-      const registration = await registrationsAPI.create({
+      // Create registration (API will infer user_id from token)
+      const registrationResponse = await registrationsAPI.create({
         stage_id: selectedStage,
-        user_id: user.user_id,
         type: "runner"
       });
 
@@ -120,7 +125,7 @@ const Inscription = () => {
         state: { 
           event,
           stage: stages.find(s => s.id === selectedStage),
-          registration,
+          registrationId: registrationResponse.registration_id,
           price: 25 // Base price, should be configured per event
         }
       });
