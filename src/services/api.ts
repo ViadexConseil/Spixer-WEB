@@ -99,10 +99,20 @@ export interface Event {
   id: string;
   name: string;
   description: string;
+  label?: string;
   start_time: string;
-  postal_code: number;
+  registration_end_time?: string | null;
+  postal_code: string;
+  address?: string;
   city: string;
+  region?: string | null;
   country: string;
+  oneplan_path?: string | null;
+  is_draft?: number;
+  cancel_reason?: string | null;
+  organiser_id?: string;
+  organiser_email?: string;
+  PMR?: number;
   created_at: string;
   updated_at: string;
 }

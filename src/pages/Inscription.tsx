@@ -20,6 +20,16 @@ const Inscription = () => {
   const [stages, setStages] = useState<Stage[]>([]);
   const [selectedStage, setSelectedStage] = useState<string>("");
 
+  const isRegistrationOpen = (event: Event): boolean => {
+    if (!event.registration_end_time) return true; // No deadline means always open
+    if (event.is_draft === 1) return false; // Draft events not open for registration
+    if (event.cancel_reason) return false; // Cancelled events not open
+    
+    const now = new Date();
+    const deadline = new Date(event.registration_end_time);
+    return now < deadline;
+  };
+
   useEffect(() => {
     const fetchEventData = async () => {
       if (!id) return;
@@ -27,6 +37,27 @@ const Inscription = () => {
       try {
         const eventData = await eventsAPI.get(id);
         setEvent(eventData);
+        
+        // Check if registration is still open
+        if (!isRegistrationOpen(eventData)) {
+          let message = "Les inscriptions sont fermées pour cet événement.";
+          
+          if (eventData.is_draft === 1) {
+            message = "Cet événement est encore en préparation.";
+          } else if (eventData.cancel_reason) {
+            message = "Cet événement a été annulé.";
+          } else if (eventData.registration_end_time) {
+            message = `Les inscriptions ont fermé le ${new Date(eventData.registration_end_time).toLocaleString('fr-FR')}.`;
+          }
+          
+          toast({
+            title: "Inscription impossible",
+            description: message,
+            variant: "destructive",
+          });
+          navigate(`/courses/${id}`);
+          return;
+        }
         
         const stagesData = await stagesAPI.getByEvent(id);
         setStages(stagesData);
@@ -92,6 +123,11 @@ const Inscription = () => {
         });
         navigate('/login');
         return;
+      }
+
+      // Check if registration is still open (server-side validation)
+      if (event && !isRegistrationOpen(event)) {
+        throw new Error("Les inscriptions sont fermées pour cet événement.");
       }
 
       // Validation
@@ -222,6 +258,17 @@ const Inscription = () => {
                 <p className="text-center text-gray-600">
                   Remplissez le formulaire ci-dessous pour vous inscrire
                 </p>
+                
+                {/* Registration deadline info */}
+                {event?.registration_end_time && (
+                  <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200">
+                    <div className="text-center">
+                      <span className="text-sm font-medium text-blue-800">
+                        Limite d'inscription: {new Date(event.registration_end_time).toLocaleString('fr-FR')}
+                      </span>
+                    </div>
+                  </div>
+                )}
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">

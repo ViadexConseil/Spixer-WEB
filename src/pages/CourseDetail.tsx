@@ -94,6 +94,65 @@ const CourseDetail = () => {
     return { text: "À venir", class: "bg-spixer-blue text-white" };
   };
 
+  const isRegistrationOpen = (event: Event): boolean => {
+    if (!event.registration_end_time) return true; // No deadline means always open
+    if (event.is_draft === 1) return false; // Draft events not open for registration
+    if (event.cancel_reason) return false; // Cancelled events not open
+    
+    const now = new Date();
+    const deadline = new Date(event.registration_end_time);
+    return now < deadline;
+  };
+
+  const getRegistrationTimeRemaining = (event: Event): { hours: number; minutes: number } | null => {
+    if (!event.registration_end_time || !isRegistrationOpen(event)) return null;
+    
+    const now = new Date();
+    const deadline = new Date(event.registration_end_time);
+    const timeDiff = deadline.getTime() - now.getTime();
+    
+    if (timeDiff <= 0) return null;
+    
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    return { hours, minutes };
+  };
+
+  const getRegistrationStatusMessage = (event: Event): { message: string; canRegister: boolean } => {
+    if (event.is_draft === 1) {
+      return { message: "Événement en préparation", canRegister: false };
+    }
+    
+    if (event.cancel_reason) {
+      return { message: "Événement annulé", canRegister: false };
+    }
+    
+    if (!event.registration_end_time) {
+      return { message: "Inscriptions ouvertes", canRegister: true };
+    }
+    
+    if (!isRegistrationOpen(event)) {
+      return { message: "Inscriptions fermées", canRegister: false };
+    }
+    
+    const timeRemaining = getRegistrationTimeRemaining(event);
+    if (timeRemaining && timeRemaining.hours < 24) {
+      if (timeRemaining.hours === 0) {
+        return { 
+          message: `Plus que ${timeRemaining.minutes}min pour s'inscrire`, 
+          canRegister: true 
+        };
+      }
+      return { 
+        message: `Plus que ${timeRemaining.hours}h${timeRemaining.minutes.toString().padStart(2, '0')} pour s'inscrire`, 
+        canRegister: true 
+      };
+    }
+    
+    return { message: "Inscriptions ouvertes", canRegister: true };
+  };
+
   if (loading) {
     return (
       <>
@@ -129,6 +188,7 @@ const CourseDetail = () => {
   }
 
   const status = getStatusBadge(event.start_time);
+  const registrationStatus = getRegistrationStatusMessage(event);
 
   return (
     <>
@@ -168,6 +228,22 @@ const CourseDetail = () => {
           </div>
           
           <div className="p-6 md:p-8">
+            {/* Registration Status Banner */}
+            {event.registration_end_time && (
+              <div className="mb-4 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium text-blue-800">
+                    {registrationStatus.message}
+                  </span>
+                  {event.registration_end_time && (
+                    <span className="text-xs text-blue-600">
+                      Limite: {new Date(event.registration_end_time).toLocaleString('fr-FR')}
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-between items-start">
               <p className="text-gray-600 flex-1">{event.description}</p>
               <div className="flex gap-3">
@@ -183,9 +259,15 @@ const CourseDetail = () => {
                   <Share2 className="w-4 h-4" />
                   Partager
                 </Button>
-                <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                  <a href={`/courses/${event.id}/participer`}>Participer</a>
-                </Button>
+                {registrationStatus.canRegister ? (
+                  <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
+                    <a href={`/courses/${event.id}/participer`}>Participer</a>
+                  </Button>
+                ) : (
+                  <Button disabled className="bg-gray-400 cursor-not-allowed">
+                    {registrationStatus.message}
+                  </Button>
+                )}
               </div>
             </div>
           </div>

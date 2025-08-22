@@ -103,7 +103,7 @@ const CreateCourse = () => {
         start_time: eventData.start_time,
         city: eventData.city,
         country: eventData.country,
-        postal_code: parseInt(eventData.postal_code) || 0
+        postal_code: eventData.postal_code
       });
 
       // Create stages for the event
