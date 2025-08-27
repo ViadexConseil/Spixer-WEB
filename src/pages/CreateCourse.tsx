@@ -102,7 +102,6 @@ const CreateCourse = () => {
         description: eventData.description,
         start_time: eventData.start_time,
         city: eventData.city,
-        country: eventData.country,
         postal_code: eventData.postal_code
       });
 
@@ -112,18 +111,24 @@ const CreateCourse = () => {
       // If no stages were added, create a default stage with the event name
       if (stagesToCreate.length === 0) {
         await stagesAPI.create({
-          event_id: createdEvent.id,
+          event_id: createdEvent.event_id,
           name: eventData.name,
           description: "Épreuve principale",
+          start_time: eventData.start_time,
+          end_time: eventData.start_time,
+          registration_end_time: eventData.start_time,
           max_participants: 1000
         });
       } else {
         // Create the specified stages
         for (const stage of stagesToCreate) {
           await stagesAPI.create({
-            event_id: createdEvent.id,
+            event_id: createdEvent.event_id,
             name: stage.name,
             description: stage.description,
+            start_time: eventData.start_time,
+            end_time: eventData.start_time,
+            registration_end_time: eventData.start_time,
             max_participants: stage.max_participants
           });
         }

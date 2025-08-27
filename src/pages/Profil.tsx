@@ -122,21 +122,21 @@ const Profil = () => {
 
   const displayName = user.name || user.username || user.email;
 
-  // Use actual registration data from user profile
+  // Use actual registration data from user profile  
   const mesCoursesParticipant = user.registrations?.map(registration => ({
     id: registration.registration_id,
     title: registration.stage?.event?.event_name || 'Course inconnue',
-    date: registration.stage?.event?.event_start || '',
-    status: registration.stage?.event?.event_start ? 
-      (new Date(registration.stage.event.event_start) > new Date() ? 'À venir' : 'Terminé') : 
+    date: registration.stage?.event?.start_time || '',
+    status: registration.stage?.event?.start_time ? 
+      (new Date(registration.stage.event.start_time) > new Date() ? 'À venir' : 'Terminé') : 
       'Date inconnue',
     position: registration.ranking?.rank_position || null,
     temps: null // No total_time field available in current API structure
   })) || [];
 
   const mesCoursesOrganisateur = user.events?.map(event => ({
-    id: event.id,
-    title: event.name,
+    id: event.event_id,
+    title: event.event_name,
     date: event.start_time ? event.start_time.split('T')[0] : 'Date inconnue',
     participants: 0, // Would be calculated from registrations
     status: "Publié"

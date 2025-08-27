@@ -1,42 +1,45 @@
 const API_BASE_URL = 'https://api.spixer.fr';
 
-// Types for new API structure
+// ============= UPDATED API TYPES TO MATCH DOCUMENTATION =============
+
 export interface FavoriteSport {
-  id: string;
+  id: number;
   label: string;
+}
+
+export interface EventSummary {
+  event_id: string;
+  event_name: string;
+  start_time: string;
+  end_time?: string;
+  city: string;
+  country: string;
+}
+
+export interface StageSummary {
+  stage_id: string;
+  stage_name: string;
+  stage_description?: string;
+  stage_start: string;
+  stage_end: string;
+  stage_registration_end: string;
+  category_label: string;
+  event: EventSummary;
+}
+
+export interface RankingSummary {
+  ranking_id: string;
+  rank_position: number;
+  bib_number: string;
 }
 
 export interface UserRegistration {
   registration_id: string;
-  registration_type?: string;
-  registration_status?: string;
-  registration_date?: string;
-  stage: {
-    stage_id: string;
-    stage_name?: string;
-    stage_description?: string;
-    category_label?: string;
-    event: {
-      event_id: string;
-      event_name?: string;
-      event_start?: string;
-      event_city?: string;
-      event_country?: string;
-    };
-  };
-  ranking: {
-    ranking_id: string;
-    rank_position?: number;
-    bib_number?: string;
-    ranking_date?: string;
-    records: Array<{
-      ocr_label?: string;
-      face_signature?: string;
-      latitude?: number;
-      longitude?: number;
-      captured_at?: string;
-    }>;
-  };
+  registration_type: string;
+  registration_status: string;
+  registration_date: string;
+  stage: StageSummary;
+  ranking?: RankingSummary;
 }
 
 export interface ProfileUser {
@@ -44,15 +47,17 @@ export interface ProfileUser {
   email: string;
   username: string;
   user_created_at: string;
-  name: string; // Merged field containing first_name + last_name
+  first_name?: string;
+  last_name?: string;
+  name?: string;
   bio?: string;
   avatar_url?: string;
   birthdate?: string;
   location?: string;
-  is_premium?: boolean;
+  is_premium_member: boolean;
   registrations: UserRegistration[];
   favorite_sports: FavoriteSport[];
-  events: Event[];
+  events: EventSummary[];
 }
 
 export interface AuthUser {
@@ -75,46 +80,25 @@ export interface RegisterResponse {
 
 export interface ProfileResponse {
   user: ProfileUser[];
-  favorite_sports: FavoriteSport[];
-}
-
-// Legacy interfaces for backward compatibility
-export interface User {
-  id: string;
-  email: string;
-  created_at: string;
-  updated_at: string;
-  user_informations?: UserInformations;
-  registrations?: Registration[];
-  rankings?: Ranking[];
-  favorite_sport?: {
-    id: string;
-    name: string;
-    created_at: string;
-    updated_at: string;
-  };
 }
 
 export interface Event {
   id: string;
   name: string;
   description: string;
-  label?: string;
   start_time: string;
-  registration_end_time?: string | null;
-  postal_code: string;
-  address?: string;
+  end_time?: string;
   city: string;
-  region?: string | null;
   country: string;
-  oneplan_path?: string | null;
+  organiser_email: string;
+  // Additional fields for backward compatibility
+  registration_end_time?: string | null;
   is_draft?: number;
   cancel_reason?: string | null;
-  organiser_id?: string;
-  organiser_email?: string;
-  PMR?: number;
-  created_at: string;
-  updated_at: string;
+  postal_code?: string;
+  address?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Stage {
@@ -122,18 +106,24 @@ export interface Stage {
   event_id: string;
   name: string;
   description: string;
-  max_participants: number;
-  created_at: string;
-  updated_at: string;
+  start_time: string;
+  end_time: string;
+  registration_end_time: string;
+  category_label: string;
+  // Additional fields for backward compatibility
+  max_participants?: number;
 }
 
 export interface Registration {
   id: string;
-  stage_id: string;
   user_id: string;
+  stage_id: string;
   type: string;
+  status: string;
   created_at: string;
-  updated_at: string;
+  user_email: string;
+  stage_name: string;
+  event_name: string;
 }
 
 export interface Ranking {
@@ -141,39 +131,54 @@ export interface Ranking {
   stage_id: string;
   user_id: string;
   rank_position: number;
-  created_at: string;
-  updated_at: string;
+  user_email: string;
+  stage_name: string;
+  event_name: string;
 }
 
 export interface Category {
+  id: number;
+  label: string;
+}
+
+export interface Club {
   id: string;
+  federation_id: string;
   name: string;
   description: string;
   created_at: string;
   updated_at: string;
+  federation_name: string;
+}
+
+export interface ClubMember {
+  id: string;
+  username: string;
+  role: string;
+}
+
+export interface GuestProfile {
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  birthdate: string;
 }
 
 export interface UserInformations {
-  id: string;
-  user_id: string;
   first_name?: string;
   last_name?: string;
+  bio?: string;
+  avatar_url?: string;
+  birthdate?: string;
+  location?: string;
+  is_premium_member?: boolean;
+  favorite_categories?: number[];
   phone?: string;
-  birth_date?: string;
-  address?: string;
-  city?: string;
-  postal_code?: string;
-  country?: string;
-  emergency_contact?: string;
-  emergency_phone?: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface PaymentIntent {
   client_secret: string;
-  amount: number;
-  currency: string;
 }
 
 export interface RankingRecord {
@@ -184,8 +189,7 @@ export interface RankingRecord {
   latitude?: number;
   longitude?: number;
   source?: string;
-  created_at: string;
-  updated_at: string;
+  captured_at: string;
 }
 
 // Auth helpers
@@ -218,7 +222,7 @@ const apiCall = async (endpoint: string, options: RequestInit = {}): Promise<any
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    // Handle new error structure: { "error": { "message": "<reason>" } }
+    // Handle API error structure: { "error": { "message": "<reason>" } }
     const errorMessage = errorData.error?.message || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
     throw new Error(errorMessage);
   }
@@ -261,31 +265,38 @@ export const eventsAPI = {
   },
 
   get: async (id: string): Promise<Event> => {
-    // Workaround: API individual event endpoint has UUID format issues
-    // Fetch all events and find the specific one
-    const allEvents = await eventsAPI.list();
-    const event = allEvents.find(e => e.id === id);
-    if (!event) {
-      throw new Error('Event not found');
-    }
-    return event;
+    const response = await apiCall(`/v1/events/${id}`);
+    return response.event;
   },
 
-  create: async (event: Omit<Event, 'id' | 'created_at' | 'updated_at'>): Promise<Event> => {
+  create: async (eventData: {
+    name: string;
+    description: string;
+    start_time: string;
+    end_time?: string;
+    postal_code: string;
+    city?: string;
+    club_id?: string;
+  }): Promise<{ message: string; event_id: string }> => {
     return apiCall('/v1/events', {
       method: 'POST',
-      body: JSON.stringify(event),
+      body: JSON.stringify(eventData),
     });
   },
 
-  update: async (id: string, event: Partial<Event>): Promise<Event> => {
+  update: async (id: string, eventData: {
+    name?: string;
+    description?: string;
+    start_time?: string;
+    end_time?: string;
+  }): Promise<{ message: string }> => {
     return apiCall(`/v1/events/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(event),
+      body: JSON.stringify(eventData),
     });
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: string): Promise<{ message: string }> => {
     return apiCall(`/v1/events/${id}`, {
       method: 'DELETE',
     });
@@ -295,39 +306,51 @@ export const eventsAPI = {
 // Stages API
 export const stagesAPI = {
   list: async (): Promise<Stage[]> => {
-    return apiCall('/v1/stages');
+    const response = await apiCall('/v1/stages');
+    return response.stages || [];
   },
 
   get: async (id: string): Promise<Stage> => {
-    return apiCall(`/v1/stages/${id}`);
+    const response = await apiCall(`/v1/stages/${id}`);
+    return response.stage;
   },
 
   getByEvent: async (eventId: string): Promise<Stage[]> => {
-    try {
-      const response = await apiCall(`/v1/events/${eventId}/stages`);
-      return response.stages || [];
-    } catch (error) {
-      // API endpoint may have UUID format issues, return empty array for now
-      console.warn(`Could not fetch stages for event ${eventId}:`, error);
-      return [];
-    }
+    const response = await apiCall(`/v1/events/${eventId}/stages`);
+    return response.stages || [];
   },
 
-  create: async (stage: Omit<Stage, 'id' | 'created_at' | 'updated_at'>): Promise<Stage> => {
+  create: async (stageData: {
+    event_id: string;
+    name: string;
+    description: string;
+    start_time: string;
+    end_time: string;
+    registration_end_time: string;
+    max_participants?: number;
+    min_age?: number;
+  }): Promise<{ message: string; stage_id: string }> => {
     return apiCall('/v1/stages', {
       method: 'POST',
-      body: JSON.stringify(stage),
+      body: JSON.stringify(stageData),
     });
   },
 
-  update: async (id: string, stage: Partial<Stage>): Promise<Stage> => {
+  update: async (id: string, stageData: {
+    name?: string;
+    description?: string;
+    start_time?: string;
+    end_time?: string;
+    registration_end_time?: string;
+    min_age?: number;
+  }): Promise<{ message: string }> => {
     return apiCall(`/v1/stages/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(stage),
+      body: JSON.stringify(stageData),
     });
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: string): Promise<{ message: string }> => {
     return apiCall(`/v1/stages/${id}`, {
       method: 'DELETE',
     });
@@ -337,32 +360,42 @@ export const stagesAPI = {
 // Registrations API
 export const registrationsAPI = {
   list: async (): Promise<Registration[]> => {
-    return apiCall('/v1/registrations');
+    const response = await apiCall('/v1/registrations');
+    return response.registrations || [];
   },
 
   get: async (id: string): Promise<Registration> => {
-    return apiCall(`/v1/registrations/${id}`);
+    const response = await apiCall(`/v1/registrations/${id}`);
+    return response.registration;
   },
 
   getByStage: async (stageId: string): Promise<Registration[]> => {
-    return apiCall(`/v1/stages/${stageId}/registrations`);
+    const response = await apiCall(`/v1/stages/${stageId}/registrations`);
+    return response.registrations || [];
   },
 
-  create: async (registration: { stage_id: string; type: string }): Promise<{ message: string; registration_id: string }> => {
+  create: async (registrationData: { 
+    stage_id: string; 
+    type: string;
+    registrant_user_id?: string; 
+  }): Promise<{ message: string; registration_id: string }> => {
     return apiCall('/v1/registrations', {
       method: 'POST',
-      body: JSON.stringify(registration),
+      body: JSON.stringify(registrationData),
     });
   },
 
-  update: async (id: string, registration: Partial<Registration>): Promise<Registration> => {
+  update: async (id: string, registrationData: { 
+    status?: string;
+    type?: string; 
+  }): Promise<{ message: string }> => {
     return apiCall(`/v1/registrations/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(registration),
+      body: JSON.stringify(registrationData),
     });
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: string): Promise<{ message: string }> => {
     return apiCall(`/v1/registrations/${id}`, {
       method: 'DELETE',
     });
@@ -372,74 +405,79 @@ export const registrationsAPI = {
 // Rankings API
 export const rankingsAPI = {
   list: async (): Promise<Ranking[]> => {
-    return apiCall('/v1/rankings');
+    const response = await apiCall('/v1/rankings');
+    return response.rankings || [];
   },
 
   get: async (id: string): Promise<Ranking> => {
-    return apiCall(`/v1/rankings/${id}`);
+    const response = await apiCall(`/v1/rankings/${id}`);
+    return response.ranking;
   },
 
   getByStage: async (stageId: string): Promise<Ranking[]> => {
-    return apiCall(`/v1/stages/${stageId}/rankings`);
+    const response = await apiCall(`/v1/stages/${stageId}/rankings`);
+    return response.rankings || [];
   },
 
-  create: async (ranking: Omit<Ranking, 'id' | 'created_at' | 'updated_at'>): Promise<Ranking> => {
+  create: async (rankingData: {
+    stage_id: string;
+    user_id: string;
+    rank_position: number;
+  }): Promise<{ message: string; ranking_id: string }> => {
     return apiCall('/v1/rankings', {
       method: 'POST',
-      body: JSON.stringify(ranking),
+      body: JSON.stringify(rankingData),
     });
   },
 
-  update: async (id: string, ranking: Partial<Ranking>): Promise<Ranking> => {
+  update: async (id: string, rankingData: {
+    rank_position?: number;
+  }): Promise<{ message: string }> => {
     return apiCall(`/v1/rankings/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(ranking),
+      body: JSON.stringify(rankingData),
     });
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: string): Promise<{ message: string }> => {
     return apiCall(`/v1/rankings/${id}`, {
       method: 'DELETE',
     });
   },
 
   getRecords: async (rankingId: string): Promise<RankingRecord[]> => {
-    return apiCall(`/v1/rankings/${rankingId}/records`);
-  },
-
-  createRecord: async (rankingId: string, record: Omit<RankingRecord, 'id' | 'ranking_id' | 'created_at' | 'updated_at'>): Promise<RankingRecord> => {
-    return apiCall(`/v1/rankings/${rankingId}/records`, {
-      method: 'POST',
-      body: JSON.stringify(record),
-    });
+    const response = await apiCall(`/v1/rankings/${rankingId}/records`);
+    return response.records || [];
   },
 };
 
 // Categories API
 export const categoriesAPI = {
   list: async (): Promise<Category[]> => {
-    return apiCall('/v1/categories');
+    const response = await apiCall('/v1/categories');
+    return response.categories || [];
   },
 
-  get: async (id: string): Promise<Category> => {
-    return apiCall(`/v1/categories/${id}`);
+  get: async (id: number): Promise<Category> => {
+    const response = await apiCall(`/v1/categories/${id}`);
+    return response.category;
   },
 
-  create: async (category: Omit<Category, 'id' | 'created_at' | 'updated_at'>): Promise<Category> => {
+  create: async (categoryData: { label: string }): Promise<{ message: string; category_id: number }> => {
     return apiCall('/v1/categories', {
       method: 'POST',
-      body: JSON.stringify(category),
+      body: JSON.stringify(categoryData),
     });
   },
 
-  update: async (id: string, category: Partial<Category>): Promise<Category> => {
+  update: async (id: number, categoryData: { label: string }): Promise<{ message: string }> => {
     return apiCall(`/v1/categories/${id}`, {
       method: 'PATCH',
-      body: JSON.stringify(category),
+      body: JSON.stringify(categoryData),
     });
   },
 
-  delete: async (id: string): Promise<void> => {
+  delete: async (id: number): Promise<{ message: string }> => {
     return apiCall(`/v1/categories/${id}`, {
       method: 'DELETE',
     });
@@ -448,37 +486,101 @@ export const categoriesAPI = {
 
 // User Informations API
 export const userInformationsAPI = {
-  create: async (informations: {
-    first_name?: string;
-    last_name?: string;
-    bio?: string;
-    avatar_url?: string;
-    birthdate?: string;
-    location?: string;
-    is_premium_member?: boolean;
-    favorite_categories?: number[];
-  }): Promise<{ message: string }> => {
+  create: async (informations: UserInformations): Promise<{ message: string }> => {
     return apiCall('/v1/user/informations', {
       method: 'POST',
       body: JSON.stringify(informations),
     });
   },
 
-  update: async (informations: {
-    first_name?: string;
-    last_name?: string;
-    bio?: string;
-    avatar_url?: string;
-    birthdate?: string;
-    location?: string;
-    is_premium_member?: boolean;
-    favorite_categories?: number[];
-    phone?: string;
-  }): Promise<{ message: string }> => {
+  update: async (informations: UserInformations): Promise<{ message: string }> => {
     return apiCall('/v1/user/informations', {
       method: 'PUT',
       body: JSON.stringify(informations),
     });
+  },
+};
+
+// Clubs API
+export const clubsAPI = {
+  list: async (): Promise<Club[]> => {
+    const response = await apiCall('/v1/clubs');
+    return response.clubs || [];
+  },
+
+  get: async (id: string): Promise<Club> => {
+    const response = await apiCall(`/v1/clubs/${id}`);
+    return response.club;
+  },
+
+  getMembers: async (id: string): Promise<ClubMember[]> => {
+    const response = await apiCall(`/v1/clubs/${id}/members`);
+    return response.members || [];
+  },
+
+  getEvents: async (id: string): Promise<Event[]> => {
+    const response = await apiCall(`/v1/clubs/${id}/events`);
+    return response.events || [];
+  },
+};
+
+// Guest Profiles API
+export const guestProfilesAPI = {
+  create: async (guestData: {
+    username: string;
+    first_name: string;
+    last_name: string;
+    birthdate: string;
+  }): Promise<{ message: string; guest_id: string }> => {
+    return apiCall('/v1/profiles/guests', {
+      method: 'POST',
+      body: JSON.stringify(guestData),
+    });
+  },
+
+  list: async (): Promise<GuestProfile[]> => {
+    const response = await apiCall('/v1/profiles/guests');
+    return response.guests || [];
+  },
+
+  initiateClaim: async (guestId: string, email: string): Promise<{ message: string }> => {
+    return apiCall(`/v1/profiles/guests/${guestId}/initiate-claim`, {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  claim: async (token: string, password: string): Promise<{ message: string }> => {
+    return apiCall('/v1/profiles/claim', {
+      method: 'POST',
+      body: JSON.stringify({ token, password }),
+    });
+  },
+};
+
+// File Upload API
+export const uploadAPI = {
+  upload: async (file: File, type: 'gpx' | 'img'): Promise<{ url: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+
+    const token = getAuthToken();
+    const response = await fetch(`${API_BASE_URL}/v1/upload`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error?.message || errorData.message || `Upload failed: ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
   },
 };
 
@@ -491,18 +593,44 @@ export const paymentsAPI = {
     });
   },
 
-  webhook: async (payload: any, signature: string): Promise<void> => {
+  webhook: async (payload: any): Promise<{ received: string }> => {
     return apiCall('/v1/payments/webhook', {
       method: 'POST',
-      headers: {
-        'Stripe-Signature': signature,
-      },
       body: JSON.stringify(payload),
     });
   },
 };
 
+// Server-to-Server API (for automated processes)
+export const serverAPI = {
+  createRecord: async (recordData: {
+    ranking_id: string;
+    face_signature: string;
+    ocr_label: string;
+    latitude: number;
+    longitude: number;
+    source: string;
+  }, apiKey: string): Promise<{ message: string; record_id: string }> => {
+    const response = await fetch(`${API_BASE_URL}/v1/server/records`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+      },
+      body: JSON.stringify(recordData),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      const errorMessage = errorData.error?.message || `Server API call failed: ${response.status}`;
+      throw new Error(errorMessage);
+    }
+
+    return response.json();
+  },
+};
+
 // Health check
-export const healthCheck = async (): Promise<{ message: string; version: string }> => {
+export const healthCheck = async (): Promise<{ message: string; version?: string }> => {
   return apiCall('/');
 };

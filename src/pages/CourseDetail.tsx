@@ -53,9 +53,11 @@ const CourseDetail = () => {
               event_id: eventData.id,
               name: eventData.name,
               description: "Épreuve principale",
-              max_participants: 1000,
-              created_at: eventData.created_at,
-              updated_at: eventData.updated_at
+              start_time: eventData.start_time,
+              end_time: eventData.start_time,
+              registration_end_time: eventData.start_time,
+              category_label: "Course",
+              max_participants: 1000
             }
           ]);
         }
