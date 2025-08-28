@@ -7,11 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { authAPI, setAuthToken } from "@/services/api";
+import { authAPI } from "@/services/api";
+import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loginData, setLoginData] = useState({ identifier: "", password: "" });
@@ -26,12 +28,11 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const loginResponse = await authAPI.login(loginData.identifier, loginData.password);
-      setAuthToken(loginResponse.token);
+      await login(loginData.identifier, loginData.password);
       
       toast({
         title: "Connexion réussie",
-        description: `Bienvenue ${loginResponse.user.email} !`,
+        description: "Bienvenue !",
       });
       
       navigate('/profil');
@@ -52,16 +53,15 @@ const Login = () => {
     setIsLoading(true);
 
     try {
-      const registerResponse = await authAPI.register(registerData.email, registerData.username, registerData.password);
+      await authAPI.register(registerData.email, registerData.username, registerData.password);
       
       toast({
         title: "Inscription réussie",
-        description: `Bienvenue ${registerResponse.user.email} ! Votre compte a été créé.`,
+        description: "Votre compte a été créé. Connexion en cours...",
       });
       
-      // Since registration doesn't return a token, we need to login automatically
-      const loginResponse = await authAPI.login(registerData.email, registerData.password);
-      setAuthToken(loginResponse.token);
+      // Automatically login after registration
+      await login(registerData.email, registerData.password);
       
       navigate('/profil');
     } catch (error) {
