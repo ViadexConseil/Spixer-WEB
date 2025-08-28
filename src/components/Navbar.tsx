@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
-import { Menu, X, User, Settings, Shield, LogOut, UserCircle } from "lucide-react";
+import { Menu, X, User, Settings, Shield, LogOut, UserCircle, BarChart3, Users } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
-import { getAuthToken, removeAuthToken } from "@/services/api";
+import { useAuth } from "@/hooks/useAuth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,15 +17,9 @@ import { toast } from "@/hooks/use-toast";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const { user, logout, hasRole } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  useEffect(() => {
-    // Check if user is logged in
-    const token = getAuthToken();
-    setIsLoggedIn(!!token);
-  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -56,8 +50,7 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    removeAuthToken();
-    setIsLoggedIn(false);
+    logout();
     navigate('/');
     toast({
       title: "Déconnexion réussie",
@@ -102,7 +95,7 @@ const Navbar = () => {
           <Link to="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</Link>
           <Link to="/contact" className="nav-link hover:text-spixer-blue transition-colors">Contact</Link>
           
-          {!isLoggedIn ? (
+          {!user ? (
             <>
               <Link to="/login" className="bg-spixer-blue hover:bg-spixer-blue-dark text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
                 Se connecter
@@ -132,6 +125,18 @@ const Navbar = () => {
                   <User className="mr-2 h-4 w-4" />
                   <span>Profil</span>
                 </DropdownMenuItem>
+                {hasRole('admin') && (
+                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    <span>Admin Dashboard</span>
+                  </DropdownMenuItem>
+                )}
+                {hasRole('organizer') && (
+                  <DropdownMenuItem onClick={() => navigate('/organizer')}>
+                    <Users className="mr-2 h-4 w-4" />
+                    <span>Organizer Dashboard</span>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuItem onClick={() => navigate('/settings')}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Paramètres</span>
@@ -197,7 +202,7 @@ const Navbar = () => {
             Contact
           </Link>
           <div className="flex flex-col space-y-4 w-full mt-8">
-            {!isLoggedIn ? (
+            {!user ? (
               <>
                 <button 
                   onClick={() => {

@@ -46,6 +46,7 @@ export interface ProfileUser {
   user_id: string;
   email: string;
   username: string;
+  roles: string[];
   user_created_at: string;
   first_name?: string;
   last_name?: string;
@@ -498,6 +499,14 @@ export const userInformationsAPI = {
       method: 'PUT',
       body: JSON.stringify(informations),
     });
+  },
+};
+
+// Organizer API
+export const organizerAPI = {
+  getEvents: async (): Promise<Event[]> => {
+    const response = await apiCall('/v1/organizer/events');
+    return response.events || [];
   },
 };
 
