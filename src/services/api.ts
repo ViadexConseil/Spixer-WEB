@@ -207,7 +207,7 @@ export const removeAuthToken = (): void => {
 };
 
 // API helper function
-const apiCall = async (endpoint: string, options: RequestInit = {}): Promise<any> => {
+const apiCall = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
   const token = getAuthToken();
   
   const config: RequestInit = {
@@ -626,7 +626,7 @@ export const paymentsAPI = {
     });
   },
 
-  webhook: async (payload: any): Promise<{ received: string }> => {
+  webhook: async (payload: Record<string, unknown>): Promise<{ received: string }> => {
     return apiCall('/v1/payments/webhook', {
       method: 'POST',
       body: JSON.stringify(payload),

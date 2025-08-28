@@ -27,7 +27,10 @@ const CreateCourse = () => {
     name: "",
     description: "",
     max_participants: 100,
-    id: Date.now().toString()
+    id: Date.now().toString(),
+    start_time: "",
+    end_time: "",
+    registration_end_time: "",
   }]);
 
   const addStage = () => {
@@ -35,7 +38,10 @@ const CreateCourse = () => {
       name: "",
       description: "",
       max_participants: 100,
-      id: Date.now().toString()
+      id: Date.now().toString(),
+      start_time: "",
+      end_time: "",
+      registration_end_time: "",
     }]);
   };
 
@@ -45,7 +51,7 @@ const CreateCourse = () => {
     }
   };
 
-  const updateStage = (stageId: string, field: string, value: any) => {
+  const updateStage = (stageId: string, field: string, value: string | number) => {
     setStages(stages.map(stage => 
       stage.id === stageId ? { ...stage, [field]: value } : stage
     ));
@@ -108,30 +114,35 @@ const CreateCourse = () => {
       // Create stages for the event
       const stagesToCreate = stages.filter(stage => stage.name.trim() !== "");
       
-      // If no stages were added, create a default stage with the event name
-      if (stagesToCreate.length === 0) {
+      // Create the specified stages
+      for (const stage of stagesToCreate) {
+        if (!stage.start_time || !stage.end_time || !stage.registration_end_time) {
+            toast({
+                title: "Dates manquantes pour une épreuve",
+                description: `Veuillez renseigner toutes les dates pour l'épreuve: ${stage.name}`,
+                variant: "destructive",
+            });
+            // We should probably stop the whole process here
+            throw new Error("Missing dates for a stage");
+        }
         await stagesAPI.create({
           event_id: createdEvent.event_id,
-          name: eventData.name,
-          description: "Épreuve principale",
-          start_time: eventData.start_time,
-          end_time: eventData.start_time,
-          registration_end_time: eventData.start_time,
-          max_participants: 1000
+          name: stage.name,
+          description: stage.description,
+          start_time: stage.start_time,
+          end_time: stage.end_time,
+          registration_end_time: stage.registration_end_time,
+          max_participants: stage.max_participants
         });
-      } else {
-        // Create the specified stages
-        for (const stage of stagesToCreate) {
-          await stagesAPI.create({
-            event_id: createdEvent.event_id,
-            name: stage.name,
-            description: stage.description,
-            start_time: eventData.start_time,
-            end_time: eventData.start_time,
-            registration_end_time: eventData.start_time,
-            max_participants: stage.max_participants
-          });
-        }
+      }
+
+      if (stagesToCreate.length === 0) {
+        toast({
+            title: "Aucune épreuve",
+            description: "Veuillez ajouter au moins une épreuve à votre événement.",
+            variant: "destructive",
+        });
+        throw new Error("No stages provided");
       }
 
       toast({
@@ -318,36 +329,53 @@ const CreateCourse = () => {
                           </Button>
                         )}
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor={`epreuve-${stage.id}`}>Nom de l'épreuve</Label>
-                          <Input 
-                            id={`epreuve-${stage.id}`} 
-                            placeholder="Ex: Marathon, Semi-marathon..." 
-                            value={stage.name}
-                            onChange={(e) => updateStage(stage.id, 'name', e.target.value)}
-                          />
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor={`epreuve-${stage.id}`}>Nom de l'épreuve *</Label>
+                            <Input
+                              id={`epreuve-${stage.id}`}
+                              placeholder="Ex: Marathon, Semi-marathon..."
+                              value={stage.name}
+                              onChange={(e) => updateStage(stage.id, 'name', e.target.value)}
+                              required
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor={`participants-${stage.id}`}>Nombre max de participants</Label>
+                            <Input
+                              id={`participants-${stage.id}`}
+                              type="number"
+                              placeholder="100"
+                              value={stage.max_participants}
+                              onChange={(e) => updateStage(stage.id, 'max_participants', parseInt(e.target.value) || 100)}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <Label htmlFor={`start_time-${stage.id}`}>Début *</Label>
+                                <Input type="datetime-local" id={`start_time-${stage.id}`} value={stage.start_time} onChange={(e) => updateStage(stage.id, 'start_time', e.target.value)} required />
+                            </div>
+                            <div>
+                                <Label htmlFor={`end_time-${stage.id}`}>Fin *</Label>
+                                <Input type="datetime-local" id={`end_time-${stage.id}`} value={stage.end_time} onChange={(e) => updateStage(stage.id, 'end_time', e.target.value)} required />
+                            </div>
+                            <div>
+                                <Label htmlFor={`registration_end_time-${stage.id}`}>Fin des inscriptions *</Label>
+                                <Input type="datetime-local" id={`registration_end_time-${stage.id}`} value={stage.registration_end_time} onChange={(e) => updateStage(stage.id, 'registration_end_time', e.target.value)} required />
+                            </div>
                         </div>
                         <div>
-                          <Label htmlFor={`participants-${stage.id}`}>Nombre max de participants</Label>
-                          <Input 
-                            id={`participants-${stage.id}`} 
-                            type="number"
-                            placeholder="100" 
-                            value={stage.max_participants}
-                            onChange={(e) => updateStage(stage.id, 'max_participants', parseInt(e.target.value) || 100)}
+                          <Label htmlFor={`description-${stage.id}`}>Description</Label>
+                          <Textarea
+                            id={`description-${stage.id}`}
+                            placeholder="Description de l'épreuve..."
+                            rows={2}
+                            value={stage.description}
+                            onChange={(e) => updateStage(stage.id, 'description', e.target.value)}
                           />
                         </div>
-                      </div>
-                      <div className="mt-4">
-                        <Label htmlFor={`description-${stage.id}`}>Description</Label>
-                        <Textarea 
-                          id={`description-${stage.id}`}
-                          placeholder="Description de l'épreuve..."
-                          rows={2}
-                          value={stage.description}
-                          onChange={(e) => updateStage(stage.id, 'description', e.target.value)}
-                        />
                       </div>
                     </CardContent>
                   </Card>

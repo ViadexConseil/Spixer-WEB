@@ -108,11 +108,12 @@ const Checkout = () => {
         navigate('/profil');
       }, 2000);
 
-    } catch (error: any) {
+    } catch (error) {
       console.error('Payment error:', error);
+      const errorMessage = error instanceof Error ? error.message : "Une erreur est survenue lors du paiement";
       toast({
         title: "Erreur de paiement",
-        description: error.message || "Une erreur est survenue lors du paiement",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

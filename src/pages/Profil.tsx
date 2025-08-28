@@ -125,6 +125,7 @@ const Profil = () => {
   // Use actual registration data from user profile  
   const mesCoursesParticipant = user.registrations?.map(registration => ({
     id: registration.registration_id,
+    eventId: registration.stage?.event?.event_id,
     title: registration.stage?.event?.event_name || 'Course inconnue',
     date: registration.stage?.event?.start_time || '',
     status: registration.stage?.event?.start_time ? 
@@ -257,7 +258,7 @@ const Profil = () => {
                       )}
                     </div>
                     <Button className="w-full mt-4" variant="outline" asChild>
-                      <a href={`/courses/${course.id}`}>Voir détails</a>
+                      <a href={course.eventId ? `/courses/${course.eventId}` : '#'}>Voir détails</a>
                     </Button>
                   </CardContent>
                 </Card>
@@ -476,7 +477,10 @@ const Profil = () => {
                      )}
                   </div>
                   <div className="pt-4 border-t">
-                    <Button className="bg-spixer-orange hover:bg-spixer-orange-dark">
+                    <Button
+                      className="bg-spixer-orange hover:bg-spixer-orange-dark"
+                      onClick={() => navigate('/settings')}
+                    >
                       Modifier le profil
                     </Button>
                   </div>
