@@ -19,8 +19,12 @@ const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [newCategory, setNewCategory] = useState('');
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
   const [editingEvent, setEditingEvent] = useState<Partial<Event>>({});
+  const [editingStage, setEditingStage] = useState<Partial<Stage>>({});
   const [eventStages, setEventStages] = useState<Stage[]>([]);
+  const [stageRegistrations, setStageRegistrations] = useState<Registration[]>([]);
+  const [stageRankings, setStageRankings] = useState<Ranking[]>([]);
 
   useEffect(() => {
     loadData();
@@ -167,10 +171,69 @@ const AdminDashboard = () => {
     }
   };
 
+  const handleEditStage = async (stage: Stage) => {
+    setSelectedStage(stage);
+    setEditingStage(stage);
+    try {
+      const [stageRegs, stageRanks] = await Promise.all([
+        registrationsAPI.getByStage(stage.id),
+        rankingsAPI.getByStage(stage.id),
+      ]);
+      setStageRegistrations(stageRegs);
+      setStageRankings(stageRanks);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les données de l'étape",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleSaveStage = async () => {
+    if (!selectedStage || !editingStage.name || !editingStage.description) return;
+
+    try {
+      await stagesAPI.update(selectedStage.id, {
+        name: editingStage.name,
+        description: editingStage.description,
+        start_time: editingStage.start_time,
+        end_time: editingStage.end_time,
+        registration_end_time: editingStage.registration_end_time,
+      });
+      
+      const updatedStages = await stagesAPI.getByEvent(selectedEvent!.id);
+      setEventStages(updatedStages);
+      setSelectedStage(null);
+      setEditingStage({});
+      toast({
+        title: "Succès",
+        description: "Étape mise à jour avec succès",
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour l'étape",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleBackToStages = () => {
+    setSelectedStage(null);
+    setEditingStage({});
+    setStageRegistrations([]);
+    setStageRankings([]);
+  };
+
   const handleBackToEvents = () => {
     setSelectedEvent(null);
+    setSelectedStage(null);
     setEditingEvent({});
+    setEditingStage({});
     setEventStages([]);
+    setStageRegistrations([]);
+    setStageRankings([]);
   };
 
   if (loading) {
@@ -234,8 +297,6 @@ const AdminDashboard = () => {
         <TabsList>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
           <TabsTrigger value="events">Événements</TabsTrigger>
-          <TabsTrigger value="registrations">Inscriptions</TabsTrigger>
-          <TabsTrigger value="rankings">Classements</TabsTrigger>
         </TabsList>
 
         <TabsContent value="categories">
@@ -276,7 +337,164 @@ const AdminDashboard = () => {
         </TabsContent>
 
         <TabsContent value="events">
-          {selectedEvent ? (
+          {selectedStage ? (
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Button variant="ghost" size="sm" onClick={handleBackToStages}>
+                      <ArrowLeft className="w-4 h-4" />
+                    </Button>
+                    Gestion: {selectedStage.name}
+                  </CardTitle>
+                  <CardDescription>Modifiez l'étape et gérez ses inscriptions et classements</CardDescription>
+                </div>
+                <Button onClick={handleSaveStage}>
+                  <Save className="w-4 h-4 mr-2" />
+                  Sauvegarder
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Nom de l'étape</label>
+                    <Input
+                      value={editingStage.name || ''}
+                      onChange={(e) => setEditingStage({ ...editingStage, name: e.target.value })}
+                      placeholder="Nom de l'étape"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Catégorie</label>
+                    <Input
+                      value={editingStage.category_label || ''}
+                      onChange={(e) => setEditingStage({ ...editingStage, category_label: e.target.value })}
+                      placeholder="Catégorie"
+                      disabled
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Date de début</label>
+                    <Input
+                      type="datetime-local"
+                      value={editingStage.start_time ? editingStage.start_time.slice(0, 16) : ''}
+                      onChange={(e) => setEditingStage({ ...editingStage, start_time: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Date de fin</label>
+                    <Input
+                      type="datetime-local"
+                      value={editingStage.end_time ? editingStage.end_time.slice(0, 16) : ''}
+                      onChange={(e) => setEditingStage({ ...editingStage, end_time: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Fin des inscriptions</label>
+                    <Input
+                      type="datetime-local"
+                      value={editingStage.registration_end_time ? editingStage.registration_end_time.slice(0, 16) : ''}
+                      onChange={(e) => setEditingStage({ ...editingStage, registration_end_time: e.target.value })}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="text-sm font-medium">Description</label>
+                    <Textarea
+                      value={editingStage.description || ''}
+                      onChange={(e) => setEditingStage({ ...editingStage, description: e.target.value })}
+                      placeholder="Description de l'étape"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Inscriptions */}
+                  <div className="border-t pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Inscriptions ({stageRegistrations.length})</h3>
+                    </div>
+                    
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {stageRegistrations.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-4">
+                          Aucune inscription pour cette étape
+                        </p>
+                      ) : (
+                        stageRegistrations.map((registration) => (
+                          <div key={registration.id} className="p-3 border rounded-lg">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h4 className="font-semibold text-sm">{registration.user_email}</h4>
+                                <div className="flex gap-2 mt-1">
+                                  <Badge variant={registration.status === 'approved' ? 'default' : 'secondary'} className="text-xs">
+                                    {registration.status}
+                                  </Badge>
+                                  <Badge variant="outline" className="text-xs">{registration.type}</Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                  {new Date(registration.created_at).toLocaleDateString()}
+                                </p>
+                              </div>
+                              <Button variant="outline" size="sm">
+                                <Edit className="w-3 h-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Classements */}
+                  <div className="border-t pt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-semibold">Classements ({stageRankings.length})</h3>
+                      <Button size="sm">
+                        <Plus className="w-4 h-4 mr-2" />
+                        Ajouter un résultat
+                      </Button>
+                    </div>
+                    
+                    <div className="space-y-3 max-h-96 overflow-y-auto">
+                      {stageRankings.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-4">
+                          Aucun classement pour cette étape
+                        </p>
+                      ) : (
+                        stageRankings
+                          .sort((a, b) => a.rank_position - b.rank_position)
+                          .map((ranking) => (
+                            <div key={ranking.id} className="p-3 border rounded-lg">
+                              <div className="flex items-center justify-between">
+                                <div>
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                                      <span className="text-sm font-bold">#{ranking.rank_position}</span>
+                                    </div>
+                                    <div>
+                                      <h4 className="font-semibold text-sm">{ranking.user_email}</h4>
+                                      <p className="text-xs text-muted-foreground">Position {ranking.rank_position}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <Button variant="outline" size="sm">
+                                    <Edit className="w-3 h-3" />
+                                  </Button>
+                                  <Button variant="destructive" size="sm">
+                                    <Trash2 className="w-3 h-3" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ) : selectedEvent ? (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
@@ -353,8 +571,8 @@ const AdminDashboard = () => {
                       </p>
                     ) : (
                       eventStages.map((stage) => (
-                        <div key={stage.id} className="flex items-center justify-between p-4 border rounded-lg">
-                          <div>
+                        <div key={stage.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
+                          <div className="flex-1 cursor-pointer" onClick={() => handleEditStage(stage)}>
                             <h4 className="font-semibold">{stage.name}</h4>
                             <p className="text-sm text-muted-foreground">{stage.description}</p>
                             <div className="flex gap-2 mt-1">
@@ -365,7 +583,11 @@ const AdminDashboard = () => {
                             </p>
                           </div>
                           <div className="flex gap-2">
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleEditStage(stage)}
+                            >
                               <Edit className="w-4 h-4" />
                             </Button>
                             <Button
@@ -429,68 +651,6 @@ const AdminDashboard = () => {
           )}
         </TabsContent>
 
-
-        <TabsContent value="registrations">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Inscriptions</CardTitle>
-              <CardDescription>Vue d'ensemble de toutes les inscriptions</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {registrations.map((registration) => (
-                  <div key={registration.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-semibold">{registration.user_email}</h3>
-                      <p className="text-sm text-muted-foreground">{registration.event_name} - {registration.stage_name}</p>
-                      <div className="flex gap-2 mt-1">
-                        <Badge variant={registration.status === 'approved' ? 'default' : 'secondary'}>
-                          {registration.status}
-                        </Badge>
-                        <Badge variant="outline">{registration.type}</Badge>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="rankings">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Classements</CardTitle>
-              <CardDescription>Vue d'ensemble de tous les classements</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {rankings.map((ranking) => (
-                  <div key={ranking.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <h3 className="font-semibold">Position #{ranking.rank_position}</h3>
-                      <p className="text-sm text-muted-foreground">{ranking.user_email}</p>
-                      <p className="text-sm">{ranking.event_name} - {ranking.stage_name}</p>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button variant="destructive" size="sm">
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
       </Tabs>
     </div>
   );
