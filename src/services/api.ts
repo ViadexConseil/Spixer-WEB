@@ -584,6 +584,30 @@ export const uploadAPI = {
   },
 };
 
+// User Account Management API (Password & Email Change)
+export const accountAPI = {
+  changePassword: async (currentPassword: string, newPassword: string): Promise<{ message: string }> => {
+    return apiCall('/v1/user/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+    });
+  },
+
+  requestEmailChange: async (newEmail: string): Promise<{ message: string }> => {
+    return apiCall('/v1/user/request-email-change', {
+      method: 'POST',
+      body: JSON.stringify({ new_email: newEmail }),
+    });
+  },
+
+  verifyEmailChange: async (token: string): Promise<{ message: string }> => {
+    return apiCall('/v1/user/verify-email-change', {
+      method: 'POST',
+      body: JSON.stringify({ token }),
+    });
+  },
+};
+
 // Payments API
 export const paymentsAPI = {
   createIntent: async (amount: number, currency: string = 'eur'): Promise<PaymentIntent> => {

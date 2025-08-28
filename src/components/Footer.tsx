@@ -38,10 +38,10 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Légal</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Mentions légales</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">RGPD</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Conditions d'utilisation</a></li>
+              <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">Mentions légales</a></li>
+              <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">RGPD</a></li>
+              <li><a href="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+              <li><a href="/privacy" className="text-gray-400 hover:text-white transition-colors">Conditions d'utilisation</a></li>
             </ul>
           </div>
 
@@ -49,10 +49,10 @@ const Footer = () => {
           <div>
             <h4 className="font-semibold mb-4">Support</h4>
             <ul className="space-y-2">
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Support technique</a></li>
-              <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Formation</a></li>
+              <li><a href="/faq" className="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+              <li><a href="/faq" className="text-gray-400 hover:text-white transition-colors">FAQ</a></li>
+              <li><a href="/contact" className="text-gray-400 hover:text-white transition-colors">Support technique</a></li>
+              <li><a href="/contact" className="text-gray-400 hover:text-white transition-colors">Formation</a></li>
             </ul>
           </div>
         </div>

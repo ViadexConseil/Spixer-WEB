@@ -126,9 +126,12 @@ const CTAFinal = () => {
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </button>
             
-            <button className="text-white border border-white/30 hover:border-white font-medium py-4 px-8 rounded-full hover:bg-white/10 transition-all duration-300">
+            <a 
+              href="/contact"
+              className="text-white border border-white/30 hover:border-white font-medium py-4 px-8 rounded-full hover:bg-white/10 transition-all duration-300 inline-block text-center"
+            >
               En savoir plus
-            </button>
+            </a>
           </div>
         </div>
       </div>
