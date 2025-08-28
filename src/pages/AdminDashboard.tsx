@@ -27,6 +27,14 @@ const AdminDashboard = () => {
   const [eventStages, setEventStages] = useState<Stage[]>([]);
   const [stageRegistrations, setStageRegistrations] = useState<Registration[]>([]);
   const [stageRankings, setStageRankings] = useState<Ranking[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const filteredRegistrations = registrations.filter(
+    (registration) =>
+      registration.user_email.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      (statusFilter === 'all' || registration.status === statusFilter)
+  );
 
   useEffect(() => {
     loadData();
@@ -238,6 +246,23 @@ const AdminDashboard = () => {
     setStageRankings([]);
   };
 
+  const handleUpdateRegistrationStatus = async (id: string, status: 'approved' | 'rejected') => {
+    try {
+      await registrationsAPI.update(id, { status });
+      loadData();
+      toast({
+        title: "Succès",
+        description: `Inscription ${status === 'approved' ? 'approuvée' : 'rejetée'} avec succès`,
+      });
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de mettre à jour l'inscription",
+        variant: "destructive",
+      });
+    }
+  };
+
   if (loading) {
     return (
       <>
@@ -305,6 +330,7 @@ const AdminDashboard = () => {
         <TabsList>
           <TabsTrigger value="categories">Catégories</TabsTrigger>
           <TabsTrigger value="events">Événements</TabsTrigger>
+          <TabsTrigger value="registrations">Inscriptions</TabsTrigger>
         </TabsList>
 
         <TabsContent value="categories">
@@ -657,6 +683,71 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           )}
+        </TabsContent>
+
+        <TabsContent value="registrations">
+          <Card>
+            <CardHeader>
+              <CardTitle>Gestion des Inscriptions</CardTitle>
+              <CardDescription>Rechercher, filtrer et gérer les inscriptions des utilisateurs</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between mb-4">
+                <Input
+                  placeholder="Rechercher par email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="max-w-sm"
+                />
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="p-2 border rounded-lg"
+                >
+                  <option value="all">Tous les statuts</option>
+                  <option value="pending">En attente</option>
+                  <option value="approved">Approuvé</option>
+                  <option value="rejected">Rejeté</option>
+                </select>
+              </div>
+              <div className="space-y-4">
+                {filteredRegistrations.map((registration) => (
+                  <div key={registration.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div>
+                      <p className="font-semibold">{registration.user_email}</p>
+                      <p className="text-sm text-muted-foreground">
+                        Étape: {stages.find(s => s.id === registration.stage_id)?.name || 'N/A'}
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        {new Date(registration.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant={registration.status === 'approved' ? 'default' : 'secondary'}>
+                        {registration.status}
+                      </Badge>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleUpdateRegistrationStatus(registration.id, 'approved')}
+                        disabled={registration.status === 'approved'}
+                      >
+                        Approuver
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleUpdateRegistrationStatus(registration.id, 'rejected')}
+                        disabled={registration.status === 'rejected'}
+                      >
+                        Rejeter
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </TabsContent>
 
       </Tabs>

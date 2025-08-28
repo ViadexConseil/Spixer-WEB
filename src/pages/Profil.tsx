@@ -174,10 +174,6 @@ const Profil = () => {
               </div>
             </div>
             <div className="flex gap-3">
-              <Button variant="outline" className="flex items-center gap-2">
-                <Settings className="w-4 h-4" />
-                Paramètres
-              </Button>
               <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
                 <a href="/create" className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
