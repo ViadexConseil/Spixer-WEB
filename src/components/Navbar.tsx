@@ -128,15 +128,16 @@ const Navbar = () => {
                 {hasRole('admin') && (
                   <DropdownMenuItem onClick={() => navigate('/admin')}>
                     <BarChart3 className="mr-2 h-4 w-4" />
-                    <span>Admin Dashboard</span>
+                    <span>Administration</span>
                   </DropdownMenuItem>
                 )}
                 {hasRole('organizer') && (
                   <DropdownMenuItem onClick={() => navigate('/organizer')}>
                     <Users className="mr-2 h-4 w-4" />
-                    <span>Organizer Dashboard</span>
+                    <span>Organisateur</span>
                   </DropdownMenuItem>
                 )}
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/settings')}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Paramètres</span>

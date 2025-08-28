@@ -7,6 +7,8 @@ import { Plus, Edit, Trash2, Users, Calendar, Eye } from 'lucide-react';
 import { organizerAPI, stagesAPI, registrationsAPI, rankingsAPI } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import type { Event, Stage, Registration, Ranking } from '@/services/api';
 
 const OrganizerDashboard = () => {
@@ -55,9 +57,13 @@ const OrganizerDashboard = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="text-center">Chargement...</div>
-      </div>
+      <>
+        <Navbar />
+        <div className="container mx-auto p-6 pt-24">
+          <div className="text-center">Chargement...</div>
+        </div>
+        <Footer />
+      </>
     );
   }
 
@@ -69,7 +75,9 @@ const OrganizerDashboard = () => {
   const myRankings = rankings.filter(rank => myStageIds.includes(rank.stage_id));
 
   return (
-    <div className="container mx-auto p-6">
+    <>
+      <Navbar />
+      <div className="container mx-auto p-6 pt-24">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Tableau de Bord Organisateur</h1>
         <p className="text-muted-foreground">Gérez vos événements, étapes et inscriptions</p>
@@ -295,7 +303,9 @@ const OrganizerDashboard = () => {
           </Card>
         </TabsContent>
       </Tabs>
-    </div>
+      </div>
+      <Footer />
+    </>
   );
 };
 
