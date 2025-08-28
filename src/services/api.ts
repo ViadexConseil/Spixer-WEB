@@ -261,12 +261,12 @@ export const authAPI = {
 // Events API
 export const eventsAPI = {
   list: async (): Promise<Event[]> => {
-    const response = await apiCall('/v1/events');
+    const response = await apiCall<{ events: Event[] }>('/v1/events');
     return response.events || [];
   },
 
   get: async (id: string): Promise<Event> => {
-    const response = await apiCall(`/v1/events/${id}`);
+    const response = await apiCall<{ event: Event }>(`/v1/events/${id}`);
     return response.event;
   },
 
@@ -307,17 +307,17 @@ export const eventsAPI = {
 // Stages API
 export const stagesAPI = {
   list: async (): Promise<Stage[]> => {
-    const response = await apiCall('/v1/stages');
+    const response = await apiCall<{ stages: Stage[] }>('/v1/stages');
     return response.stages || [];
   },
 
   get: async (id: string): Promise<Stage> => {
-    const response = await apiCall(`/v1/stages/${id}`);
+    const response = await apiCall<{ stage: Stage }>(`/v1/stages/${id}`);
     return response.stage;
   },
 
   getByEvent: async (eventId: string): Promise<Stage[]> => {
-    const response = await apiCall(`/v1/events/${eventId}/stages`);
+    const response = await apiCall<{ stages: Stage[] }>(`/v1/events/${eventId}/stages`);
     return response.stages || [];
   },
 
@@ -361,17 +361,17 @@ export const stagesAPI = {
 // Registrations API
 export const registrationsAPI = {
   list: async (): Promise<Registration[]> => {
-    const response = await apiCall('/v1/registrations');
+    const response = await apiCall<{ registrations: Registration[] }>('/v1/registrations');
     return response.registrations || [];
   },
 
   get: async (id: string): Promise<Registration> => {
-    const response = await apiCall(`/v1/registrations/${id}`);
+    const response = await apiCall<{ registration: Registration }>(`/v1/registrations/${id}`);
     return response.registration;
   },
 
   getByStage: async (stageId: string): Promise<Registration[]> => {
-    const response = await apiCall(`/v1/stages/${stageId}/registrations`);
+    const response = await apiCall<{ registrations: Registration[] }>(`/v1/stages/${stageId}/registrations`);
     return response.registrations || [];
   },
 
@@ -406,17 +406,17 @@ export const registrationsAPI = {
 // Rankings API
 export const rankingsAPI = {
   list: async (): Promise<Ranking[]> => {
-    const response = await apiCall('/v1/rankings');
+    const response = await apiCall<{ rankings: Ranking[] }>('/v1/rankings');
     return response.rankings || [];
   },
 
   get: async (id: string): Promise<Ranking> => {
-    const response = await apiCall(`/v1/rankings/${id}`);
+    const response = await apiCall<{ ranking: Ranking }>(`/v1/rankings/${id}`);
     return response.ranking;
   },
 
   getByStage: async (stageId: string): Promise<Ranking[]> => {
-    const response = await apiCall(`/v1/stages/${stageId}/rankings`);
+    const response = await apiCall<{ rankings: Ranking[] }>(`/v1/stages/${stageId}/rankings`);
     return response.rankings || [];
   },
 
@@ -447,7 +447,7 @@ export const rankingsAPI = {
   },
 
   getRecords: async (rankingId: string): Promise<RankingRecord[]> => {
-    const response = await apiCall(`/v1/rankings/${rankingId}/records`);
+    const response = await apiCall<{ records: RankingRecord[] }>(`/v1/rankings/${rankingId}/records`);
     return response.records || [];
   },
 };
@@ -455,12 +455,12 @@ export const rankingsAPI = {
 // Categories API
 export const categoriesAPI = {
   list: async (): Promise<Category[]> => {
-    const response = await apiCall('/v1/categories');
+    const response = await apiCall<{ categories: Category[] }>('/v1/categories');
     return response.categories || [];
   },
 
   get: async (id: number): Promise<Category> => {
-    const response = await apiCall(`/v1/categories/${id}`);
+    const response = await apiCall<{ category: Category }>(`/v1/categories/${id}`);
     return response.category;
   },
 
@@ -505,7 +505,7 @@ export const userInformationsAPI = {
 // Organizer API
 export const organizerAPI = {
   getEvents: async (): Promise<Event[]> => {
-    const response = await apiCall('/v1/organizer/events');
+    const response = await apiCall<{ events: Event[] }>('/v1/organizer/events');
     return response.events || [];
   },
 };
@@ -513,22 +513,22 @@ export const organizerAPI = {
 // Clubs API
 export const clubsAPI = {
   list: async (): Promise<Club[]> => {
-    const response = await apiCall('/v1/clubs');
+    const response = await apiCall<{ clubs: Club[] }>('/v1/clubs');
     return response.clubs || [];
   },
 
   get: async (id: string): Promise<Club> => {
-    const response = await apiCall(`/v1/clubs/${id}`);
+    const response = await apiCall<{ club: Club }>(`/v1/clubs/${id}`);
     return response.club;
   },
 
   getMembers: async (id: string): Promise<ClubMember[]> => {
-    const response = await apiCall(`/v1/clubs/${id}/members`);
+    const response = await apiCall<{ members: ClubMember[] }>(`/v1/clubs/${id}/members`);
     return response.members || [];
   },
 
   getEvents: async (id: string): Promise<Event[]> => {
-    const response = await apiCall(`/v1/clubs/${id}/events`);
+    const response = await apiCall<{ events: Event[] }>(`/v1/clubs/${id}/events`);
     return response.events || [];
   },
 };
@@ -548,7 +548,7 @@ export const guestProfilesAPI = {
   },
 
   list: async (): Promise<GuestProfile[]> => {
-    const response = await apiCall('/v1/profiles/guests');
+    const response = await apiCall<{ guests: GuestProfile[] }>('/v1/profiles/guests');
     return response.guests || [];
   },
 
