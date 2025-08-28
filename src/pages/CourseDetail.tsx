@@ -24,44 +24,21 @@ const CourseDetail = () => {
       setLoading(true);
       
       try {
-        // First try to get all events and find the specific one
-        const allEvents = await eventsAPI.list();
-        const eventData = allEvents.find(event => event.id === id);
-        
-        if (!eventData) {
-          throw new Error('Event not found');
-        }
-        
+        const eventData = await eventsAPI.get(id);
         setEvent(eventData);
-        
-        // Try to fetch stages for this event
-        try {
-          const stagesData = await stagesAPI.getByEvent(id);
-          setStages(stagesData);
-          
-          // Fetch rankings for the first stage if available
-          if (stagesData.length > 0) {
-            const rankingsData = await rankingsAPI.getByStage(stagesData[0].id);
-            setRankings(rankingsData);
-          }
-        } catch (stagesError) {
-          console.log("No stages found for this event, using default");
-          // Create a default stage based on event name
-          setStages([
-            {
-              id: "default-stage",
-              event_id: eventData.id,
-              name: eventData.name,
-              description: "Épreuve principale",
-              start_time: eventData.start_time,
-              end_time: eventData.start_time,
-              registration_end_time: eventData.start_time,
-              category_label: "Course",
-              max_participants: 1000
-            }
-          ]);
+
+        const stagesData = await stagesAPI.getByEvent(id);
+        setStages(stagesData);
+
+        // Fetch rankings for all stages and combine them
+        if (stagesData.length > 0) {
+          const allRankings = await Promise.all(
+            stagesData.map(stage => rankingsAPI.getByStage(stage.id))
+          );
+          // Flatten the array of arrays and sort by rank
+          const combinedRankings = allRankings.flat().sort((a, b) => a.rank_position - b.rank_position);
+          setRankings(combinedRankings);
         }
-        
       } catch (error) {
         console.error("Erreur lors du chargement des données:", error);
         toast({
@@ -76,14 +53,6 @@ const CourseDetail = () => {
 
     fetchCourseData();
   }, [id]);
-
-  const mockClassement = [
-    { position: 1, nom: "Jean Dupont", temps: "2:15:34", dossard: "001" },
-    { position: 2, nom: "Marie Martin", temps: "2:18:42", dossard: "002" },
-    { position: 3, nom: "Pierre Bernard", temps: "2:22:15", dossard: "003" },
-    { position: 4, nom: "Sophie Dubois", temps: "2:25:31", dossard: "004" },
-    { position: 5, nom: "Antoine Moreau", temps: "2:28:07", dossard: "005" }
-  ];
 
   const getStatusBadge = (dateString: string) => {
     const eventDate = new Date(dateString);
@@ -299,31 +268,36 @@ const CourseDetail = () => {
           <TabsContent value="classement">
             <Card>
               <CardHeader>
-                <CardTitle>Classement en direct</CardTitle>
+                <CardTitle>Classement</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {mockClassement.map((runner) => (
-                    <div key={runner.position} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                          runner.position === 1 ? 'bg-yellow-500' : 
-                          runner.position === 2 ? 'bg-gray-400' : 
-                          runner.position === 3 ? 'bg-amber-600' : 'bg-gray-600'
-                        }`}>
-                          {runner.position}
-                        </div>
-                        <div>
-                          <div className="font-semibold">{runner.nom}</div>
-                          <div className="text-sm text-gray-600">Dossard #{runner.dossard}</div>
+                {rankings.length > 0 ? (
+                  <div className="space-y-4">
+                    {rankings.map((runner) => (
+                      <div key={runner.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-4">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                            runner.rank_position === 1 ? 'bg-yellow-500' :
+                            runner.rank_position === 2 ? 'bg-gray-400' :
+                            runner.rank_position === 3 ? 'bg-amber-600' : 'bg-gray-300'
+                          }`}>
+                            {runner.rank_position}
+                          </div>
+                          <div>
+                            <div className="font-semibold">{runner.user_email}</div>
+                            <div className="text-sm text-gray-600">{runner.stage_name}</div>
+                          </div>
                         </div>
                       </div>
-                      <div className="text-lg font-mono font-semibold">
-                        {runner.temps}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-10">
+                    <Trophy className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                    <h3 className="text-lg font-semibold">Classement non disponible</h3>
+                    <p className="text-gray-600 text-sm">Les résultats seront affichés ici une fois disponibles.</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
