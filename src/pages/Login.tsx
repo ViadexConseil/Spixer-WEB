@@ -35,7 +35,7 @@ const Login = () => {
         description: "Bienvenue !",
       });
       
-      navigate('/profil');
+      navigate('/profile');
     } catch (error) {
       console.error("Erreur de connexion:", error);
       toast({
@@ -63,7 +63,7 @@ const Login = () => {
       // Automatically login after registration
       await login(registerData.email, registerData.password);
       
-      navigate('/profil');
+      navigate('/profile');
     } catch (error) {
       console.error("Erreur d'inscription:", error);
       toast({

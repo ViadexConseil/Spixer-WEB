@@ -105,7 +105,7 @@ const Checkout = () => {
           title: "Paiement réussi !",
           description: "Votre inscription a été confirmée.",
         });
-        navigate('/profil');
+        navigate('/profile');
       }, 2000);
 
     } catch (error) {

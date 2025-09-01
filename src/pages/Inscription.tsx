@@ -55,7 +55,7 @@ const Inscription = () => {
             description: message,
             variant: "destructive",
           });
-          navigate(`/courses/${id}`);
+          navigate(`/events/${id}`);
           return;
         }
         
@@ -76,7 +76,7 @@ const Inscription = () => {
           description: "Impossible de charger les détails de l'événement.",
           variant: "destructive",
         });
-        navigate('/courses');
+        navigate('/events');
       }
     };
 
@@ -219,10 +219,10 @@ const Inscription = () => {
           <Button 
             variant="ghost" 
             className="mb-6 flex items-center gap-2"
-            onClick={() => navigate(`/courses/${id}`)}
+            onClick={() => navigate(`/events/${id}`)}
           >
             <ArrowLeft className="w-4 h-4" />
-            Retour à la course
+            Retour à l'événement
           </Button>
 
           {/* Course info header */}

@@ -149,7 +149,7 @@ const CourseDetail = () => {
             <div className="text-center py-20">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Événement non trouvé</h1>
               <Button asChild>
-                <a href="/courses">Retour aux événements</a>
+                <a href="/events">Retour aux événements</a>
               </Button>
             </div>
           </div>
@@ -232,7 +232,7 @@ const CourseDetail = () => {
                 </Button>
                 {registrationStatus.canRegister ? (
                   <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                    <a href={`/courses/${event.id}/participer`}>Participer</a>
+                    <a href={`/events/${event.id}/register`}>Participer</a>
                   </Button>
                 ) : (
                   <Button disabled className="bg-gray-400 cursor-not-allowed">

@@ -175,9 +175,9 @@ const Profil = () => {
             </div>
             <div className="flex gap-3">
               <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                <a href="/create" className="flex items-center gap-2">
+                <a href="/create-event" className="flex items-center gap-2">
                   <Plus className="w-4 h-4" />
-                  Créer une course
+                  Créer un événement
                 </a>
               </Button>
             </div>
@@ -254,7 +254,7 @@ const Profil = () => {
                       )}
                     </div>
                     <Button className="w-full mt-4" variant="outline" asChild>
-                      <a href={course.eventId ? `/courses/${course.eventId}` : '#'}>Voir détails</a>
+                      <a href={course.eventId ? `/events/${course.eventId}` : '#'}>Voir détails</a>
                     </Button>
                   </CardContent>
                 </Card>
@@ -266,7 +266,7 @@ const Profil = () => {
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune participation</h3>
                 <p className="text-gray-600 mb-4">Vous n'avez participé à aucune course pour le moment.</p>
                 <Button asChild>
-                  <a href="/courses">Découvrir les courses</a>
+                  <a href="/events">Découvrir les événements</a>
                 </Button>
               </div>
             )}
@@ -275,11 +275,11 @@ const Profil = () => {
           <TabsContent value="courses-creees">
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-xl font-semibold">Mes courses créées</h2>
+                <h2 className="text-xl font-semibold">Mes événements créés</h2>
                 <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                  <a href="/create" className="flex items-center gap-2">
+                  <a href="/create-event" className="flex items-center gap-2">
                     <Plus className="w-4 h-4" />
-                    Nouvelle course
+                    Nouvel événement
                   </a>
                 </Button>
               </div>
@@ -313,7 +313,7 @@ const Profil = () => {
                         Modifier
                       </Button>
                       <Button size="sm" className="flex-1" asChild>
-                        <a href={`/courses/${course.id}`}>Voir</a>
+                        <a href={`/events/${course.id}`}>Voir</a>
                       </Button>
                     </div>
                   </CardContent>
@@ -324,9 +324,9 @@ const Profil = () => {
               <div className="text-center py-12">
                 <Plus className="w-12 h-12 mx-auto text-gray-400 mb-4" />
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune course créée</h3>
-                <p className="text-gray-600 mb-4">Vous n'avez pas encore créé de course.</p>
+                <p className="text-gray-600 mb-4">Vous n'avez pas encore créé d'événement.</p>
                 <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                  <a href="/create">Créer ma première course</a>
+                  <a href="/create-event">Créer mon premier événement</a>
                 </Button>
               </div>
             )}
@@ -383,7 +383,7 @@ const Profil = () => {
                 <h3 className="text-lg font-medium text-gray-900 mb-2">Aucun badge débloqué</h3>
                 <p className="text-gray-600 mb-4">Participez à des courses pour débloquer vos premiers badges !</p>
                 <Button asChild>
-                  <a href="/courses">Découvrir les courses</a>
+                  <a href="/events">Découvrir les événements</a>
                 </Button>
               </div>
             )}

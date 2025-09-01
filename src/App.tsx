@@ -5,12 +5,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import Courses from "./pages/Courses";
+import Events from "./pages/Events";
 import CourseDetail from "./pages/CourseDetail";
 import Inscription from "./pages/Inscription";
 import Login from "./pages/Login";
 import Profil from "./pages/Profil";
-import CreateCourse from "./pages/CreateCourse";
+import CreateEvent from "./pages/CreateEvent";
 import AdminDashboard from "./pages/AdminDashboard";
 import OrganizerDashboard from "./pages/OrganizerDashboard";
 import Pricing from "./pages/Pricing";
@@ -32,20 +32,32 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/courses" element={<Courses />} />
-            <Route path="/courses/:id" element={<CourseDetail />} />
-            <Route path="/courses/:id/participer" element={<Inscription />} />
+            {/* Events Management */}
+            <Route path="/events" element={<Events />} />
+            <Route path="/events/:id" element={<CourseDetail />} />
+            <Route path="/events/:id/register" element={<Inscription />} />
+            <Route path="/events/:id/volunteer" element={<Inscription />} />
+            <Route path="/create-event" element={<CreateEvent />} />
+            {/* User Management */}
             <Route path="/login" element={<Login />} />
-            <Route path="/profil" element={<Profil />} />
-            <Route path="/create" element={<CreateCourse />} />
+            <Route path="/profile" element={<Profil />} />
+            <Route path="/settings" element={<Settings />} />
+            {/* Admin & Organizer */}
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/organizer" element={<OrganizerDashboard />} />
+            {/* Commerce */}
             <Route path="/pricing" element={<Pricing />} />
             <Route path="/checkout" element={<Checkout />} />
+            {/* Static Pages */}
             <Route path="/contact" element={<Contact />} />
             <Route path="/faq" element={<FAQ />} />
-            <Route path="/settings" element={<Settings />} />
             <Route path="/privacy" element={<Privacy />} />
+            {/* Legacy redirects for backward compatibility */}
+            <Route path="/courses" element={<Events />} />
+            <Route path="/courses/:id" element={<CourseDetail />} />
+            <Route path="/courses/:id/participer" element={<Inscription />} />
+            <Route path="/profil" element={<Profil />} />
+            <Route path="/create" element={<CreateEvent />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

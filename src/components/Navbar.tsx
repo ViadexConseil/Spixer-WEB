@@ -92,7 +92,7 @@ const Navbar = () => {
         >
           Accueil
         </Link>
-          <Link to="/courses" className="nav-link hover:text-spixer-blue transition-colors">Courses</Link>
+          <Link to="/events" className="nav-link hover:text-spixer-blue transition-colors">Événements</Link>
           <Link to="/contact" className="nav-link hover:text-spixer-blue transition-colors">Contact</Link>
           
           {!user ? (
@@ -121,7 +121,7 @@ const Navbar = () => {
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate('/profil')}>
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
                   <User className="mr-2 h-4 w-4" />
                   <span>Profil</span>
                 </DropdownMenuItem>
@@ -183,14 +183,14 @@ const Navbar = () => {
             Accueil
           </Link>
           <Link 
-            to="/courses" 
+            to="/events" 
             className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
             onClick={() => {
               setIsMenuOpen(false);
               document.body.style.overflow = '';
             }}
           >
-            Courses
+            Événements
           </Link>
           <Link 
             to="/contact" 
@@ -230,7 +230,7 @@ const Navbar = () => {
               <>
                 <button 
                   onClick={() => {
-                    navigate('/profil');
+                    navigate('/profile');
                     setIsMenuOpen(false);
                     document.body.style.overflow = '';
                   }}

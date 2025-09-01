@@ -9,7 +9,7 @@ import Navbar from "@/components/Navbar";
 import { eventsAPI, Event } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 
-const Courses = () => {
+const Events = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [searchTerm, setSearchTerm] = useState('');
   const [events, setEvents] = useState<Event[]>([]);
@@ -77,8 +77,8 @@ const Courses = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="section-title mb-4">Toutes les courses</h1>
-          <p className="section-subtitle">Découvrez toutes les courses à venir et passées</p>
+          <h1 className="section-title mb-4">Tous les événements</h1>
+          <p className="section-subtitle">Découvrez tous les événements sportifs à venir et passés</p>
         </div>
 
         {/* Filters */}
@@ -88,7 +88,7 @@ const Courses = () => {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                 <Input
-                  placeholder="Rechercher une course..."
+                  placeholder="Rechercher un événement..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -123,7 +123,7 @@ const Courses = () => {
           </div>
         </div>
 
-        {/* Course List */}
+        {/* Event List */}
         {viewMode === 'list' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event) => {
@@ -158,7 +158,7 @@ const Courses = () => {
                       </div>
                     </div>
                     <Button className="w-full mt-4" asChild>
-                      <Link to={`/courses/${event.id}`}>Voir la course</Link>
+                      <Link to={`/events/${event.id}`}>Voir l'événement</Link>
                     </Button>
                   </CardContent>
                 </Card>
@@ -172,7 +172,7 @@ const Courses = () => {
           <div className="bg-white rounded-2xl shadow-elegant p-8 text-center">
             <Map className="w-16 h-16 mx-auto text-gray-300 mb-4" />
             <h3 className="text-xl font-semibold mb-2">Vue carte à venir</h3>
-            <p className="text-gray-600">La visualisation des courses sur carte sera bientôt disponible.</p>
+            <p className="text-gray-600">La visualisation des événements sur carte sera bientôt disponible.</p>
           </div>
         )}
         
@@ -197,4 +197,4 @@ const Courses = () => {
   );
 };
 
-export default Courses;
+export default Events;

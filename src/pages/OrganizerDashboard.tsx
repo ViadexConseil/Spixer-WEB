@@ -48,11 +48,11 @@ const OrganizerDashboard = () => {
   };
 
   const handleViewEvent = (eventId: string) => {
-    navigate(`/courses/${eventId}`);
+    navigate(`/events/${eventId}`);
   };
 
   const handleCreateEvent = () => {
-    navigate('/create-course');
+    navigate('/create-event');
   };
 
   if (loading) {

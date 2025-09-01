@@ -11,7 +11,7 @@ import { eventsAPI, stagesAPI, authAPI, Event, Stage, getAuthToken } from "@/ser
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
-const CreateCourse = () => {
+const CreateEvent = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
@@ -150,7 +150,7 @@ const CreateCourse = () => {
         description: "Votre course a été publiée avec succès.",
       });
 
-      navigate('/profil');
+      navigate('/profile');
     } catch (error) {
       console.error("Erreur lors de la publication:", error);
       toast({
@@ -437,7 +437,7 @@ const CreateCourse = () => {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="section-title mb-4">Créer une nouvelle course</h1>
+          <h1 className="section-title mb-4">Créer un nouvel événement</h1>
           <p className="section-subtitle">Configurez votre événement sportif en quelques étapes</p>
         </div>
 
@@ -515,4 +515,4 @@ const CreateCourse = () => {
   );
 };
 
-export default CreateCourse;
+export default CreateEvent;
