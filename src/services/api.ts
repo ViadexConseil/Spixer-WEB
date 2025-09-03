@@ -667,7 +667,7 @@ export const serverAPI = {
 export const healthAPI = {
   check: async (): Promise<{ message: string; version?: string; status: 'healthy' | 'unhealthy' }> => {
     try {
-      const response = await fetch('https://api.spixer.fr');
+      const response = await fetch(`${API_BASE_URL}/v1/health`);
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -675,41 +675,17 @@ export const healthAPI = {
       return { ...data, status: 'healthy' };
     } catch (error) {
       console.error('API Health Check Failed:', error);
-      
-      // In preview/development environments, CORS errors are expected
-      // Don't mark as unhealthy unless we're sure there's an actual API problem
-      if (error instanceof Error && error.message === 'Failed to fetch') {
-        console.warn('CORS blocked in preview environment - API is likely healthy');
-        return { 
-          message: 'Spixer API is running', 
-          version: '1.0.0',
-          status: 'healthy' // Assume healthy in CORS scenarios
-        };
-      }
-      
       return { 
         message: 'API unavailable', 
         status: 'unhealthy' 
       };
-    }
-  },
-
-  // Quick connection test without full health check
-  ping: async (): Promise<boolean> => {
-    try {
-      const response = await fetch('https://api.spixer.fr', { 
-        method: 'HEAD'
-      });
-      return response.ok;
-    } catch {
-      return false;
     }
   }
 };
 
 // Legacy health check (kept for backward compatibility)
 export const healthCheck = async (): Promise<{ message: string; version?: string }> => {
-  const response = await fetch('https://api.spixer.fr');
+  const response = await fetch(`${API_BASE_URL}/v1/health`);
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }

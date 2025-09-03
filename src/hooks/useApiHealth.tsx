@@ -33,12 +33,8 @@ export const useApiHealth = () => {
   };
 
   useEffect(() => {
+    // Only check health on mount, no background polling
     checkHealth();
-    
-    // Check health every 5 minutes in background
-    const interval = setInterval(checkHealth, 5 * 60 * 1000);
-    
-    return () => clearInterval(interval);
   }, []);
 
   return {
