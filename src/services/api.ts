@@ -663,7 +663,36 @@ export const serverAPI = {
   },
 };
 
-// Health check
+// API Health Check and Connection Status
+export const healthAPI = {
+  check: async (): Promise<{ message: string; version?: string; status: 'healthy' | 'unhealthy' }> => {
+    try {
+      const response = await apiCall<{ message: string; version?: string }>('/');
+      return { ...response, status: 'healthy' };
+    } catch (error) {
+      console.error('API Health Check Failed:', error);
+      return { 
+        message: 'API unavailable', 
+        status: 'unhealthy' 
+      };
+    }
+  },
+
+  // Quick connection test without full health check
+  ping: async (): Promise<boolean> => {
+    try {
+      await fetch(`${API_BASE_URL}/`, { 
+        method: 'HEAD',
+        timeout: 5000 
+      } as any);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+};
+
+// Legacy health check (kept for backward compatibility)
 export const healthCheck = async (): Promise<{ message: string; version?: string }> => {
   return apiCall('/');
 };
