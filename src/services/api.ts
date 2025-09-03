@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://dev-api.spixer.fr';
+const API_BASE_URL = 'https://api.spixer.fr';
 
 // ============= UPDATED API TYPES TO MATCH DOCUMENTATION =============
 
