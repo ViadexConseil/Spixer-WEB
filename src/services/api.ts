@@ -667,7 +667,7 @@ export const serverAPI = {
 export const healthAPI = {
   check: async (): Promise<{ message: string; version?: string; status: 'healthy' | 'unhealthy' }> => {
     try {
-      const response = await fetch(`${API_BASE_URL}`);
+      const response = await fetch('https://api.spixer.fr');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
@@ -685,7 +685,7 @@ export const healthAPI = {
   // Quick connection test without full health check
   ping: async (): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE_URL}`, { 
+      const response = await fetch('https://api.spixer.fr', { 
         method: 'HEAD'
       });
       return response.ok;
@@ -697,7 +697,7 @@ export const healthAPI = {
 
 // Legacy health check (kept for backward compatibility)
 export const healthCheck = async (): Promise<{ message: string; version?: string }> => {
-  const response = await fetch(`${API_BASE_URL}`);
+  const response = await fetch('https://api.spixer.fr');
   if (!response.ok) {
     throw new Error(`HTTP ${response.status}`);
   }
