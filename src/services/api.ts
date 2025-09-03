@@ -667,8 +667,12 @@ export const serverAPI = {
 export const healthAPI = {
   check: async (): Promise<{ message: string; version?: string; status: 'healthy' | 'unhealthy' }> => {
     try {
-      const response = await apiCall<{ message: string; version?: string }>('/');
-      return { ...response, status: 'healthy' };
+      const response = await fetch(`${API_BASE_URL}`);
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const data = await response.json();
+      return { ...data, status: 'healthy' };
     } catch (error) {
       console.error('API Health Check Failed:', error);
       return { 
@@ -681,11 +685,10 @@ export const healthAPI = {
   // Quick connection test without full health check
   ping: async (): Promise<boolean> => {
     try {
-      await fetch(`${API_BASE_URL}/`, { 
-        method: 'HEAD',
-        timeout: 5000 
-      } as any);
-      return true;
+      const response = await fetch(`${API_BASE_URL}`, { 
+        method: 'HEAD'
+      });
+      return response.ok;
     } catch {
       return false;
     }
@@ -694,5 +697,9 @@ export const healthAPI = {
 
 // Legacy health check (kept for backward compatibility)
 export const healthCheck = async (): Promise<{ message: string; version?: string }> => {
-  return apiCall('/');
+  const response = await fetch(`${API_BASE_URL}`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  return response.json();
 };
