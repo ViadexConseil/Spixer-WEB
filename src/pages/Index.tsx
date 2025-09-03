@@ -9,8 +9,13 @@ import ScreenshotsApp from "@/components/ScreenshotsApp";
 import Partenaires from "@/components/Partenaires";
 import CTAFinal from "@/components/CTAFinal";
 import Footer from "@/components/Footer";
+import { ApiStatus } from "@/components/ApiStatus";
+import { useApiHealth } from "@/hooks/useApiHealth";
+import { EventsPreview } from "@/components/EventsPreview";
 
 const Index = () => {
+  const { isHealthy, status } = useApiHealth();
+
   // Initialize intersection observer to detect when elements enter viewport
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -59,9 +64,18 @@ const Index = () => {
   return (
     <div className="min-h-screen">
       <Navbar />
+      
+      {/* API Status Indicator - Only show if unhealthy */}
+      {!isHealthy && status !== 'checking' && (
+        <div className="fixed top-20 right-4 z-50">
+          <ApiStatus showDetails />
+        </div>
+      )}
+      
       <main className="space-y-0"> 
         <Hero />
         <NosServices />
+        <EventsPreview />
         <Fonctionnement />
         <PourquoiNous />
         <ScreenshotsApp />

@@ -6,37 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navbar from "@/components/Navbar";
-import { eventsAPI, Event } from "@/services/api";
-import { toast } from "@/hooks/use-toast";
+import { useEvents } from "@/hooks/useEvents";
 
 const Events = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [searchTerm, setSearchTerm] = useState('');
-  const [events, setEvents] = useState<Event[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchEvents = async () => {
-      setLoading(true);
-      
-      try {
-        const fetchedEvents = await eventsAPI.list();
-        setEvents(fetchedEvents);
-      } catch (error) {
-        console.error("Erreur lors du chargement des événements:", error);
-        toast({
-          title: "Erreur API",
-          description: "Impossible de charger les événements depuis l'API.",
-          variant: "destructive"
-        });
-        setEvents([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchEvents();
-  }, []);
+  const { events, loading, error, refetch } = useEvents();
 
   const filteredEvents = events.filter(event => 
     event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
