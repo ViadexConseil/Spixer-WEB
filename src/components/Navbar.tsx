@@ -93,6 +93,7 @@ const Navbar = () => {
           Accueil
         </Link>
           <Link to="/events" className="nav-link hover:text-spixer-blue transition-colors">Événements</Link>
+          <Link to="/clubs" className="nav-link hover:text-spixer-blue transition-colors">Clubs</Link>
           <Link to="/contact" className="nav-link hover:text-spixer-blue transition-colors">Contact</Link>
           
           {!user ? (
@@ -191,6 +192,16 @@ const Navbar = () => {
             }}
           >
             Événements
+          </Link>
+          <Link 
+            to="/clubs" 
+            className="text-xl font-medium py-3 px-6 w-full text-center rounded-lg hover:bg-gray-100" 
+            onClick={() => {
+              setIsMenuOpen(false);
+              document.body.style.overflow = '';
+            }}
+          >
+            Clubs
           </Link>
           <Link 
             to="/contact" 
