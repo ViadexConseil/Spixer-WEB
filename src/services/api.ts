@@ -48,15 +48,16 @@ export interface ProfileUser {
   username: string;
   roles: string[];
   user_created_at: string;
-  first_name?: string;
-  last_name?: string;
-  name?: string;
-  bio?: string;
-  avatar_url?: string;
-  birthdate?: string;
-  location?: string;
-  is_premium_member: boolean;
+  first_name?: string | null;
+  last_name?: string | null;
+  name?: string | null;
+  bio?: string | null;
+  avatar_url?: string | null;
+  birthdate?: string | null;
+  location?: string | null;
+  is_premium: number;
   registrations: UserRegistration[];
+  volunteer_assignments: any[];
   favorite_sports: FavoriteSport[];
   events: EventSummary[];
 }

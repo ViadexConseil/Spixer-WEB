@@ -122,7 +122,9 @@ const Profil = () => {
                   <div>
                     <h1 className="text-2xl md:text-3xl font-bold mb-2 text-foreground">{displayName}</h1>
                     <p className="text-muted-foreground mb-2">{user.email}</p>
-                    <Badge variant="secondary">Utilisateur</Badge>
+                  <Badge variant="secondary">
+                    {user.is_premium ? "Premium" : "Gratuit"} • {user.roles?.length > 0 ? user.roles.join(", ") : "Utilisateur"}
+                  </Badge>
                   </div>
                 </div>
                 <div className="flex gap-3">
@@ -141,7 +143,7 @@ const Profil = () => {
               </div>
               
               {/* Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-8 pt-6 border-t border-border">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-8 pt-6 border-t border-border">
                 <div className="text-center p-4 rounded-lg bg-muted/50">
                   <div className="text-3xl font-bold text-primary mb-2">{participations.length}</div>
                   <div className="text-sm text-muted-foreground">Participations</div>
@@ -149,6 +151,14 @@ const Profil = () => {
                 <div className="text-center p-4 rounded-lg bg-muted/50">
                   <div className="text-3xl font-bold text-secondary-foreground mb-2">{eventsCreated.length}</div>
                   <div className="text-sm text-muted-foreground">Événements créés</div>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-muted/50">
+                  <div className="text-3xl font-bold text-green-600 mb-2">{user.volunteer_assignments?.length || 0}</div>
+                  <div className="text-sm text-muted-foreground">Missions bénévoles</div>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-muted/50">
+                  <div className="text-3xl font-bold text-purple-600 mb-2">{user.favorite_sports?.length || 0}</div>
+                  <div className="text-sm text-muted-foreground">Sports favoris</div>
                 </div>
               </div>
             </CardContent>
@@ -304,8 +314,32 @@ const Profil = () => {
                       <p className="text-foreground">{user.name || "Non défini"}</p>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-muted-foreground">Statut</label>
-                      <p className="text-foreground">Actif</p>
+                      <label className="text-sm font-medium text-muted-foreground">Prénom</label>
+                      <p className="text-foreground">{user.first_name || "Non défini"}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Nom de famille</label>
+                      <p className="text-foreground">{user.last_name || "Non défini"}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Date de naissance</label>
+                      <p className="text-foreground">
+                        {user.birthdate ? new Date(user.birthdate).toLocaleDateString('fr-FR') : "Non défini"}
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Lieu</label>
+                      <p className="text-foreground">{user.location || "Non défini"}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Compte Premium</label>
+                      <p className="text-foreground">{user.is_premium ? "Oui" : "Non"}</p>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-muted-foreground">Membre depuis</label>
+                      <p className="text-foreground">
+                        {new Date(user.user_created_at).toLocaleDateString('fr-FR')}
+                      </p>
                     </div>
                   </div>
                   
