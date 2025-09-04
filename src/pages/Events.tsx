@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import { useEvents } from "@/hooks/useEvents";
 
 const Events = () => {
@@ -45,7 +45,7 @@ const Events = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
+      <Navigation />
         <div className="min-h-screen bg-gray-50 page-content">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-20">
@@ -60,7 +60,7 @@ const Events = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Hero Section */}

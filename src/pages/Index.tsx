@@ -1,69 +1,22 @@
 
-import React, { useEffect } from "react";
-import Navbar from "@/components/Navbar";
-import Hero from "@/components/Hero";
+import React from "react";
+import Navigation from "@/components/Navigation";
+import QuickActions from "@/components/QuickActions";
+import StatsOverview from "@/components/StatsOverview";
+import RecentActivity from "@/components/RecentActivity";
 import NosServices from "@/components/NosServices";
-import Fonctionnement from "@/components/Fonctionnement";
-import PourquoiNous from "@/components/PourquoiNous";
-import ScreenshotsApp from "@/components/ScreenshotsApp";
-import Partenaires from "@/components/Partenaires";
-import CTAFinal from "@/components/CTAFinal";
 import Footer from "@/components/Footer";
 import { ApiStatus } from "@/components/ApiStatus";
 import { useApiHealth } from "@/hooks/useApiHealth";
-import { EventsPreview } from "@/components/EventsPreview";
+import { useAuth } from "@/hooks/useAuth";
 
 const Index = () => {
   const { isHealthy, status } = useApiHealth();
-
-  // Initialize intersection observer to detect when elements enter viewport
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("animate-fade-in");
-            observer.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    
-    const elements = document.querySelectorAll(".animate-on-scroll");
-    elements.forEach((el) => observer.observe(el));
-    
-    return () => {
-      elements.forEach((el) => observer.unobserve(el));
-    };
-  }, []);
-
-  useEffect(() => {
-    // This helps ensure smooth scrolling for the anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-      anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        
-        const targetId = this.getAttribute('href')?.substring(1);
-        if (!targetId) return;
-        
-        const targetElement = document.getElementById(targetId);
-        if (!targetElement) return;
-        
-        // Increased offset to account for mobile nav
-        const offset = window.innerWidth < 768 ? 100 : 80;
-        
-        window.scrollTo({
-          top: targetElement.offsetTop - offset,
-          behavior: 'smooth'
-        });
-      });
-    });
-  }, []);
+  const { user } = useAuth();
 
   return (
-    <div className="min-h-screen">
-      <Navbar />
+    <div className="min-h-screen bg-background">
+      <Navigation />
       
       {/* API Status Indicator - Only show if unhealthy */}
       {!isHealthy && status !== 'checking' && (
@@ -71,17 +24,51 @@ const Index = () => {
           <ApiStatus showDetails />
         </div>
       )}
-      
-      <main className="space-y-0"> 
-        <Hero />
+
+      <main>
+        {/* Hero Section */}
+        <section className="relative py-16 lg:py-24 border-b">
+          <div className="container px-4">
+            <div className="max-w-4xl mx-auto text-center space-y-6">
+              <div className="inline-flex items-center px-3 py-1 rounded-full text-sm border bg-muted/50">
+                🚀 Nouvelle version disponible - Découvrez les nouveautés
+              </div>
+              
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight">
+                Chronométrage sportif 
+                <span className="text-primary"> intelligent</span>
+              </h1>
+              
+              <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+                La première plateforme de chronométrage avec reconnaissance automatique 
+                et suivi temps réel alimenté par l'IA
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center pt-6">
+                <button className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 py-3 rounded-lg font-medium">
+                  Commencer gratuitement
+                </button>
+                <button className="border text-foreground hover:bg-muted px-8 py-3 rounded-lg font-medium">
+                  Voir une démonstration
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Stats Overview */}
+        <StatsOverview />
+
+        {/* Quick Actions - Show different content based on auth */}
+        <QuickActions />
+
+        {/* Recent Activity */}
+        <RecentActivity />
+
+        {/* Services Section */}
         <NosServices />
-        <EventsPreview />
-        <Fonctionnement />
-        <PourquoiNous />
-        <ScreenshotsApp />
-        <Partenaires />
-        <CTAFinal />
       </main>
+      
       <Footer />
     </div>
   );

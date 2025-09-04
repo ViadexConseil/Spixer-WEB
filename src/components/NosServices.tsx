@@ -40,27 +40,27 @@ const ServiceCard = ({ icon, title, description, index, color, features }: Servi
       }
     };
   }, []);
+
+  const colorMap = {
+    blue: "bg-blue-50 text-blue-600 border-blue-200",
+    green: "bg-green-50 text-green-600 border-green-200",
+    purple: "bg-purple-50 text-purple-600 border-purple-200", 
+    orange: "bg-orange-50 text-orange-600 border-orange-200"
+  };
   
   return (
     <div 
       ref={cardRef}
       className={cn(
-        "group relative bg-card border rounded-3xl p-8 opacity-0 overflow-hidden transition-all duration-500 hover:scale-105 hover:shadow-2xl cursor-pointer",
-        `hover:border-${color}/30`
+        "group relative bg-card border rounded-3xl p-8 opacity-0 overflow-hidden transition-all duration-300 hover:shadow-lg cursor-pointer"
       )}
       style={{ animationDelay: `${0.15 * index}s` }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Gradient Background */}
-      <div className={`absolute inset-0 bg-gradient-to-br from-${color}/5 via-transparent to-${color}/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
-      
-      {/* Animated background elements */}
-      <div className="absolute top-4 right-4 w-32 h-32 bg-gradient-to-br from-primary/5 to-secondary/5 rounded-full blur-2xl transition-all duration-700 group-hover:scale-150" />
-      
       <div className="relative z-10">
         {/* Icon */}
-        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-${color}/10 to-${color}/20 text-${color} mb-6 group-hover:scale-110 transition-transform duration-300`}>
+        <div className={`inline-flex items-center justify-center w-16 h-16 rounded-2xl ${colorMap[color as keyof typeof colorMap]} mb-6 group-hover:scale-110 transition-transform duration-300`}>
           {icon}
         </div>
 
@@ -75,14 +75,14 @@ const ServiceCard = ({ icon, title, description, index, color, features }: Servi
           </p>
 
           {/* Features List */}
-          <ul className="space-y-2 mt-4">
+          <ul className="space-y-2 mt-6">
             {features.map((feature, idx) => (
               <li 
                 key={idx}
                 className={`flex items-center gap-2 text-sm text-muted-foreground transition-all duration-300`}
                 style={{ animationDelay: `${(idx + 1) * 100}ms` }}
               >
-                <div className={`w-1.5 h-1.5 rounded-full bg-${color} flex-shrink-0`} />
+                <div className={`w-1.5 h-1.5 rounded-full bg-primary flex-shrink-0`} />
                 {feature}
               </li>
             ))}
@@ -92,7 +92,7 @@ const ServiceCard = ({ icon, title, description, index, color, features }: Servi
           <Button
             variant="ghost"
             className={cn(
-              "mt-6 p-0 h-auto font-medium text-${color} hover:text-${color}/80 group/button",
+              "mt-6 p-0 h-auto font-medium text-primary hover:text-primary/80 group/button",
               isHovered && "animate-pulse"
             )}
           >
@@ -100,9 +100,6 @@ const ServiceCard = ({ icon, title, description, index, color, features }: Servi
             <ArrowRight className="w-4 h-4 ml-1 transition-transform group-hover/button:translate-x-1" />
           </Button>
         </div>
-
-        {/* Corner decoration */}
-        <div className={`absolute bottom-4 right-4 w-8 h-8 bg-gradient-to-br from-${color}/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
       </div>
     </div>
   );
@@ -145,10 +142,10 @@ const NosServices = () => {
       icon: <Video size={28} />,
       title: "Suivi vidéo intelligent",
       description: "Reconnaissance automatique des participants et suivi en temps réel grâce à l'IA avancée.",
-      color: "primary",
+      color: "blue",
       features: [
         "IA de reconnaissance faciale",
-        "Tracking automatique",
+        "Tracking automatique", 
         "Détection multi-angles",
         "Précision 99.7%"
       ]
@@ -157,7 +154,7 @@ const NosServices = () => {
       icon: <Trophy size={28} />,
       title: "Classements en direct",
       description: "Résultats instantanés et classements mis à jour en temps réel pendant la course.",
-      color: "secondary", 
+      color: "green", 
       features: [
         "Mise à jour temps réel",
         "Notifications push",
@@ -169,11 +166,11 @@ const NosServices = () => {
       icon: <Map size={28} />,
       title: "Carte GPX interactive",
       description: "Visualisation du parcours en temps réel avec positions des coureurs et points clés.",
-      color: "primary",
+      color: "purple",
       features: [
         "Géolocalisation précise",
         "Zones de passage",
-        "Altitude & dénivelé",
+        "Altitude & dénivelé", 
         "Partage social"
       ]
     },
@@ -181,7 +178,7 @@ const NosServices = () => {
       icon: <Brain size={28} />,
       title: "Reconnaissance automatique",
       description: "Identification intelligente des participants sans intervention manuelle.",
-      color: "secondary",
+      color: "orange",
       features: [
         "Sans intervention humaine",
         "Multi-participants",
@@ -192,21 +189,19 @@ const NosServices = () => {
   ];
   
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-br from-muted/30 via-background to-muted/50" id="services" ref={sectionRef}>
+    <section className="py-20 md:py-28 bg-muted/30" id="services" ref={sectionRef}>
       <div className="container px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-20 space-y-6">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium opacity-0 fade-in-element">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium opacity-0 fade-in-element border border-primary/20">
             <Sparkles className="w-4 h-4" />
             Nos Services
           </div>
           
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold opacity-0 fade-in-element">
-            <span className="bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-              Suivez, vivez, mesurez
-            </span>
+            Suivez, vivez, mesurez
             <br />
-            <span className="text-foreground">vos courses autrement</span>
+            <span className="text-primary">vos courses autrement</span>
           </h2>
           
           <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed opacity-0 fade-in-element">
@@ -220,7 +215,7 @@ const NosServices = () => {
               <div className="text-sm text-muted-foreground">Précision</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-secondary mb-1">5K+</div>
+              <div className="text-3xl font-bold text-primary mb-1">5K+</div>
               <div className="text-sm text-muted-foreground">Événements</div>
             </div>
             <div className="text-center">
@@ -249,7 +244,7 @@ const NosServices = () => {
         <div className="text-center mt-20 opacity-0 fade-in-element">
           <Button 
             size="lg"
-            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white rounded-2xl px-8 py-4 font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            className="rounded-2xl px-8 py-4 font-medium text-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
             <Target className="w-5 h-5 mr-2" />
             Découvrir toutes nos fonctionnalités

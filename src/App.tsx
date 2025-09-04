@@ -8,6 +8,7 @@ import NotFound from "./pages/NotFound";
 import Events from "./pages/Events";
 import CourseDetail from "./pages/CourseDetail";
 import Clubs from "./pages/Clubs";
+import Results from "./pages/Results";
 import Inscription from "./pages/Inscription";
 import Login from "./pages/Login";
 import Profil from "./pages/Profil";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<CourseDetail />} />
           <Route path="/clubs" element={<Clubs />} />
+          <Route path="/results" element={<Results />} />
             <Route path="/events/:id/register" element={<Inscription />} />
             <Route path="/events/:id/volunteer" element={<Inscription />} />
             <Route path="/create-event" element={<CreateEvent />} />
