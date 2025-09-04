@@ -103,13 +103,26 @@ const Events = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredEvents.map((event) => {
               const status = getStatusBadge(event.start_time);
+              const imageUrl = event.images?.[0] || event.image_url || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png";
+              
+              // Debug logging
+              console.log(`Event: ${event.name} (${event.city})`, {
+                image_url: event.image_url,
+                images: event.images,
+                selected: imageUrl
+              });
+              
               return (
                 <Card key={event.id} className="hover-lift cursor-pointer group">
                   <div className="relative h-48 overflow-hidden rounded-t-lg">
                     <img 
-                      src={event.image_url || event.images?.[0] || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png"} 
+                      src={imageUrl} 
                       alt={event.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      onError={(e) => {
+                        console.log(`Image failed to load for ${event.name}:`, imageUrl);
+                        e.currentTarget.src = "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png";
+                      }}
                     />
                     <Badge className={`absolute top-4 right-4 ${status.class}`}>
                       {status.text}
