@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Plus, Edit, Trash2, Users, Calendar, Trophy, ArrowLeft, Save } from 'lucide-react';
 import { categoriesAPI, eventsAPI, stagesAPI, registrationsAPI, rankingsAPI } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
-import Navbar from '@/components/Navbar';
+import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import type { Category, Event, Stage, Registration, Ranking } from '@/services/api';
 
@@ -266,7 +266,7 @@ const AdminDashboard = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
+        <Navigation />
         <div className="container mx-auto p-6 pt-24">
           <div className="text-center">Chargement...</div>
         </div>
@@ -277,7 +277,7 @@ const AdminDashboard = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="container mx-auto p-6 pt-24">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Tableau de Bord Administrateur</h1>

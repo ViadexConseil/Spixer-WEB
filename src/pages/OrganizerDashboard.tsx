@@ -7,7 +7,7 @@ import { Plus, Edit, Trash2, Users, Calendar, Eye } from 'lucide-react';
 import { organizerAPI, stagesAPI, registrationsAPI, rankingsAPI } from '@/services/api';
 import { toast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
-import Navbar from '@/components/Navbar';
+import Navigation from '@/components/Navigation';
 import Footer from '@/components/Footer';
 import type { Event, Stage, Registration, Ranking } from '@/services/api';
 
@@ -58,7 +58,7 @@ const OrganizerDashboard = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
+        <Navigation />
         <div className="container mx-auto p-6 pt-24">
           <div className="text-center">Chargement...</div>
         </div>
@@ -76,7 +76,7 @@ const OrganizerDashboard = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="container mx-auto p-6 pt-24">
       <div className="mb-8">
         <h1 className="text-3xl font-bold">Tableau de Bord Organisateur</h1>

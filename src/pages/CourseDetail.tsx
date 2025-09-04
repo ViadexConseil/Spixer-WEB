@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import { eventsAPI, stagesAPI, rankingsAPI, Event, Stage, Ranking } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 
@@ -127,7 +127,7 @@ const CourseDetail = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
+        <Navigation />
         <div className="min-h-screen bg-gray-50 page-content">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-20">
@@ -143,7 +143,7 @@ const CourseDetail = () => {
   if (!event) {
     return (
       <>
-        <Navbar />
+        <Navigation />
         <div className="min-h-screen bg-gray-50 page-content">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-20">
@@ -163,7 +163,7 @@ const CourseDetail = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gray-50 page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Hero Section */}

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import { useToast } from "@/hooks/use-toast";
 import { eventsAPI, stagesAPI, registrationsAPI, userInformationsAPI, Event, Stage, getAuthToken } from "@/services/api";
 
@@ -212,7 +212,7 @@ const Inscription = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gray-50 page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back button */}

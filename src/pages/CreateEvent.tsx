@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Upload, Eye, Save, Plus } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import { eventsAPI, stagesAPI, authAPI, Event, Stage, getAuthToken } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -432,7 +432,7 @@ const CreateEvent = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gray-50 page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

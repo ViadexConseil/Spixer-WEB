@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Eye, Lock, UserCheck, Database, Globe, Mail } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 
 const Privacy = () => {
   const privacyPolicies = [
@@ -68,7 +68,7 @@ const Privacy = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gray-50 page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Hero Section */}

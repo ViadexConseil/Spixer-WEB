@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, MapPin, Trophy, Settings, Users, Play, Heart, Award, Star, Zap, Target, Crown, Shield, Medal, Flame, Clock, MapPin as Location } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import { authAPI, ProfileUser, Event } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
@@ -91,7 +91,7 @@ const Profil = () => {
   if (loading) {
     return (
       <>
-        <Navbar />
+        <Navigation />
         <div className="min-h-screen bg-gray-50 page-content">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-20">
@@ -107,7 +107,7 @@ const Profil = () => {
   if (!user) {
     return (
       <>
-        <Navbar />
+        <Navigation />
         <div className="min-h-screen bg-gray-50 page-content">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center py-20">
@@ -155,7 +155,7 @@ const Profil = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gray-50 page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}

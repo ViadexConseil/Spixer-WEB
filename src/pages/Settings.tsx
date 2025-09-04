@@ -5,7 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff, Mail, Lock, User, Shield, Bell, Palette } from "lucide-react";
-import Navbar from "@/components/Navbar";
+import Navigation from "@/components/Navigation";
 import { accountAPI, authAPI, userInformationsAPI } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
@@ -149,7 +149,7 @@ const Settings = () => {
 
   return (
     <>
-      <Navbar />
+      <Navigation />
       <div className="min-h-screen bg-gray-50 page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-4xl mx-auto">

@@ -65,7 +65,8 @@ const Navigation = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container flex h-16 items-center px-4">
+        <div className="flex items-center justify-between w-full">
         {/* Logo */}
         <Link to="/" className="flex items-center space-x-2">
           <img 
@@ -75,8 +76,8 @@ const Navigation = () => {
           />
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-1">
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-1 absolute left-1/2 transform -translate-x-1/2">
           {navigationItems.map((item) => (
             <Link
               key={item.href}
@@ -99,8 +100,8 @@ const Navigation = () => {
           ))}
         </nav>
 
-        {/* Actions */}
-        <div className="flex items-center space-x-2">
+          {/* Actions */}
+          <div className="flex items-center space-x-2 ml-auto">
           {/* Search */}
           <Button variant="ghost" size="sm" className="hidden sm:flex">
             <Search className="h-4 w-4" />
@@ -158,6 +159,7 @@ const Navigation = () => {
           >
             {isMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </Button>
+          </div>
         </div>
       </div>
 
