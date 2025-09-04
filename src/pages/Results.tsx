@@ -48,10 +48,38 @@ const Results = () => {
     return <span className="text-sm font-medium">#{position}</span>;
   };
 
-  const filteredRankings = rankings.filter(ranking =>
-    ranking.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    ranking.user_email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Group rankings by event, then by stage
+  const groupedResults = React.useMemo(() => {
+    const filtered = rankings.filter(ranking =>
+      ranking.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      ranking.user_email.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const grouped = filtered.reduce((acc, ranking) => {
+      const eventName = ranking.event_name;
+      const stageName = ranking.stage_name;
+
+      if (!acc[eventName]) {
+        acc[eventName] = {};
+      }
+      
+      if (!acc[eventName][stageName]) {
+        acc[eventName][stageName] = [];
+      }
+      
+      acc[eventName][stageName].push(ranking);
+      return acc;
+    }, {} as Record<string, Record<string, Ranking[]>>);
+
+    // Sort rankings within each stage by position
+    Object.keys(grouped).forEach(eventName => {
+      Object.keys(grouped[eventName]).forEach(stageName => {
+        grouped[eventName][stageName].sort((a, b) => a.rank_position - b.rank_position);
+      });
+    });
+
+    return grouped;
+  }, [rankings, searchTerm]);
 
   if (loading) {
     return (
@@ -139,42 +167,69 @@ const Results = () => {
 
           {/* Results List */}
           {rankings.length > 0 ? (
-            <div className="space-y-4">
-              <h2 className="text-2xl font-bold">Résultats disponibles</h2>
+            <div className="space-y-8">
+              <h2 className="text-2xl font-bold">Résultats par événement</h2>
               
-              {filteredRankings.map((ranking) => (
-                <Card key={ranking.id} className="hover:shadow-md transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-4">
-                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
-                          {getPositionIcon(ranking.rank_position)}
+              {Object.keys(groupedResults).length > 0 ? (
+                Object.entries(groupedResults).map(([eventName, stages]) => (
+                  <Card key={eventName} className="overflow-hidden">
+                    <CardHeader className="bg-muted/50">
+                      <CardTitle className="flex items-center gap-2">
+                        <Calendar className="h-5 w-5" />
+                        {eventName}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      {Object.entries(stages).map(([stageName, stageRankings]) => (
+                        <div key={stageName} className="border-b last:border-b-0">
+                          <div className="p-4 bg-background/50">
+                            <h3 className="font-semibold text-lg flex items-center gap-2">
+                              <Badge variant="outline">{stageName}</Badge>
+                              <span className="text-sm text-muted-foreground">
+                                ({stageRankings.length} participant{stageRankings.length > 1 ? 's' : ''})
+                              </span>
+                            </h3>
+                          </div>
+                          
+                          <div className="space-y-2 p-4">
+                            {stageRankings.map((ranking) => (
+                              <div
+                                key={ranking.id}
+                                className="flex items-center justify-between p-3 rounded-lg border bg-card hover:bg-muted/50 transition-colors"
+                              >
+                                <div className="flex items-center space-x-4">
+                                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-muted">
+                                    {getPositionIcon(ranking.rank_position)}
+                                  </div>
+                                  
+                                  <div>
+                                    <p className="font-medium">{ranking.user_email}</p>
+                                    <p className="text-sm text-muted-foreground">
+                                      Position #{ranking.rank_position}
+                                    </p>
+                                  </div>
+                                </div>
+                                
+                                <Button variant="ghost" size="sm">
+                                  Voir détails
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                        
-                        <div>
-                          <h3 className="font-semibold text-lg">{ranking.event_name}</h3>
-                          <p className="text-muted-foreground">{ranking.user_email}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="text-right space-y-1">
-                        <div className="text-2xl font-bold">Position #{ranking.rank_position}</div>
-                        <Badge variant="secondary">{ranking.stage_name}</Badge>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                      <span className="text-sm text-muted-foreground">
-                        Événement: {ranking.event_name}
-                      </span>
-                      
-                      <Button variant="outline" size="sm">
-                        Voir détails
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      ))}
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center py-12">
+                  <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-xl font-semibold mb-2">Aucun résultat trouvé</h3>
+                  <p className="text-muted-foreground">
+                    Essayez de modifier vos critères de recherche.
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             /* Empty State */
@@ -192,16 +247,6 @@ const Results = () => {
             </div>
           )}
 
-          {/* No Search Results */}
-          {rankings.length > 0 && filteredRankings.length === 0 && (
-            <div className="text-center py-12">
-              <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">Aucun résultat trouvé</h3>
-              <p className="text-muted-foreground">
-                Essayez de modifier vos critères de recherche.
-              </p>
-            </div>
-          )}
 
           {/* Error State */}
           {error && (
