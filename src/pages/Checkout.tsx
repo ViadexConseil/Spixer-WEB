@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { loadStripe } from "@stripe/stripe-js";
+import { useState, useEffect, FormEvent } from "react";
+import { loadStripe, Stripe, StripeElements } from "@stripe/stripe-js";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -12,69 +12,53 @@ import { useToast } from "@/hooks/use-toast";
 import { eventsAPI, paymentsAPI, Event, getAuthToken } from "@/services/api";
 
 // Initialize Stripe with your publishable key
-const stripePromise = loadStripe("pk_test_your_publishable_key_here");
+const stripePromise = loadStripe("pk_test_51RxRpNRxbofe5B5pL2u8bFHnN0xlgQbmFSd9pdNQifKb8jzxLysUsovPbeqP6Ck3wrh6UxkdoAg4rG41MfKHDBVg00xYFuOAbm");
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const location = useLocation();
   const { id } = useParams();
-  const [loading, setLoading] = useState(false);
-  const [event, setEvent] = useState<Event | null>(null);
-  const [coursePrice, setCoursePrice] = useState(0);
-  const [email, setEmail] = useState("");
   
-  // Flat commission fee of 2 EUR
-  const commission = 2;
+  const [event, setEvent] = useState<Event | null>(location.state?.event || null);
+  const [loading, setLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [stripe, setStripe] = useState<Stripe | null>(null);
+  const [elements, setElements] = useState<StripeElements | null>(null);
+  const [clientSecret, setClientSecret] = useState<string>("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
+  const [message, setMessage] = useState<string>("");
 
-  // Get course data from location state or fetch it
-  useEffect(() => {
-    const fetchCourseData = async () => {
-      try {
-        let courseData;
-        
-        // Try to get from location state first
-        if (location.state?.event) {
-          courseData = location.state.event;
-          setCoursePrice(location.state.price || 0);
-        } else if (id) {
-          // Fallback to fetching by ID
-          courseData = await eventsAPI.get(id);
-          setCoursePrice(location.state?.price || 50); // Default price if not provided
-        } else {
-          throw new Error("No course data available");
-        }
-        
-        setEvent(courseData);
-      } catch (error) {
-        console.error("Failed to load course data:", error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de charger les données du cours",
-          variant: "destructive",
-        });
-        navigate(-1);
-      }
-    };
-
-    fetchCourseData();
-  }, [id, location.state, navigate, toast]);
-
+  // Course pricing
+  const coursePrice = 15; // €15 for the course
+  const commission = 3;   // €3 commission
   const totalAmount = coursePrice + commission;
 
-  const handlePayment = async () => {
-    if (!email) {
-      toast({
-        title: "Email requis",
-        description: "Veuillez saisir votre email pour continuer",
-        variant: "destructive",
-      });
-      return;
+  useEffect(() => {
+    if (!event && id) {
+      const fetchEvent = async () => {
+        try {
+          setLoading(true);
+          const fetchedEvent = await eventsAPI.get(id);
+          setEvent(fetchedEvent);
+        } catch (error) {
+          console.error('Error fetching event:', error);
+          toast({
+            title: "Erreur",
+            description: "Impossible de charger les détails de l'événement.",
+            variant: "destructive",
+          });
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchEvent();
     }
+  }, [id, event, toast]);
 
-    setLoading(true);
-    
-    try {
+  // Initialize Stripe and create payment intent
+  useEffect(() => {
+    const initializePayment = async () => {
       // Check if user is authenticated
       const token = getAuthToken();
       if (!token) {
@@ -87,20 +71,81 @@ const Checkout = () => {
         return;
       }
 
-      // Calculate total amount in cents for Stripe (API expects amount in cents)
-      const totalAmountCents = Math.round(totalAmount * 100);
+      try {
+        // Initialize Stripe
+        const stripeInstance = await stripePromise;
+        if (!stripeInstance) {
+          throw new Error('Impossible d\'initialiser Stripe');
+        }
+        setStripe(stripeInstance);
 
-      // Create Stripe payment intent using the API
-      const paymentIntent = await paymentsAPI.createIntent(totalAmountCents, 'eur');
+        // Create payment intent
+        const totalAmountCents = Math.round(totalAmount * 100);
+        const paymentIntent = await paymentsAPI.createIntent(totalAmountCents, 'eur');
+        
+        if (!paymentIntent.client_secret) {
+          throw new Error('Client secret non reçu');
+        }
+        
+        setClientSecret(paymentIntent.client_secret);
 
-      const stripe = await stripePromise;
-      if (!stripe) {
-        throw new Error('Stripe non initialisé');
+        // Create elements instance
+        const elementsInstance = stripeInstance.elements({
+          clientSecret: paymentIntent.client_secret,
+        });
+        setElements(elementsInstance);
+
+        // Create and mount payment element
+        const paymentElement = elementsInstance.create('payment');
+        paymentElement.mount('#payment-element');
+
+        console.log('Stripe payment setup completed successfully');
+        
+      } catch (error) {
+        console.error('Payment initialization error:', error);
+        const errorMessage = error instanceof Error ? error.message : "Une erreur est survenue lors de l'initialisation du paiement";
+        toast({
+          title: "Erreur d'initialisation",
+          description: errorMessage,
+          variant: "destructive",
+        });
+        setMessage(errorMessage);
       }
+    };
 
-      // Confirm payment with Stripe using the client_secret
-      const { error: paymentError } = await stripe.confirmPayment({
-        clientSecret: paymentIntent.client_secret,
+    if (event) {
+      initializePayment();
+    }
+  }, [event, navigate, toast, totalAmount]);
+
+  const handlePayment = async (e: FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      toast({
+        title: "Email requis",
+        description: "Veuillez saisir votre adresse email.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!stripe || !elements) {
+      toast({
+        title: "Erreur",
+        description: "Stripe n'est pas encore initialisé. Veuillez patienter.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setPaymentLoading(true);
+    setMessage("");
+
+    try {
+      // Confirm payment with Stripe
+      const { error } = await stripe.confirmPayment({
+        elements,
         confirmParams: {
           return_url: `${window.location.origin}/profile`,
           payment_method_data: {
@@ -111,28 +156,46 @@ const Checkout = () => {
         },
       });
 
-      if (paymentError) {
-        throw new Error(paymentError.message || 'Erreur lors du paiement');
+      if (error) {
+        if (error.type === "card_error" || error.type === "validation_error") {
+          setMessage(error.message || 'Erreur de paiement');
+          toast({
+            title: "Erreur de paiement",
+            description: error.message,
+            variant: "destructive",
+          });
+        } else {
+          setMessage("Une erreur inattendue s'est produite.");
+          toast({
+            title: "Erreur",
+            description: "Une erreur inattendue s'est produite lors du paiement.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        // Payment successful - will redirect to return_url
+        toast({
+          title: "Paiement en cours",
+          description: "Votre paiement est en cours de traitement...",
+        });
       }
-
-      // Payment successful - user will be redirected to return_url
-
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error('Payment confirmation error:', error);
       const errorMessage = error instanceof Error ? error.message : "Une erreur est survenue lors du paiement";
+      setMessage(errorMessage);
       toast({
         title: "Erreur de paiement",
         description: errorMessage,
         variant: "destructive",
       });
     } finally {
-      setLoading(false);
+      setPaymentLoading(false);
     }
   };
 
-  if (!event) {
+  if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-muted-foreground">Chargement...</p>
@@ -141,37 +204,47 @@ const Checkout = () => {
     );
   }
 
+  if (!event) {
+    return (
+      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
+        <Card className="w-full max-w-md">
+          <CardContent className="pt-6">
+            <div className="text-center">
+              <p className="text-muted-foreground mb-4">Événement non trouvé.</p>
+              <Button onClick={() => navigate('/events')} variant="outline">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Retour aux événements
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center gap-4">
-            <Button
-              variant="ghost"
-              size="sm"
+    <div className="min-h-screen bg-gradient-subtle py-8">
+      <div className="container mx-auto px-4">
+        <div className="max-w-4xl mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <Button 
+              variant="ghost" 
               onClick={() => navigate(-1)}
-              className="gap-2"
+              className="mb-4"
             >
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="mr-2 h-4 w-4" />
               Retour
             </Button>
-            <div>
-              <h1 className="text-2xl font-display font-bold">Inscription à la course</h1>
-              <p className="text-muted-foreground">Paiement sécurisé par Stripe</p>
-            </div>
+            <h1 className="text-3xl font-bold text-foreground">Finaliser l'inscription</h1>
+            <p className="text-muted-foreground mt-2">
+              Complétez votre inscription pour participer à cet événement
+            </p>
           </div>
-        </div>
-      </div>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-          {/* Left Column - Course Information */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-xl">Détails de la course</CardTitle>
-              </CardHeader>
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Event Details */}
+            <Card className="h-fit">
               <CardContent className="space-y-4">
                 <div className="relative h-48 overflow-hidden rounded-lg">
                   <img 
@@ -179,135 +252,130 @@ const Checkout = () => {
                     alt={event.name}
                     className="w-full h-full object-cover"
                   />
+                  <div className="absolute inset-0 bg-black/20"></div>
+                  <Badge className="absolute top-4 right-4 bg-white/90 text-black">
+                    Premium
+                  </Badge>
                 </div>
                 
-                <div>
-                  <h3 className="text-2xl font-bold mb-2">{event.name}</h3>
-                  <p className="text-muted-foreground mb-4">{event.description}</p>
+                <div className="space-y-3">
+                  <h2 className="text-xl font-semibold text-foreground">{event.name}</h2>
+                  <p className="text-muted-foreground text-sm line-clamp-3">
+                    {event.description}
+                  </p>
                   
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <span>{new Date(event.start_time).toLocaleDateString('fr-FR', {
+                  <div className="space-y-2">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Calendar className="mr-2 h-4 w-4" />
+                      {new Date(event.start_time).toLocaleDateString('fr-FR', {
                         weekday: 'long',
                         year: 'numeric',
                         month: 'long',
                         day: 'numeric'
-                      })}</span>
+                      })}
                     </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="h-4 w-4 text-primary" />
-                      <span>{event.city}, {event.country}</span>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <MapPin className="mr-2 h-4 w-4" />
+                      {event.city}, {event.country}
                     </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Payment Summary */}
-          <div className="space-y-6">
-            <Card className="sticky top-4">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <CreditCard className="h-5 w-5" />
-                  Résumé de commande
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span>Prix de la course</span>
-                    <span className="font-medium">{coursePrice}€</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span>Commission plateforme</span>
-                    <span className="font-medium">{commission}€</span>
-                  </div>
-                  <Separator />
-                  <div className="flex justify-between items-center font-semibold text-lg">
-                    <span>Total</span>
-                    <span>{totalAmount}€</span>
-                  </div>
-                </div>
-
-                <div className="space-y-4 pt-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="votre@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  <Button
-                    onClick={handlePayment}
-                    disabled={loading || !email}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {loading ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current mr-2" />
-                        Traitement...
-                      </>
-                    ) : (
-                      <>
-                        <CreditCard className="h-4 w-4 mr-2" />
-                        S&apos;inscrire pour {totalAmount}€
-                      </>
-                    )}
-                  </Button>
-
-                  <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
-                    <Shield className="h-4 w-4" />
-                    <span>Paiement sécurisé par Stripe</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Security Features */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Votre inscription inclut</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                      <Check className="h-3 w-3 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Dossard personnalisé</p>
-                      <p className="text-sm text-muted-foreground">Avec votre nom et numéro unique</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                      <Check className="h-3 w-3 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Suivi en temps réel</p>
-                      <p className="text-sm text-muted-foreground">Chronométrage et classement live</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center mt-0.5">
-                      <Check className="h-3 w-3 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Certificat de participation</p>
-                      <p className="text-sm text-muted-foreground">Téléchargeable après la course</p>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Users className="mr-2 h-4 w-4" />
+                      Événement sportif
                     </div>
                   </div>
                 </div>
               </CardContent>
             </Card>
+
+            {/* Payment Form */}
+            <div className="space-y-6">
+              {/* Order Summary */}
+              <Card className="sticky top-4">
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <CreditCard className="mr-2 h-5 w-5" />
+                    Résumé de commande
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="space-y-3">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Cours</span>
+                      <span className="font-medium">{coursePrice}€</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Commission</span>
+                      <span className="font-medium">{commission}€</span>
+                    </div>
+                    <Separator />
+                    <div className="flex justify-between text-lg font-semibold">
+                      <span>Total</span>
+                      <span>{totalAmount}€</span>
+                    </div>
+                  </div>
+
+                  <form onSubmit={handlePayment} className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Adresse email</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="votre@email.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    {/* Stripe Payment Element */}
+                    <div className="space-y-2">
+                      <Label>Informations de paiement</Label>
+                      <div id="payment-element" className="p-3 border rounded-md bg-background">
+                        {/* Stripe Elements will be mounted here */}
+                      </div>
+                      {message && (
+                        <p className="text-sm text-destructive">{message}</p>
+                      )}
+                    </div>
+
+                    <Button 
+                      type="submit" 
+                      className="w-full" 
+                      size="lg"
+                      disabled={paymentLoading || !stripe || !elements}
+                    >
+                      {paymentLoading ? (
+                        <>
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2"></div>
+                          Traitement en cours...
+                        </>
+                      ) : (
+                        <>
+                          <CreditCard className="mr-2 h-4 w-4" />
+                          Payer {totalAmount}€
+                        </>
+                      )}
+                    </Button>
+                  </form>
+
+                  {/* Security Features */}
+                  <div className="pt-4 border-t space-y-3">
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Shield className="mr-2 h-4 w-4 text-green-600" />
+                      Paiement sécurisé par Stripe
+                    </div>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Check className="mr-2 h-4 w-4 text-green-600" />
+                      Données chiffrées SSL
+                    </div>
+                    <div className="flex items-center text-sm text-muted-foreground">
+                      <Check className="mr-2 h-4 w-4 text-green-600" />
+                      Garantie de remboursement
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
       </div>
