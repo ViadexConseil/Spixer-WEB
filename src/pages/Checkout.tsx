@@ -93,20 +93,29 @@ const Checkout = () => {
       // Create Stripe payment intent using the API
       const paymentIntent = await paymentsAPI.createIntent(totalAmountCents, 'eur');
 
-      toast({
-        title: "Redirection vers le paiement",
-        description: "Vous allez être redirigé vers Stripe pour finaliser le paiement.",
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Stripe non initialisé');
+      }
+
+      // Confirm payment with Stripe using the client_secret
+      const { error: paymentError } = await stripe.confirmPayment({
+        clientSecret: paymentIntent.client_secret,
+        confirmParams: {
+          return_url: `${window.location.origin}/profile`,
+          payment_method_data: {
+            billing_details: {
+              email: email,
+            },
+          },
+        },
       });
 
-      // For now, simulate success since we need proper Stripe setup
-      // In real implementation, you would use the client_secret to confirm payment
-      setTimeout(() => {
-        toast({
-          title: "Paiement réussi !",
-          description: "Votre inscription a été confirmée.",
-        });
-        navigate('/profile');
-      }, 2000);
+      if (paymentError) {
+        throw new Error(paymentError.message || 'Erreur lors du paiement');
+      }
+
+      // Payment successful - user will be redirected to return_url
 
     } catch (error) {
       console.error('Payment error:', error);
