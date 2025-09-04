@@ -170,7 +170,7 @@ const CourseDetail = () => {
         <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
           <div className="relative h-64 md:h-80">
             <img 
-              src="/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png" 
+              src={event.images?.[0] || event.image_url || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png"} 
               alt={event.name}
               className="w-full h-full object-cover"
             />

@@ -230,7 +230,7 @@ const Inscription = () => {
             <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
               <div className="relative h-32 md:h-40">
                 <img 
-                  src="/lovable-uploads/77a7ef3b-a09f-4099-8c96-d468f4ded307.png" 
+                  src={event.images?.[0] || event.image_url || "/lovable-uploads/77a7ef3b-a09f-4099-8c96-d468f4ded307.png"} 
                   alt={event.name}
                   className="w-full h-full object-cover"
                 />

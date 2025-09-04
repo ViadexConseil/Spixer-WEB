@@ -166,7 +166,7 @@ const Checkout = () => {
               <CardContent className="space-y-4">
                 <div className="relative h-48 overflow-hidden rounded-lg">
                   <img 
-                    src="/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png" 
+                    src={event.images?.[0] || event.image_url || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png"} 
                     alt={event.name}
                     className="w-full h-full object-cover"
                   />

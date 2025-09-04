@@ -119,6 +119,8 @@ export interface Stage {
   end_time: string;
   registration_end_time: string;
   category_label: string;
+  image_url?: string | null;
+  images: string[];
   // Additional fields for backward compatibility
   max_participants?: number;
 }
@@ -158,6 +160,8 @@ export interface Club {
   created_at: string;
   updated_at: string;
   federation_name: string;
+  image_url?: string | null;
+  images: string[];
 }
 
 export interface ClubMember {
