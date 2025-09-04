@@ -143,11 +143,11 @@ const Checkout = () => {
     setMessage("");
 
     try {
-      // Confirm payment with Stripe
-      const { error } = await stripe.confirmPayment({
+      // Confirm payment with Stripe (without redirect to avoid sandbox security issues)
+      const { error, paymentIntent } = await stripe.confirmPayment({
         elements,
+        redirect: 'if_required',
         confirmParams: {
-          return_url: `${window.location.origin}/profile`,
           payment_method_data: {
             billing_details: {
               email: email,
@@ -172,11 +172,22 @@ const Checkout = () => {
             variant: "destructive",
           });
         }
-      } else {
-        // Payment successful - will redirect to return_url
+      } else if (paymentIntent && paymentIntent.status === 'succeeded') {
+        // Payment successful!
         toast({
-          title: "Paiement en cours",
-          description: "Votre paiement est en cours de traitement...",
+          title: "Paiement réussi !",
+          description: "Votre inscription a été confirmée.",
+        });
+        
+        // Navigate to profile page after success
+        setTimeout(() => {
+          navigate('/profile');
+        }, 1500);
+      } else {
+        setMessage("Le paiement nécessite une action supplémentaire.");
+        toast({
+          title: "Action requise",
+          description: "Veuillez suivre les instructions pour finaliser le paiement.",
         });
       }
     } catch (error) {
