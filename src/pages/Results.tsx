@@ -1,43 +1,44 @@
-import React, { useState } from "react";
-import { Search, Filter, Trophy, Medal, Award, TrendingUp } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { Search, Filter, Trophy, Medal, Award, TrendingUp, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
+import { rankingsAPI, eventsAPI, Ranking, Event } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 const Results = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const [rankings, setRankings] = useState<Ranking[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const mockResults = [
-    {
-      id: "1",
-      eventName: "Marathon de Paris 2024",
-      participantName: "Jean Dupont",
-      position: 1,
-      time: "2:08:45",
-      category: "Senior M",
-      date: "2024-04-07"
-    },
-    {
-      id: "2", 
-      eventName: "Trail des Vosges",
-      participantName: "Marie Martin",
-      position: 3,
-      time: "1:45:32",
-      category: "Senior F",
-      date: "2024-03-15"
-    },
-    {
-      id: "3",
-      eventName: "10K Lyon",
-      participantName: "Pierre Dubois",
-      position: 12,
-      time: "38:21",
-      category: "Vétéran M",
-      date: "2024-03-10"
-    }
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [rankingsData, eventsData] = await Promise.all([
+          rankingsAPI.list(),
+          eventsAPI.list()
+        ]);
+        setRankings(rankingsData);
+        setEvents(eventsData);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur de chargement');
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les résultats.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const getPositionIcon = (position: number) => {
     if (position === 1) return <Trophy className="h-5 w-5 text-yellow-500" />;
@@ -46,10 +47,26 @@ const Results = () => {
     return <span className="text-sm font-medium">#{position}</span>;
   };
 
-  const filteredResults = mockResults.filter(result =>
-    result.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    result.participantName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredRankings = rankings.filter(ranking =>
+    ranking.event_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    ranking.user_email.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (loading) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-background">
+          <div className="container px-4 py-8">
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Chargement des résultats...</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -67,7 +84,7 @@ const Results = () => {
             </h1>
             
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Consultez les résultats en temps réel et les classements de tous les événements
+              Consultez les résultats et classements des événements terminés
             </p>
           </div>
 
@@ -90,88 +107,108 @@ const Results = () => {
             </div>
           </div>
 
-          {/* Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          {/* Stats - Only show real data */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <Card>
               <CardContent className="p-6 text-center">
                 <Trophy className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">156</div>
-                <div className="text-sm text-muted-foreground">Événements terminés</div>
+                <div className="text-2xl font-bold">{events.length}</div>
+                <div className="text-sm text-muted-foreground">Événements référencés</div>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="p-6 text-center">
                 <TrendingUp className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">45.2K</div>
-                <div className="text-sm text-muted-foreground">Participants classés</div>
+                <div className="text-2xl font-bold">{rankings.length}</div>
+                <div className="text-sm text-muted-foreground">Résultats disponibles</div>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="p-6 text-center">
                 <Award className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">2:08:45</div>
-                <div className="text-sm text-muted-foreground">Record marathon</div>
-              </CardContent>
-            </Card>
-            
-            <Card>
-              <CardContent className="p-6 text-center">
-                <Medal className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-                <div className="text-2xl font-bold">99.7%</div>
-                <div className="text-sm text-muted-foreground">Précision chronométrage</div>
+                <div className="text-2xl font-bold">
+                  {new Set(rankings.map(r => r.user_email)).size}
+                </div>
+                <div className="text-sm text-muted-foreground">Participants uniques</div>
               </CardContent>
             </Card>
           </div>
 
           {/* Results List */}
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Derniers résultats</h2>
-            
-            {filteredResults.map((result) => (
-              <Card key={result.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
-                        {getPositionIcon(result.position)}
+          {rankings.length > 0 ? (
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold">Résultats disponibles</h2>
+              
+              {filteredRankings.map((ranking) => (
+                <Card key={ranking.id} className="hover:shadow-md transition-shadow">
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-muted">
+                          {getPositionIcon(ranking.rank_position)}
+                        </div>
+                        
+                        <div>
+                          <h3 className="font-semibold text-lg">{ranking.event_name}</h3>
+                          <p className="text-muted-foreground">{ranking.user_email}</p>
+                        </div>
                       </div>
                       
-                      <div>
-                        <h3 className="font-semibold text-lg">{result.eventName}</h3>
-                        <p className="text-muted-foreground">{result.participantName}</p>
+                      <div className="text-right space-y-1">
+                        <div className="text-2xl font-bold">Position #{ranking.rank_position}</div>
+                        <Badge variant="secondary">{ranking.stage_name}</Badge>
                       </div>
                     </div>
                     
-                    <div className="text-right space-y-1">
-                      <div className="text-2xl font-bold">{result.time}</div>
-                      <Badge variant="secondary">{result.category}</Badge>
+                    <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                      <span className="text-sm text-muted-foreground">
+                        Événement: {ranking.event_name}
+                      </span>
+                      
+                      <Button variant="outline" size="sm">
+                        Voir détails
+                      </Button>
                     </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                    <span className="text-sm text-muted-foreground">
-                      {new Date(result.date).toLocaleDateString('fr-FR')}
-                    </span>
-                    
-                    <Button variant="outline" size="sm">
-                      Voir détails
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Empty State */}
-          {filteredResults.length === 0 && (
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            /* Empty State */
             <div className="text-center py-12">
               <Trophy className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-xl font-semibold mb-2">Aucun résultat disponible</h3>
+              <p className="text-muted-foreground mb-6">
+                Les résultats des courses seront affichés ici une fois les événements terminés.
+              </p>
+              <Button asChild>
+                <a href="/events">
+                  Découvrir les événements
+                </a>
+              </Button>
+            </div>
+          )}
+
+          {/* No Search Results */}
+          {rankings.length > 0 && filteredRankings.length === 0 && (
+            <div className="text-center py-12">
+              <Search className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
               <h3 className="text-xl font-semibold mb-2">Aucun résultat trouvé</h3>
               <p className="text-muted-foreground">
                 Essayez de modifier vos critères de recherche.
               </p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && (
+            <div className="text-center py-12">
+              <div className="bg-destructive/10 text-destructive rounded-lg p-4 max-w-md mx-auto">
+                <h3 className="font-semibold mb-2">Erreur de chargement</h3>
+                <p className="text-sm">{error}</p>
+              </div>
             </div>
           )}
         </div>

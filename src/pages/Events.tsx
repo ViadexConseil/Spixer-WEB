@@ -61,7 +61,7 @@ const Events = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background page-content">
+      <div className="min-h-screen bg-background page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Hero Section */}
           <div className="text-center mb-12 space-y-6">
@@ -71,30 +71,35 @@ const Events = () => {
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
-              <span className="bg-gradient-to-r from-foreground via-primary to-secondary bg-clip-text text-transparent">
-                Tous les événements
-              </span>
+              Tous les événements
             </h1>
             
             <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Découvrez tous les événements sportifs à venir et passés avec chronométrage intelligent
             </p>
 
-            {/* Quick Stats */}
-            <div className="flex flex-wrap justify-center gap-8 mt-8">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-1">{events.length}</div>
-                <div className="text-sm text-muted-foreground">Événements actifs</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-secondary mb-1">50K+</div>
-                <div className="text-sm text-muted-foreground">Participants</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-primary mb-1">4.9★</div>
-                <div className="text-sm text-muted-foreground">Satisfaction</div>
-              </div>
+          {/* Quick Stats - Only show real data */}
+          <div className="flex flex-wrap justify-center gap-8 mt-8">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary mb-1">{events.length}</div>
+              <div className="text-sm text-muted-foreground">Événements disponibles</div>
             </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-secondary mb-1">
+                {new Set(events.map(e => e.organiser_email)).size}
+              </div>
+              <div className="text-sm text-muted-foreground">Organisateurs</div>
+            </div>
+            <div className="text-center">
+              <div className="text-2xl font-bold text-primary mb-1">
+                {events.filter(e => {
+                  const eventDate = new Date(e.start_time);
+                  return eventDate > new Date();
+                }).length}
+              </div>
+              <div className="text-sm text-muted-foreground">À venir</div>
+            </div>
+          </div>
           </div>
 
           {/* Enhanced Filters */}
@@ -211,7 +216,7 @@ const Events = () => {
                       </div>
                       
                       <Button 
-                        className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/btn" 
+                        className="w-full rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/btn" 
                         asChild
                       >
                         <Link to={`/events/${event.id}`}>
@@ -230,15 +235,14 @@ const Events = () => {
           {viewMode === 'map' && (
             <div className="bg-card rounded-3xl shadow-xl border p-12 text-center">
               <div className="max-w-md mx-auto space-y-6">
-                <div className="bg-gradient-to-br from-primary/10 to-secondary/10 rounded-full w-20 h-20 flex items-center justify-center mx-auto">
+                <div className="rounded-full w-20 h-20 flex items-center justify-center mx-auto bg-muted">
                   <Map className="w-10 h-10 text-primary" />
                 </div>
                 <h3 className="text-2xl font-bold">Vue carte interactive</h3>
                 <p className="text-muted-foreground leading-relaxed">
                   La visualisation des événements sur carte avec géolocalisation et filtres avancés sera bientôt disponible.
                 </p>
-                <Button className="bg-gradient-to-r from-primary to-secondary text-white rounded-xl">
-                  <Sparkles className="w-4 h-4 mr-2" />
+                <Button className="rounded-xl">
                   Être notifié du lancement
                 </Button>
               </div>
@@ -264,7 +268,7 @@ const Events = () => {
                   >
                     Réinitialiser la recherche
                   </Button>
-                  <Button className="bg-gradient-to-r from-primary to-secondary text-white rounded-xl">
+                  <Button className="rounded-xl">
                     Voir tous les événements
                   </Button>
                 </div>

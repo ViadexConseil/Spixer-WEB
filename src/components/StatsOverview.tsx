@@ -1,33 +1,38 @@
 import React from "react";
 import { TrendingUp, Users, Calendar, Trophy } from "lucide-react";
+import { useEvents } from "@/hooks/useEvents";
 
 const StatsOverview = () => {
+  const { events } = useEvents();
+
+  // Only show real data from the API
   const stats = [
     {
-      label: "Événements actifs",
-      value: "156",
-      change: "+12%",
+      label: "Événements disponibles",
+      value: events.length.toString(),
       icon: Calendar,
       color: "text-blue-600"
     },
     {
-      label: "Participants inscrits",
-      value: "12.5K",
-      change: "+8%", 
+      label: "Organisateurs actifs",
+      value: new Set(events.map(e => e.organiser_email)).size.toString(),
       icon: Users,
       color: "text-green-600"
     },
     {
       label: "Clubs partenaires",
-      value: "89",
-      change: "+15%",
+      value: new Set(events.filter(e => e.club_id).map(e => e.club_id)).size.toString(),
       icon: Trophy,
       color: "text-purple-600"
     },
     {
-      label: "Taux de satisfaction",
-      value: "98%",
-      change: "+2%",
+      label: "Événements récents",
+      value: events.filter(e => {
+        const eventDate = new Date(e.start_time);
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        return eventDate >= thirtyDaysAgo;
+      }).length.toString(),
       icon: TrendingUp,
       color: "text-orange-600"
     }
@@ -46,10 +51,6 @@ const StatsOverview = () => {
               <div className="space-y-1">
                 <div className="text-2xl font-bold">{stat.value}</div>
                 <div className="text-sm text-muted-foreground">{stat.label}</div>
-                <div className={`text-xs ${stat.color} flex items-center justify-center gap-1`}>
-                  <TrendingUp className="h-3 w-3" />
-                  {stat.change}
-                </div>
               </div>
             </div>
           ))}
