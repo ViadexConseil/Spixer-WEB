@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { ArrowRight, Smartphone, Download, Users } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CTAFinal = () => {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -74,14 +75,14 @@ const CTAFinal = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
           {/* Bouton Créer un compte */}
           <div className="opacity-0 fade-in-element">
-            <a
-              href="/login"
-              className="block w-full bg-spixer-orange text-white rounded-2xl p-6 hover:bg-spixer-orange-dark transition-all duration-300 hover:scale-105 shadow-lg text-center"
+            <Link
+              to="/login"
+              className="block w-full bg-primary text-primary-foreground rounded-2xl p-6 hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg text-center"
             >
               <Users size={32} className="mx-auto mb-3" />
               <h3 className="text-lg font-semibold mb-2">Créer un compte</h3>
               <p className="text-sm opacity-90">Rejoignez la communauté Spixer</p>
-            </a>
+            </Link>
           </div>
 
           {/* Bouton Télécharger l'app */}
@@ -100,14 +101,14 @@ const CTAFinal = () => {
 
           {/* Bouton Voir les offres */}
           <div className="opacity-0 fade-in-element">
-            <a
-              href="/pricing"
-              className="block w-full bg-spixer-orange text-white rounded-2xl p-6 hover:bg-spixer-orange-dark transition-all duration-300 hover:scale-105 shadow-lg text-center"
+            <Link
+              to="/pricing"
+              className="block w-full bg-primary text-primary-foreground rounded-2xl p-6 hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg text-center"
             >
               <ArrowRight size={32} className="mx-auto mb-3" />
               <h3 className="text-lg font-semibold mb-2">Voir les offres</h3>
               <p className="text-sm opacity-90">Découvrez nos plans tarifaires</p>
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -126,12 +127,12 @@ const CTAFinal = () => {
               <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             </button>
             
-            <a 
-              href="/contact"
+            <Link 
+              to="/contact"
               className="text-white border border-white/30 hover:border-white font-medium py-4 px-8 rounded-full hover:bg-white/10 transition-all duration-300 inline-block text-center"
             >
               En savoir plus
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Calendar, MapPin, Users, Share2, Heart, Trophy, Video, Info, Map } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -149,7 +149,7 @@ const CourseDetail = () => {
             <div className="text-center py-20">
               <h1 className="text-2xl font-bold text-gray-900 mb-4">Événement non trouvé</h1>
               <Button asChild>
-                <a href="/events">Retour aux événements</a>
+                <Link to="/events">Retour aux événements</Link>
               </Button>
             </div>
           </div>
@@ -231,8 +231,8 @@ const CourseDetail = () => {
                   Partager
                 </Button>
                 {registrationStatus.canRegister ? (
-                  <Button className="bg-spixer-orange hover:bg-spixer-orange-dark" asChild>
-                    <a href={`/events/${event.id}/register`}>Participer</a>
+                  <Button asChild>
+                    <Link to={`/events/${event.id}/register`}>Participer</Link>
                   </Button>
                 ) : (
                   <Button disabled className="bg-gray-400 cursor-not-allowed">

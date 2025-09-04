@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Navigation from "@/components/Navigation";
 import { rankingsAPI, eventsAPI, Ranking, Event } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 const Results = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -184,9 +185,9 @@ const Results = () => {
                 Les résultats des courses seront affichés ici une fois les événements terminés.
               </p>
               <Button asChild>
-                <a href="/events">
+                <Link to="/events">
                   Découvrir les événements
-                </a>
+                </Link>
               </Button>
             </div>
           )}
