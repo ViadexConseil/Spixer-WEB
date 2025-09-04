@@ -87,19 +87,27 @@ export interface Event {
   id: string;
   name: string;
   description: string;
+  label?: string | null;
   start_time: string;
-  end_time?: string;
-  city: string;
-  country: string;
-  organiser_email: string;
-  // Additional fields for backward compatibility
+  end_time?: string | null;
   registration_end_time?: string | null;
-  is_draft?: number;
+  created_at: string;
+  updated_at: string;
+  organiser_id: string;
+  club_id?: string | null;
+  image_url?: string | null;
   cancel_reason?: string | null;
-  postal_code?: string;
-  address?: string;
-  created_at?: string;
-  updated_at?: string;
+  PMR: number;
+  postal_code: number;
+  address?: string | null;
+  city: string;
+  region?: string | null;
+  country: string;
+  oneplan_path?: string | null;
+  organiser_email: string;
+  images: string[];
+  // Legacy fields for backward compatibility
+  is_draft?: number;
 }
 
 export interface Stage {
@@ -261,7 +269,7 @@ export const authAPI = {
 // Events API
 export const eventsAPI = {
   list: async (): Promise<Event[]> => {
-    const response = await apiCall<{ events: Event[] }>('/v1/events');
+    const response = await apiCall<{ events: Event[] }>('/v1/events?include=images');
     return response.events || [];
   },
 
