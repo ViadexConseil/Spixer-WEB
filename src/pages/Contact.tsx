@@ -133,7 +133,7 @@ const Contact = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 page-content">
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-primary/5 page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Hero Section */}
           <div className="text-center mb-16">
@@ -141,10 +141,10 @@ const Contact = () => {
               <Zap className="w-4 h-4" />
               Contactez-nous
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-spixer-blue to-spixer-orange bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-primary to-primary bg-clip-text text-transparent mb-6">
               Parlons de votre projet
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               Une question, une idée, un projet ? Notre équipe est là pour vous accompagner 
               dans votre aventure sportive.
             </p>
@@ -166,8 +166,8 @@ const Contact = () => {
                     <div className={`w-16 h-16 ${type.color} rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg`}>
                       <Icon className="w-8 h-8 text-white" />
                     </div>
-                    <h3 className="font-bold text-lg mb-2">{type.title}</h3>
-                    <p className="text-gray-600 text-sm">{type.description}</p>
+                    <h3 className="font-bold text-lg mb-2 text-foreground">{type.title}</h3>
+                    <p className="text-muted-foreground text-sm">{type.description}</p>
                   </CardContent>
                 </Card>
               );
@@ -177,11 +177,11 @@ const Contact = () => {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div className="order-2 lg:order-1">
-              <Card className="border-0 shadow-2xl bg-white/80 backdrop-blur-sm">
+              <Card className="border-0 shadow-2xl bg-card/80 backdrop-blur-sm">
                 <CardContent className="p-8">
                   <div className="mb-8">
-                    <h2 className="text-3xl font-bold mb-4">Envoyez-nous un message</h2>
-                    <p className="text-gray-600">
+                    <h2 className="text-3xl font-bold mb-4 text-foreground">Envoyez-nous un message</h2>
+                    <p className="text-muted-foreground">
                       Remplissez le formulaire ci-dessous et nous vous répondrons rapidement.
                     </p>
                   </div>
@@ -199,7 +199,7 @@ const Contact = () => {
                           onChange={handleInputChange}
                           placeholder="Votre nom"
                           required
-                          className="h-12 border-2 border-gray-200 focus:border-spixer-orange transition-colors"
+                          className="h-12 border-2 border-border focus:border-primary transition-colors"
                         />
                       </div>
                       
@@ -215,7 +215,7 @@ const Contact = () => {
                           onChange={handleInputChange}
                           placeholder="votre@email.com"
                           required
-                          className="h-12 border-2 border-gray-200 focus:border-spixer-orange transition-colors"
+                          className="h-12 border-2 border-border focus:border-primary transition-colors"
                         />
                       </div>
                     </div>
@@ -231,7 +231,7 @@ const Contact = () => {
                         onChange={handleInputChange}
                         placeholder="Sujet de votre message"
                         required
-                        className="h-12 border-2 border-gray-200 focus:border-spixer-orange transition-colors"
+                        className="h-12 border-2 border-border focus:border-primary transition-colors"
                       />
                     </div>
 
@@ -247,7 +247,7 @@ const Contact = () => {
                         placeholder="Décrivez votre demande en détail..."
                         required
                         rows={6}
-                        className="border-2 border-gray-200 focus:border-spixer-orange transition-colors resize-none"
+                        className="border-2 border-border focus:border-primary transition-colors resize-none"
                       />
                     </div>
 
@@ -304,9 +304,9 @@ const Contact = () => {
               </Card>
 
               {/* Features */}
-              <Card className="border-0 shadow-xl bg-gradient-to-br from-green-50 to-emerald-50">
+              <Card className="border-0 shadow-xl bg-card">
                 <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold mb-6 text-gray-900">Pourquoi nous choisir ?</h3>
+                  <h3 className="text-2xl font-bold mb-6 text-foreground">Pourquoi nous choisir ?</h3>
                   <div className="space-y-4">
                     {[
                       "Réponse garantie sous 24h",
@@ -318,7 +318,7 @@ const Contact = () => {
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0">
                           <CheckCircle className="w-4 h-4 text-white" />
                         </div>
-                        <span className="text-gray-700 font-medium">{feature}</span>
+                        <span className="text-foreground font-medium">{feature}</span>
                       </div>
                     ))}
                   </div>
@@ -326,15 +326,15 @@ const Contact = () => {
               </Card>
 
               {/* FAQ Quick Access */}
-              <Card className="border-0 shadow-xl bg-gradient-to-br from-orange-50 to-yellow-50">
+              <Card className="border-0 shadow-xl bg-card">
                 <CardContent className="p-8">
-                  <h3 className="text-2xl font-bold mb-4 text-gray-900">Questions fréquentes</h3>
-                  <p className="text-gray-600 mb-6">
+                  <h3 className="text-2xl font-bold mb-4 text-foreground">Questions fréquentes</h3>
+                  <p className="text-muted-foreground mb-6">
                     Consultez notre FAQ pour obtenir des réponses immédiates aux questions les plus courantes.
                   </p>
                   <Button 
                     variant="outline" 
-                    className="w-full border-2 border-spixer-orange text-spixer-orange hover:bg-spixer-orange hover:text-white transition-all duration-300"
+                    className="w-full border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-300"
                     asChild
                   >
                     <Link to="/faq">

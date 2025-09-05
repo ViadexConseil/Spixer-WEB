@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, Trophy, Settings, Users, Heart, Edit } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import DashboardAccess from "@/components/DashboardAccess";
+import RoleStatus from "@/components/RoleStatus";
 import { authAPI, ProfileUser } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
@@ -165,6 +166,9 @@ const Profil = () => {
             </CardContent>
           </Card>
 
+          {/* Role Status */}
+          <RoleStatus />
+          
           {/* Dashboard Access */}
           <DashboardAccess />
 
