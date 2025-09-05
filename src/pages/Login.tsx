@@ -79,14 +79,14 @@ const Login = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center page-content">
+      <div className="min-h-screen bg-background flex items-center justify-center page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
           {/* Left side - Form */}
           <div className="w-full max-w-md mx-auto">
             <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold mb-2">Bienvenue sur Spixer</h1>
-              <p className="text-gray-600">Connectez-vous pour accéder à votre espace personnel</p>
+              <h1 className="text-3xl font-bold mb-2 text-foreground">Bienvenue sur Spixer</h1>
+              <p className="text-muted-foreground">Connectez-vous pour accéder à votre espace personnel</p>
             </div>
 
             <Tabs defaultValue="login" className="w-full">
@@ -108,7 +108,7 @@ const Login = () => {
                       <div className="space-y-2">
                         <Label htmlFor="identifier">Email ou nom d'utilisateur</Label>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                           <Input 
                             id="identifier" 
                             type="text" 
@@ -123,7 +123,7 @@ const Login = () => {
                       <div className="space-y-2">
                         <Label htmlFor="password">Mot de passe</Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                           <Input 
                             id="password" 
                             type={showPassword ? "text" : "password"} 
@@ -135,7 +135,7 @@ const Login = () => {
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
@@ -143,7 +143,7 @@ const Login = () => {
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full bg-spixer-orange hover:bg-spixer-orange-dark"
+                        className="w-full bg-primary hover:bg-primary/90"
                         disabled={isLoading}
                       >
                         {isLoading ? "Connexion..." : "Se connecter"}
@@ -166,7 +166,7 @@ const Login = () => {
                       <div className="space-y-2">
                         <Label htmlFor="username">Nom d'utilisateur</Label>
                         <div className="relative">
-                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                           <Input 
                             id="username" 
                             placeholder="Nom d'utilisateur" 
@@ -180,7 +180,7 @@ const Login = () => {
                       <div className="space-y-2">
                         <Label htmlFor="registerEmail">Email</Label>
                         <div className="relative">
-                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                           <Input 
                             id="registerEmail" 
                             type="email" 
@@ -195,7 +195,7 @@ const Login = () => {
                       <div className="space-y-2">
                         <Label htmlFor="registerPassword">Mot de passe</Label>
                         <div className="relative">
-                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                          <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                           <Input 
                             id="registerPassword" 
                             type={showPassword ? "text" : "password"} 
@@ -207,7 +207,7 @@ const Login = () => {
                           <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
-                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                           >
                             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                           </button>
@@ -215,7 +215,7 @@ const Login = () => {
                       </div>
                       <Button 
                         type="submit" 
-                        className="w-full bg-spixer-orange hover:bg-spixer-orange-dark"
+                        className="w-full bg-primary hover:bg-primary/90"
                         disabled={isLoading}
                       >
                         {isLoading ? "Création..." : "Créer mon compte"}

@@ -8,7 +8,7 @@ import { ThemeProvider } from "./hooks/useTheme";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import Events from "./pages/Events";
-import CourseDetail from "./pages/CourseDetail";
+import EventDetail from "./pages/EventDetail";
 import Clubs from "./pages/Clubs";
 
 import Inscription from "./pages/Inscription";
@@ -38,7 +38,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             {/* Events Management */}
           <Route path="/events" element={<Events />} />
-          <Route path="/events/:id" element={<CourseDetail />} />
+          <Route path="/events/:id" element={<EventDetail />} />
           <Route path="/clubs" element={<Clubs />} />
           
             <Route path="/events/:id/register" element={<Inscription />} />
@@ -60,7 +60,7 @@ const App = () => (
             <Route path="/privacy" element={<Privacy />} />
             {/* Legacy redirects for backward compatibility */}
             <Route path="/courses" element={<Events />} />
-            <Route path="/courses/:id" element={<CourseDetail />} />
+            <Route path="/courses/:id" element={<EventDetail />} />
             <Route path="/courses/:id/participer" element={<Inscription />} />
             <Route path="/profil" element={<Profil />} />
             <Route path="/create" element={<CreateEvent />} />

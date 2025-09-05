@@ -180,30 +180,30 @@ const FAQ = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-blue-50 page-content">
+      <div className="min-h-screen bg-background page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Hero Section */}
           <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-spixer-orange to-orange-500 text-white px-4 py-2 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-full text-sm font-medium mb-6">
               <HelpCircle className="w-4 h-4" />
               Questions fréquentes
             </div>
-            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-gray-900 via-spixer-blue to-spixer-orange bg-clip-text text-transparent mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold bg-gradient-to-r from-foreground via-primary to-primary bg-clip-text text-transparent mb-6">
               Centre d'aide
             </h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-8">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed mb-8">
               Trouvez rapidement les réponses à vos questions les plus fréquentes
             </p>
 
             {/* Search Bar */}
             <div className="max-w-2xl mx-auto mb-12">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
                 <Input
                   placeholder="Rechercher dans la FAQ..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 pr-4 py-4 text-lg border-2 border-gray-200 focus:border-spixer-orange rounded-2xl shadow-lg"
+                  className="pl-12 pr-4 py-4 text-lg border-2 border-border focus:border-primary rounded-2xl shadow-lg"
                 />
               </div>
             </div>
@@ -223,8 +223,8 @@ const FAQ = () => {
                       <div className="flex items-start gap-3">
                         <Badge className="bg-yellow-100 text-yellow-800 text-xs">Populaire</Badge>
                       </div>
-                      <h3 className="font-semibold text-lg mt-3 mb-2">{faq.question}</h3>
-                      <p className="text-gray-600 text-sm line-clamp-3">{faq.answer}</p>
+                      <h3 className="font-semibold text-lg mt-3 mb-2 text-foreground">{faq.question}</h3>
+                      <p className="text-muted-foreground text-sm line-clamp-3">{faq.answer}</p>
                     </CardContent>
                   </Card>
                 ))}
@@ -237,7 +237,7 @@ const FAQ = () => {
             <div className="lg:col-span-1">
               <Card className="border-0 shadow-xl sticky top-6">
                 <CardContent className="p-6">
-                  <h3 className="font-bold text-lg mb-6">Catégories</h3>
+                  <h3 className="font-bold text-lg mb-6 text-foreground">Catégories</h3>
                   <div className="space-y-2">
                     {updatedCategories.map((category) => {
                       const Icon = category.icon;
@@ -247,8 +247,8 @@ const FAQ = () => {
                           onClick={() => setSelectedCategory(category.id)}
                           className={`w-full flex items-center justify-between p-3 rounded-lg transition-all duration-200 ${
                             selectedCategory === category.id
-                              ? 'bg-gradient-to-r from-spixer-orange to-orange-500 text-white shadow-lg'
-                              : 'hover:bg-gray-100 text-gray-700'
+                              ? 'bg-primary text-primary-foreground shadow-lg'
+                              : 'hover:bg-muted text-foreground'
                           }`}
                         >
                           <div className="flex items-center gap-3">
@@ -259,8 +259,8 @@ const FAQ = () => {
                             variant="secondary" 
                             className={`${
                               selectedCategory === category.id 
-                                ? 'bg-white/20 text-white border-white/30' 
-                                : 'bg-gray-200 text-gray-600'
+                                ? 'bg-primary-foreground/20 text-primary-foreground border-primary-foreground/30' 
+                                : 'bg-muted text-muted-foreground'
                             }`}
                           >
                             {category.count}
@@ -279,11 +279,11 @@ const FAQ = () => {
                 {filteredFAQs.length === 0 ? (
                   <Card className="border-0 shadow-lg">
                     <CardContent className="p-12 text-center">
-                      <Search className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                      <Search className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold text-foreground mb-2">
                         Aucun résultat trouvé
                       </h3>
-                      <p className="text-gray-600 mb-6">
+                      <p className="text-muted-foreground mb-6">
                         Essayez de modifier vos critères de recherche ou parcourez les catégories.
                       </p>
                       <Button 
@@ -303,7 +303,7 @@ const FAQ = () => {
                       <CardContent className="p-0">
                         <button
                           onClick={() => toggleItem(index)}
-                          className="w-full p-6 text-left hover:bg-gray-50 transition-colors duration-200 flex items-center justify-between"
+                          className="w-full p-6 text-left hover:bg-muted/50 transition-colors duration-200 flex items-center justify-between"
                         >
                           <div className="flex items-start gap-4 flex-1">
                             {faq.popular && (
@@ -311,23 +311,23 @@ const FAQ = () => {
                                 Populaire
                               </Badge>
                             )}
-                            <h3 className="font-semibold text-lg text-gray-900 flex-1">
+                            <h3 className="font-semibold text-lg text-foreground flex-1">
                               {faq.question}
                             </h3>
                           </div>
                           <div className="ml-4">
                             {openItems.includes(index) ? (
-                              <ChevronUp className="w-5 h-5 text-spixer-orange" />
+                              <ChevronUp className="w-5 h-5 text-primary" />
                             ) : (
-                              <ChevronDown className="w-5 h-5 text-gray-400" />
+                              <ChevronDown className="w-5 h-5 text-muted-foreground" />
                             )}
                           </div>
                         </button>
                         
                         {openItems.includes(index) && (
                           <div className="px-6 pb-6 animate-fade-in">
-                            <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-spixer-orange">
-                              <p className="text-gray-700 leading-relaxed">
+                            <div className="bg-muted/50 rounded-lg p-4 border-l-4 border-primary">
+                              <p className="text-foreground leading-relaxed">
                                 {faq.answer}
                               </p>
                             </div>
@@ -358,7 +358,7 @@ const FAQ = () => {
                     <Button 
                       asChild
                       size="lg" 
-                      className="bg-white text-spixer-blue hover:bg-gray-100 shadow-lg"
+                      className="bg-white text-primary hover:bg-gray-100 shadow-lg"
                     >
                       <Link to="/contact" className="flex items-center gap-2">
                         <MessageCircle className="w-5 h-5" />
@@ -370,7 +370,7 @@ const FAQ = () => {
                     <Button 
                       size="lg" 
                       variant="outline" 
-                      className="border-2 border-white/80 text-white bg-white/10 hover:bg-white hover:text-spixer-blue backdrop-blur-sm"
+                      className="border-2 border-white/80 text-white bg-white/10 hover:bg-white hover:text-primary backdrop-blur-sm"
                     >
                       <Mail className="w-5 h-5 mr-2" />
                       support@spixer.fr

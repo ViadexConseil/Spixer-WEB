@@ -65,12 +65,6 @@ const Navigation = () => {
       href: "/clubs",
       icon: Users,
       active: location.pathname.startsWith("/clubs")
-    },
-    {
-      label: "Résultats",
-      href: "/results",
-      icon: Trophy,
-      active: location.pathname.startsWith("/results")
     }
   ];
 
