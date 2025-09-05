@@ -13,17 +13,28 @@ import {
   X,
   Bell,
   Search,
-  Plus
+  Plus,
+  Shield,
+  BarChart3,
+  UserCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navigation = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, hasRole } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const handleLogout = () => {
@@ -129,16 +140,50 @@ const Navigation = () => {
 
           {/* User Menu */}
           {user ? (
-            <div className="flex items-center space-x-2">
-              <Button variant="ghost" size="sm" asChild>
-                <Link to="/profile">
-                  <User className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                  <UserCircle className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end" forceMount>
+                <DropdownMenuLabel className="font-normal">
+                  <div className="flex flex-col space-y-1">
+                    <p className="text-sm font-medium leading-none">{user.username || user.email}</p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user.email}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/profile')}>
+                  <User className="mr-2 h-4 w-4" />
+                  <span>Profil</span>
+                </DropdownMenuItem>
+                {hasRole('admin') && (
+                  <DropdownMenuItem onClick={() => navigate('/admin')}>
+                    <Shield className="mr-2 h-4 w-4" />
+                    <span>Administration</span>
+                  </DropdownMenuItem>
+                )}
+                {hasRole('organizer') && (
+                  <DropdownMenuItem onClick={() => navigate('/organizer')}>
+                    <BarChart3 className="mr-2 h-4 w-4" />
+                    <span>Organisateur</span>
+                  </DropdownMenuItem>
+                )}
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => navigate('/settings')}>
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Paramètres</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleLogout}>
+                  <LogOut className="mr-2 h-4 w-4" />
+                  <span>Se déconnecter</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           ) : (
             <div className="flex items-center space-x-2">
               <Button variant="ghost" size="sm" asChild>
@@ -188,6 +233,30 @@ const Navigation = () => {
                 )}
               </Link>
             ))}
+            
+            {user && (
+              <div className="pt-4 border-t space-y-2">
+                <div className="px-3 py-2 text-sm text-muted-foreground border-b">
+                  Mes tableaux de bord
+                </div>
+                {hasRole('admin') && (
+                  <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link to="/admin" onClick={() => setIsMenuOpen(false)}>
+                      <Shield className="h-4 w-4 mr-2" />
+                      Administration
+                    </Link>
+                  </Button>
+                )}
+                {hasRole('organizer') && (
+                  <Button variant="ghost" className="w-full justify-start" asChild>
+                    <Link to="/organizer" onClick={() => setIsMenuOpen(false)}>
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Organisateur
+                    </Link>
+                  </Button>
+                )}
+              </div>
+            )}
             
             {!user && (
               <div className="pt-4 border-t space-y-2">

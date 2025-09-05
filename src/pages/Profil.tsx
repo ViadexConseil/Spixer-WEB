@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Plus, Calendar, Trophy, Settings, Users, Heart, Edit } from "lucide-react";
 import Navigation from "@/components/Navigation";
+import DashboardAccess from "@/components/DashboardAccess";
 import { authAPI, ProfileUser } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { useNavigate, Link } from "react-router-dom";
@@ -163,6 +164,9 @@ const Profil = () => {
               </div>
             </CardContent>
           </Card>
+
+          {/* Dashboard Access */}
+          <DashboardAccess />
 
           {/* Main Tabs */}
           <Tabs defaultValue="participations" className="space-y-6">
