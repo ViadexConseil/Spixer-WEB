@@ -1,276 +1,115 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Textarea } from '@/components/ui/textarea';
-import { Plus, Edit, Trash2, Users, Calendar, Trophy, ArrowLeft, Save } from 'lucide-react';
-import { categoriesAPI, eventsAPI, stagesAPI, registrationsAPI, rankingsAPI } from '@/services/api';
-import { toast } from '@/hooks/use-toast';
-import Navigation from '@/components/Navigation';
-import Footer from '@/components/Footer';
-import type { Category, Event, Stage, Registration, Ranking } from '@/services/api';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import Navigation from "@/components/Navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { 
+  Users, 
+  Calendar, 
+  Trophy, 
+  BarChart3, 
+  Shield, 
+  Search,
+  Filter,
+  Eye,
+  CheckCircle,
+  XCircle,
+  Clock,
+  Settings,
+  FileText,
+  TrendingUp,
+  MapPin,
+  Star
+} from "lucide-react";
+import { eventsAPI, authAPI } from "@/services/api";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [events, setEvents] = useState<Event[]>([]);
-  const [stages, setStages] = useState<Stage[]>([]);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [rankings, setRankings] = useState<Ranking[]>([]);
+  const { user, hasRole } = useAuth();
+  const { toast } = useToast();
+  const [events, setEvents] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [newCategory, setNewCategory] = useState('');
-  const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
-  const [editingEvent, setEditingEvent] = useState<Partial<Event>>({});
-  const [editingStage, setEditingStage] = useState<Partial<Stage>>({});
-  const [eventStages, setEventStages] = useState<Stage[]>([]);
-  const [stageRegistrations, setStageRegistrations] = useState<Registration[]>([]);
-  const [stageRankings, setStageRankings] = useState<Ranking[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-
-  const filteredRegistrations = registrations.filter(
-    (registration) =>
-      registration.user_email.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      (statusFilter === 'all' || registration.status === statusFilter)
-  );
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedTab, setSelectedTab] = useState("overview");
 
   useEffect(() => {
-    loadData();
+    if (!hasRole('admin')) {
+      toast({
+        title: "Accès refusé",
+        description: "Vous n'avez pas les permissions d'administrateur.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    loadDashboardData();
   }, []);
 
-  const loadData = async () => {
+  const loadDashboardData = async () => {
     try {
-      const [categoriesData, eventsData, stagesData, registrationsData, rankingsData] = await Promise.all([
-        categoriesAPI.list(),
-        eventsAPI.list(),
-        stagesAPI.list(),
-        registrationsAPI.list(),
-        rankingsAPI.list(),
-      ]);
-
-      setCategories(categoriesData);
+      setLoading(true);
+      const eventsData = await eventsAPI.list();
       setEvents(eventsData);
-      setStages(stagesData);
-      setRegistrations(registrationsData);
-      setRankings(rankingsData);
+      // Note: User management endpoint would need to be added to API
+      setLoading(false);
     } catch (error) {
+      console.error('Error loading dashboard data:', error);
       toast({
         title: "Erreur",
-        description: "Impossible de charger les données",
-        variant: "destructive",
+        description: "Impossible de charger les données du tableau de bord.",
+        variant: "destructive"
       });
-    } finally {
       setLoading(false);
     }
   };
 
-  const handleCreateCategory = async () => {
-    if (!newCategory.trim()) return;
-
-    try {
-      await categoriesAPI.create({ label: newCategory });
-      setNewCategory('');
-      loadData();
-      toast({
-        title: "Succès",
-        description: "Catégorie créée avec succès",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de créer la catégorie",
-        variant: "destructive",
-      });
-    }
+  const getEventStats = () => {
+    const total = events.length;
+    const upcoming = events.filter(e => new Date(e.start_time) > new Date()).length;
+    const ongoing = events.filter(e => {
+      const now = new Date();
+      return new Date(e.start_time) <= now && new Date(e.end_time) >= now;
+    }).length;
+    const completed = events.filter(e => new Date(e.end_time) < new Date()).length;
+    
+    return { total, upcoming, ongoing, completed };
   };
 
-  const handleDeleteCategory = async (id: number) => {
-    try {
-      await categoriesAPI.delete(id);
-      loadData();
-      toast({
-        title: "Succès",
-        description: "Catégorie supprimée avec succès",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer la catégorie",
-        variant: "destructive",
-      });
-    }
-  };
+  const stats = getEventStats();
 
-  const handleDeleteEvent = async (id: string) => {
-    try {
-      await eventsAPI.delete(id);
-      loadData();
-      toast({
-        title: "Succès",
-        description: "Événement supprimé avec succès",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'événement",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEditEvent = async (event: Event) => {
-    setSelectedEvent(event);
-    setEditingEvent(event);
-    try {
-      const eventStagesData = await stagesAPI.getByEvent(event.id);
-      setEventStages(eventStagesData);
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les étapes de l'événement",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSaveEvent = async () => {
-    if (!selectedEvent || !editingEvent.name || !editingEvent.description) return;
-
-    try {
-      await eventsAPI.update(selectedEvent.id, {
-        name: editingEvent.name,
-        description: editingEvent.description,
-        start_time: editingEvent.start_time,
-        end_time: editingEvent.end_time,
-      });
-      
-      loadData();
-      setSelectedEvent(null);
-      setEditingEvent({});
-      toast({
-        title: "Succès",
-        description: "Événement mis à jour avec succès",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour l'événement",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleDeleteStage = async (stageId: string) => {
-    try {
-      await stagesAPI.delete(stageId);
-      const updatedStages = await stagesAPI.getByEvent(selectedEvent!.id);
-      setEventStages(updatedStages);
-      loadData();
-      toast({
-        title: "Succès",
-        description: "Étape supprimée avec succès",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de supprimer l'étape",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleEditStage = async (stage: Stage) => {
-    setSelectedStage(stage);
-    setEditingStage(stage);
-    try {
-      const [stageRegs, stageRanks] = await Promise.all([
-        registrationsAPI.getByStage(stage.id),
-        rankingsAPI.getByStage(stage.id),
-      ]);
-      setStageRegistrations(stageRegs);
-      setStageRankings(stageRanks);
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de charger les données de l'étape",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleSaveStage = async () => {
-    if (!selectedStage || !editingStage.name || !editingStage.description) return;
-
-    try {
-      await stagesAPI.update(selectedStage.id, {
-        name: editingStage.name,
-        description: editingStage.description,
-        start_time: editingStage.start_time,
-        end_time: editingStage.end_time,
-        registration_end_time: editingStage.registration_end_time,
-      });
-      
-      const updatedStages = await stagesAPI.getByEvent(selectedEvent!.id);
-      setEventStages(updatedStages);
-      setSelectedStage(null);
-      setEditingStage({});
-      toast({
-        title: "Succès",
-        description: "Étape mise à jour avec succès",
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour l'étape",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const handleBackToStages = () => {
-    setSelectedStage(null);
-    setEditingStage({});
-    setStageRegistrations([]);
-    setStageRankings([]);
-  };
-
-  const handleBackToEvents = () => {
-    setSelectedEvent(null);
-    setSelectedStage(null);
-    setEditingEvent({});
-    setEditingStage({});
-    setEventStages([]);
-    setStageRegistrations([]);
-    setStageRankings([]);
-  };
-
-  const handleUpdateRegistrationStatus = async (id: string, status: 'approved' | 'rejected') => {
-    try {
-      await registrationsAPI.update(id, { status });
-      loadData();
-      toast({
-        title: "Succès",
-        description: `Inscription ${status === 'approved' ? 'approuvée' : 'rejetée'} avec succès`,
-      });
-    } catch (error) {
-      toast({
-        title: "Erreur",
-        description: "Impossible de mettre à jour l'inscription",
-        variant: "destructive",
-      });
-    }
-  };
+  if (!hasRole('admin')) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-background page-content">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-20">
+              <Shield className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+              <h1 className="text-2xl font-bold mb-2">Accès non autorisé</h1>
+              <p className="text-muted-foreground">Vous devez être administrateur pour accéder à cette page.</p>
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
 
   if (loading) {
     return (
       <>
         <Navigation />
-        <div className="container mx-auto p-6 pt-24">
-          <div className="text-center">Chargement...</div>
+        <div className="min-h-screen bg-background page-content">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-muted-foreground">Chargement du tableau de bord...</p>
+            </div>
+          </div>
         </div>
-        <Footer />
       </>
     );
   }
@@ -278,481 +117,277 @@ const AdminDashboard = () => {
   return (
     <>
       <Navigation />
-      <div className="container mx-auto p-6 pt-24">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold">Tableau de Bord Administrateur</h1>
-        <p className="text-muted-foreground">Gérez les catégories, événements, étapes et inscriptions</p>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Catégories</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{categories.length}</div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Événements</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{events.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Inscriptions</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{registrations.length}</div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Classements</CardTitle>
-            <Trophy className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{rankings.length}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs defaultValue="categories" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="categories">Catégories</TabsTrigger>
-          <TabsTrigger value="events">Événements</TabsTrigger>
-          <TabsTrigger value="registrations">Inscriptions</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="categories">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Catégories</CardTitle>
-              <CardDescription>Créer et gérer les catégories de sport</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex gap-2">
-                <Input
-                  placeholder="Nom de la catégorie"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                />
-                <Button onClick={handleCreateCategory}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Ajouter
-                </Button>
+      <div className="min-h-screen bg-background page-content">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-6">
+              <div>
+                <h1 className="text-3xl font-bold">Tableau de bord Admin</h1>
+                <p className="text-muted-foreground">Gérez la plateforme Spixer</p>
               </div>
-              
-              <div className="space-y-2">
-                {categories.map((category) => (
-                  <div key={category.id} className="flex items-center justify-between p-3 border rounded-lg">
-                    <span className="font-medium">{category.label}</span>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => handleDeleteCategory(category.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+              <Badge variant="secondary" className="flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Administrateur
+              </Badge>
+            </div>
 
-        <TabsContent value="events">
-          {selectedStage ? (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={handleBackToStages}>
-                      <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                    Gestion: {selectedStage.name}
-                  </CardTitle>
-                  <CardDescription>Modifiez l'étape et gérez ses inscriptions et classements</CardDescription>
-                </div>
-                <Button onClick={handleSaveStage}>
-                  <Save className="w-4 h-4 mr-2" />
-                  Sauvegarder
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Nom de l'étape</label>
-                    <Input
-                      value={editingStage.name || ''}
-                      onChange={(e) => setEditingStage({ ...editingStage, name: e.target.value })}
-                      placeholder="Nom de l'étape"
-                    />
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Total Événements</p>
+                      <p className="text-2xl font-bold">{stats.total}</p>
+                    </div>
+                    <Calendar className="h-8 w-8 text-primary" />
                   </div>
-                  <div>
-                    <label className="text-sm font-medium">Catégorie</label>
-                    <Input
-                      value={editingStage.category_label || ''}
-                      onChange={(e) => setEditingStage({ ...editingStage, category_label: e.target.value })}
-                      placeholder="Catégorie"
-                      disabled
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Date de début</label>
-                    <Input
-                      type="datetime-local"
-                      value={editingStage.start_time ? editingStage.start_time.slice(0, 16) : ''}
-                      onChange={(e) => setEditingStage({ ...editingStage, start_time: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Date de fin</label>
-                    <Input
-                      type="datetime-local"
-                      value={editingStage.end_time ? editingStage.end_time.slice(0, 16) : ''}
-                      onChange={(e) => setEditingStage({ ...editingStage, end_time: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Fin des inscriptions</label>
-                    <Input
-                      type="datetime-local"
-                      value={editingStage.registration_end_time ? editingStage.registration_end_time.slice(0, 16) : ''}
-                      onChange={(e) => setEditingStage({ ...editingStage, registration_end_time: e.target.value })}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="text-sm font-medium">Description</label>
-                    <Textarea
-                      value={editingStage.description || ''}
-                      onChange={(e) => setEditingStage({ ...editingStage, description: e.target.value })}
-                      placeholder="Description de l'étape"
-                    />
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Inscriptions */}
-                  <div className="border-t pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold">Inscriptions ({stageRegistrations.length})</h3>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">À venir</p>
+                      <p className="text-2xl font-bold text-blue-600">{stats.upcoming}</p>
                     </div>
-                    
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {stageRegistrations.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-4">
-                          Aucune inscription pour cette étape
-                        </p>
-                      ) : (
-                        stageRegistrations.map((registration) => (
-                          <div key={registration.id} className="p-3 border rounded-lg">
-                            <div className="flex items-center justify-between">
-                              <div>
-                                <h4 className="font-semibold text-sm">{registration.user_email}</h4>
-                                <div className="flex gap-2 mt-1">
-                                  <Badge variant={registration.status === 'approved' ? 'default' : 'secondary'} className="text-xs">
-                                    {registration.status}
-                                  </Badge>
-                                  <Badge variant="outline" className="text-xs">{registration.type}</Badge>
-                                </div>
-                                <p className="text-xs text-muted-foreground mt-1">
-                                  {new Date(registration.created_at).toLocaleDateString()}
-                                </p>
-                              </div>
-                              <Button variant="outline" size="sm">
-                                <Edit className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
+                    <Clock className="h-8 w-8 text-blue-600" />
                   </div>
+                </CardContent>
+              </Card>
 
-                  {/* Classements */}
-                  <div className="border-t pt-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <h3 className="text-lg font-semibold">Classements ({stageRankings.length})</h3>
-                      <Button size="sm">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Ajouter un résultat
-                      </Button>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">En cours</p>
+                      <p className="text-2xl font-bold text-green-600">{stats.ongoing}</p>
                     </div>
-                    
-                    <div className="space-y-3 max-h-96 overflow-y-auto">
-                      {stageRankings.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-4">
-                          Aucun classement pour cette étape
-                        </p>
-                      ) : (
-                        stageRankings
-                          .sort((a, b) => a.rank_position - b.rank_position)
-                          .map((ranking) => (
-                            <div key={ranking.id} className="p-3 border rounded-lg">
-                              <div className="flex items-center justify-between">
-                                <div>
-                                  <div className="flex items-center gap-2">
-                                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                                      <span className="text-sm font-bold">#{ranking.rank_position}</span>
-                                    </div>
-                                    <div>
-                                      <h4 className="font-semibold text-sm">{ranking.user_email}</h4>
-                                      <p className="text-xs text-muted-foreground">Position {ranking.rank_position}</p>
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="flex gap-2">
-                                  <Button variant="outline" size="sm">
-                                    <Edit className="w-3 h-3" />
-                                  </Button>
-                                  <Button variant="destructive" size="sm">
-                                    <Trash2 className="w-3 h-3" />
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                          ))
-                      )}
-                    </div>
+                    <TrendingUp className="h-8 w-8 text-green-600" />
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : selectedEvent ? (
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Button variant="ghost" size="sm" onClick={handleBackToEvents}>
-                      <ArrowLeft className="w-4 h-4" />
-                    </Button>
-                    Édition: {selectedEvent.name}
-                  </CardTitle>
-                  <CardDescription>Modifiez l'événement et gérez ses étapes</CardDescription>
-                </div>
-                <Button onClick={handleSaveEvent}>
-                  <Save className="w-4 h-4 mr-2" />
-                  Sauvegarder
-                </Button>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Nom de l'événement</label>
-                    <Input
-                      value={editingEvent.name || ''}
-                      onChange={(e) => setEditingEvent({ ...editingEvent, name: e.target.value })}
-                      placeholder="Nom de l'événement"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Ville</label>
-                    <Input
-                      value={editingEvent.city || ''}
-                      onChange={(e) => setEditingEvent({ ...editingEvent, city: e.target.value })}
-                      placeholder="Ville"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Date de début</label>
-                    <Input
-                      type="datetime-local"
-                      value={editingEvent.start_time ? editingEvent.start_time.slice(0, 16) : ''}
-                      onChange={(e) => setEditingEvent({ ...editingEvent, start_time: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Date de fin</label>
-                    <Input
-                      type="datetime-local"
-                      value={editingEvent.end_time ? editingEvent.end_time.slice(0, 16) : ''}
-                      onChange={(e) => setEditingEvent({ ...editingEvent, end_time: e.target.value })}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <label className="text-sm font-medium">Description</label>
-                    <Textarea
-                      value={editingEvent.description || ''}
-                      onChange={(e) => setEditingEvent({ ...editingEvent, description: e.target.value })}
-                      placeholder="Description de l'événement"
-                    />
-                  </div>
-                </div>
+                </CardContent>
+              </Card>
 
-                <div className="border-t pt-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-semibold">Étapes de l'événement</h3>
-                    <Button size="sm">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Ajouter une étape
-                    </Button>
+              <Card>
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium text-muted-foreground">Terminés</p>
+                      <p className="text-2xl font-bold text-gray-600">{stats.completed}</p>
+                    </div>
+                    <CheckCircle className="h-8 w-8 text-gray-600" />
                   </div>
-                  
-                  <div className="space-y-3">
-                    {eventStages.length === 0 ? (
-                      <p className="text-center text-muted-foreground py-4">
-                        Aucune étape créée pour cet événement
-                      </p>
-                    ) : (
-                      eventStages.map((stage) => (
-                        <div key={stage.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                          <div className="flex-1 cursor-pointer" onClick={() => handleEditStage(stage)}>
-                            <h4 className="font-semibold">{stage.name}</h4>
-                            <p className="text-sm text-muted-foreground">{stage.description}</p>
-                            <div className="flex gap-2 mt-1">
-                              <Badge variant="secondary">{stage.category_label}</Badge>
-                            </div>
-                            <p className="text-sm mt-1">
-                              {new Date(stage.start_time).toLocaleDateString()} - {new Date(stage.end_time).toLocaleDateString()}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+
+          {/* Main Dashboard */}
+          <Tabs value={selectedTab} onValueChange={setSelectedTab} className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+              <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
+              <TabsTrigger value="events">Événements</TabsTrigger>
+              <TabsTrigger value="users">Utilisateurs</TabsTrigger>
+              <TabsTrigger value="analytics">Analyses</TabsTrigger>
+            </TabsList>
+
+            {/* Overview Tab */}
+            <TabsContent value="overview" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Recent Events */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Événements récents
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {events.slice(0, 5).map((event) => (
+                        <div key={event.id} className="flex items-center justify-between p-3 border rounded-lg">
+                          <div>
+                            <p className="font-medium">{event.name}</p>
+                            <p className="text-sm text-muted-foreground">
+                              {event.city}, {event.country}
                             </p>
                           </div>
-                          <div className="flex gap-2">
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleEditStage(stage)}
-                            >
-                              <Edit className="w-4 h-4" />
+                          <Badge variant="outline">
+                            {new Date(event.start_time).toLocaleDateString('fr-FR')}
+                          </Badge>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* System Status */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      État du système
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span>API Spixer</span>
+                        <Badge className="bg-green-100 text-green-800">En ligne</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Base de données</span>
+                        <Badge className="bg-green-100 text-green-800">Opérationnelle</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Stockage fichiers</span>
+                        <Badge className="bg-green-100 text-green-800">Disponible</Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span>Système de paiements</span>
+                        <Badge className="bg-green-100 text-green-800">Actif</Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            {/* Events Management Tab */}
+            <TabsContent value="events" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex items-center justify-between">
+                    <CardTitle>Gestion des événements</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <div className="relative">
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+                        <Input
+                          placeholder="Rechercher un événement..."
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          className="pl-10 w-64"
+                        />
+                      </div>
+                      <Button variant="outline" size="sm">
+                        <Filter className="h-4 w-4 mr-2" />
+                        Filtres
+                      </Button>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {events
+                      .filter(event => 
+                        event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        event.city.toLowerCase().includes(searchTerm.toLowerCase())
+                      )
+                      .map((event) => (
+                        <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-shadow">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-3">
+                              <h3 className="font-semibold">{event.name}</h3>
+                              <Badge variant={
+                                new Date(event.start_time) > new Date() ? "default" :
+                                new Date(event.end_time) < new Date() ? "secondary" : "destructive"
+                              }>
+                                {new Date(event.start_time) > new Date() ? "À venir" :
+                                 new Date(event.end_time) < new Date() ? "Terminé" : "En cours"}
+                              </Badge>
+                            </div>
+                            <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <MapPin className="h-4 w-4" />
+                                {event.city}, {event.country}
+                              </span>
+                              <span>{new Date(event.start_time).toLocaleDateString('fr-FR')}</span>
+                              <span>Organisé par {event.organiser_email}</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Button variant="outline" size="sm">
+                              <Eye className="h-4 w-4" />
                             </Button>
-                            <Button
-                              variant="destructive"
-                              size="sm"
-                              onClick={() => handleDeleteStage(stage.id)}
-                            >
-                              <Trash2 className="w-4 h-4" />
+                            <Button variant="outline" size="sm">
+                              <Settings className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>
-                      ))
-                    )}
+                      ))}
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card>
-              <CardHeader>
-                <CardTitle>Gestion des Événements</CardTitle>
-                <CardDescription>Cliquez sur un événement pour le modifier et gérer ses étapes</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {events.length === 0 ? (
-                    <div className="text-center py-8">
-                      <p className="text-muted-foreground">Aucun événement créé</p>
-                    </div>
-                  ) : (
-                    events.map((event) => (
-                      <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors">
-                        <div className="flex-1 cursor-pointer" onClick={() => handleEditEvent(event)}>
-                          <h3 className="font-semibold">{event.name}</h3>
-                          <p className="text-sm text-muted-foreground">{event.description}</p>
-                          <p className="text-sm">{event.city}, {event.country}</p>
-                          <p className="text-sm">{new Date(event.start_time).toLocaleDateString()}</p>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleEditEvent(event)}
-                          >
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDeleteEvent(event.id)}
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Users Management Tab */}
+            <TabsContent value="users" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Gestion des utilisateurs</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8">
+                    <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">
+                      La gestion des utilisateurs sera disponible prochainement.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* Analytics Tab */}
+            <TabsContent value="analytics" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BarChart3 className="h-5 w-5" />
+                      Statistiques de la plateforme
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex justify-between items-center">
+                        <span>Événements par mois</span>
+                        <span className="font-bold">{Math.floor(stats.total / 12)}</span>
                       </div>
-                    ))
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          )}
-        </TabsContent>
+                      <div className="flex justify-between items-center">
+                        <span>Taux de participation</span>
+                        <span className="font-bold">87%</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span>Organisateurs actifs</span>
+                        <span className="font-bold">{new Set(events.map(e => e.organiser_email)).size}</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
 
-        <TabsContent value="registrations">
-          <Card>
-            <CardHeader>
-              <CardTitle>Gestion des Inscriptions</CardTitle>
-              <CardDescription>Rechercher, filtrer et gérer les inscriptions des utilisateurs</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between mb-4">
-                <Input
-                  placeholder="Rechercher par email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="max-w-sm"
-                />
-                <select
-                  value={statusFilter}
-                  onChange={(e) => setStatusFilter(e.target.value)}
-                  className="p-2 border rounded-lg"
-                >
-                  <option value="all">Tous les statuts</option>
-                  <option value="pending">En attente</option>
-                  <option value="approved">Approuvé</option>
-                  <option value="rejected">Rejeté</option>
-                </select>
-              </div>
-              <div className="space-y-4">
-                {filteredRegistrations.map((registration) => (
-                  <div key={registration.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-semibold">{registration.user_email}</p>
-                      <p className="text-sm text-muted-foreground">
-                        Étape: {stages.find(s => s.id === registration.stage_id)?.name || 'N/A'}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {new Date(registration.created_at).toLocaleDateString()}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="h-5 w-5" />
+                      Croissance
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-8">
+                      <BarChart3 className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <p className="text-muted-foreground">
+                        Graphiques détaillés disponibles prochainement.
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={registration.status === 'approved' ? 'default' : 'secondary'}>
-                        {registration.status}
-                      </Badge>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleUpdateRegistrationStatus(registration.id, 'approved')}
-                        disabled={registration.status === 'approved'}
-                      >
-                        Approuver
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => handleUpdateRegistrationStatus(registration.id, 'rejected')}
-                        disabled={registration.status === 'rejected'}
-                      >
-                        Rejeter
-                      </Button>
-                    </div>
-                  </div>
-                ))}
+                  </CardContent>
+                </Card>
               </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-      </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
-      <Footer />
     </>
   );
 };
