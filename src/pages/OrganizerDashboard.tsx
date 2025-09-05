@@ -369,6 +369,7 @@ const OrganizerDashboard = () => {
                         <TableHead>Événement</TableHead>
                         <TableHead>Étape</TableHead>
                         <TableHead>Email</TableHead>
+                        <TableHead>Dossard</TableHead>
                         <TableHead>Statut</TableHead>
                         <TableHead>Date inscription</TableHead>
                       </TableRow>
@@ -380,6 +381,7 @@ const OrganizerDashboard = () => {
                           <TableCell className="text-sm">{registration.event_name}</TableCell>
                           <TableCell className="text-sm">{registration.stage_name}</TableCell>
                           <TableCell className="text-sm">{registration.user_email}</TableCell>
+                          <EditableCell type="registration" id={registration.id} field="bib_number" value={registration.bib_number} onUpdate={updateField} />
                           <EditableCell type="registration" id={registration.id} field="status" value={registration.status} onUpdate={updateField} />
                           <TableCell className="text-sm">{registration.created_at}</TableCell>
                         </TableRow>
