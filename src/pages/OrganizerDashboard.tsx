@@ -277,132 +277,350 @@ const OrganizerDashboard = () => {
           )}
 
           {/* Main Dashboard */}
-          <Tabs defaultValue="events" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-              <TabsTrigger value="events">Mes événements</TabsTrigger>
-              <TabsTrigger value="live">Contrôle Live</TabsTrigger>
-              <TabsTrigger value="participants">Participants</TabsTrigger>
-              <TabsTrigger value="analytics">Analyses</TabsTrigger>
+          <Tabs defaultValue="management" className="space-y-6">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="management" className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                Gestion
+              </TabsTrigger>
+              <TabsTrigger value="live" className="flex items-center gap-2">
+                <Activity className="h-4 w-4" />
+                Suivi Live
+              </TabsTrigger>
             </TabsList>
 
-            {/* Events Tab */}
-            <TabsContent value="events" className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Mes événements</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {events.map((event) => (
-                      <div key={event.id} className="flex items-center justify-between p-4 border rounded-lg hover:shadow-md transition-shadow">
-                        <div className="flex-1">
-                          <div className="flex items-center gap-3">
-                            <h3 className="font-semibold">{event.name}</h3>
-                            <Badge variant={
-                              new Date(event.start_time) > new Date() ? "default" :
-                              new Date(event.end_time) < new Date() ? "secondary" : "destructive"
-                            }>
-                              {new Date(event.start_time) > new Date() ? "À venir" :
-                               new Date(event.end_time) < new Date() ? "Terminé" : "En cours"}
-                            </Badge>
-                          </div>
-                          <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <MapPin className="h-4 w-4" />
-                              {event.city}, {event.country}
-                            </span>
-                            <span>{new Date(event.start_time).toLocaleDateString('fr-FR')}</span>
-                          </div>
+            {/* Management Tab */}
+            <TabsContent value="management" className="space-y-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Event Management */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Calendar className="h-5 w-5" />
+                      Mes événements
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {events.slice(0, 5).map((event) => (
+                      <div key={event.id} className="p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="font-medium text-sm">{event.name}</h4>
+                          <Badge variant={
+                            new Date(event.start_time) > new Date() ? "outline" :
+                            new Date(event.end_time) < new Date() ? "secondary" : "default"
+                          } className="text-xs">
+                            {new Date(event.start_time) > new Date() ? "À venir" :
+                             new Date(event.end_time) < new Date() ? "Terminé" : "En cours"}
+                          </Badge>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <p className="text-xs text-muted-foreground mb-2">{event.city}, {event.country}</p>
+                        <div className="flex gap-1">
                           <Button 
                             variant="outline" 
-                            size="sm"
+                            size="sm" 
+                            className="h-7 px-2 text-xs"
                             onClick={() => {
                               setSelectedEvent(event);
                               loadEventDetails(event.id);
                             }}
                           >
-                            <Eye className="h-4 w-4" />
+                            Gérer
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button variant="outline" size="sm">
-                            <Settings className="h-4 w-4" />
+                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                            Modifier
                           </Button>
                         </div>
                       </div>
                     ))}
-                  </div>
-                </CardContent>
-              </Card>
+                  </CardContent>
+                </Card>
+
+                {/* Registration Management */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Users className="h-5 w-5" />
+                      Inscriptions
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    {registrations.slice(0, 5).map((registration) => (
+                      <div key={registration.id} className="p-3 bg-muted/30 rounded-lg">
+                        <div className="flex items-center justify-between mb-2">
+                          <p className="font-medium text-sm">{registration.user_email}</p>
+                          <Badge variant={registration.status === 'approved' ? 'default' : 'outline'} className="text-xs">
+                            {registration.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mb-2">{registration.stage_name}</p>
+                        <div className="flex gap-1">
+                          <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                            Approuver
+                          </Button>
+                          <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                            Refuser
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+
+                {/* Volunteer Assignment */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <UserCheck className="h-5 w-5" />
+                      Attribution bénévoles
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-3">
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium text-sm">Zone Départ</p>
+                        <Badge variant="outline" className="text-xs">2/4 assignés</Badge>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                          Assigner
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                          Voir équipe
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="p-3 bg-muted/30 rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="font-medium text-sm">Zone Arrivée</p>
+                        <Badge variant="default" className="text-xs">4/4 assignés</Badge>
+                      </div>
+                      <div className="flex gap-1">
+                        <Button variant="outline" size="sm" className="h-7 px-2 text-xs">
+                          Modifier
+                        </Button>
+                        <Button variant="ghost" size="sm" className="h-7 px-2 text-xs">
+                          Voir équipe
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Quick Actions */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Settings className="h-5 w-5" />
+                      Actions rapides
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <Button variant="outline" size="sm" className="w-full justify-start h-9">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Créer un événement
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start h-9">
+                      <Users className="h-4 w-4 mr-2" />
+                      Inviter des bénévoles
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start h-9">
+                      <Trophy className="h-4 w-4 mr-2" />
+                      Configurer les prix
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start h-9">
+                      <BarChart3 className="h-4 w-4 mr-2" />
+                      Exporter les données
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </TabsContent>
 
-            {/* Live Control Tab */}
+            {/* Live Tracking Tab */}
             <TabsContent value="live" className="space-y-6">
               {liveEvents.length > 0 ? (
                 <div className="space-y-6">
-                  {liveEvents.map((event) => (
-                    <Card key={event.id}>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                          <Activity className="h-5 w-5 text-red-500" />
-                          {event.name} - Contrôle Live
-                        </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                          {/* Live Controls */}
-                          <div className="space-y-4">
-                            <h3 className="font-semibold">Contrôles en temps réel</h3>
-                            <div className="flex gap-2">
-                              <Button variant="destructive" size="sm">
-                                <Play className="h-4 w-4 mr-2" />
-                                Démarrer
-                              </Button>
-                              <Button variant="outline" size="sm">
-                                <Pause className="h-4 w-4 mr-2" />
-                                Pause
-                              </Button>
-                              <Button variant="secondary" size="sm">
-                                <StopCircle className="h-4 w-4 mr-2" />
-                                Arrêter
-                              </Button>
-                            </div>
-                            <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                              <p className="text-sm text-green-800">✅ Système de chronométrage actif</p>
-                              <p className="text-sm text-green-800">✅ Reconnaissance IA opérationnelle</p>
-                              <p className="text-sm text-green-800">✅ Classements mis à jour automatiquement</p>
-                            </div>
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Activity className="h-5 w-5 text-primary" />
+                        Suivi en temps réel
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        {/* Live Controls */}
+                        <div className="space-y-4">
+                          <h3 className="font-medium text-sm">Contrôles</h3>
+                          <div className="flex flex-col gap-2">
+                            <Button variant="default" size="sm" className="justify-start">
+                              <Play className="h-4 w-4 mr-2" />
+                              Démarrer course
+                            </Button>
+                            <Button variant="outline" size="sm" className="justify-start">
+                              <Pause className="h-4 w-4 mr-2" />
+                              Pause générale
+                            </Button>
+                            <Button variant="outline" size="sm" className="justify-start">
+                              <StopCircle className="h-4 w-4 mr-2" />
+                              Fin de course
+                            </Button>
                           </div>
-
-                          {/* Live Stats */}
-                          <div className="space-y-4">
-                            <h3 className="font-semibold">Statistiques en direct</h3>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div className="p-3 border rounded-lg text-center">
-                                <p className="text-2xl font-bold text-blue-600">145</p>
-                                <p className="text-sm text-muted-foreground">Participants actifs</p>
-                              </div>
-                              <div className="p-3 border rounded-lg text-center">
-                                <p className="text-2xl font-bold text-green-600">89</p>
-                                <p className="text-sm text-muted-foreground">Arrivées</p>
-                              </div>
+                          <div className="p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                            <div className="flex items-center gap-2 text-primary text-sm">
+                              <CheckCircle className="h-4 w-4" />
+                              Système opérationnel
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
-                  ))}
+
+                        {/* Live Stats */}
+                        <div className="space-y-4">
+                          <h3 className="font-medium text-sm">En direct</h3>
+                          <div className="space-y-3">
+                            <div className="p-3 bg-muted/30 rounded-lg">
+                              <p className="text-lg font-semibold">147</p>
+                              <p className="text-xs text-muted-foreground">Participants actifs</p>
+                            </div>
+                            <div className="p-3 bg-muted/30 rounded-lg">
+                              <p className="text-lg font-semibold text-green-600">92</p>
+                              <p className="text-xs text-muted-foreground">Arrivées enregistrées</p>
+                            </div>
+                            <div className="p-3 bg-muted/30 rounded-lg">
+                              <p className="text-lg font-semibold text-blue-600">55</p>
+                              <p className="text-xs text-muted-foreground">En course</p>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Recent Activity */}
+                        <div className="space-y-4">
+                          <h3 className="font-medium text-sm">Activité récente</h3>
+                          <div className="space-y-2 max-h-64 overflow-y-auto">
+                            <div className="p-2 bg-green-50 border border-green-200 rounded text-xs">
+                              <p className="font-medium text-green-800">15:42:33 - Arrivée détectée</p>
+                              <p className="text-green-600">Coureur #247</p>
+                            </div>
+                            <div className="p-2 bg-blue-50 border border-blue-200 rounded text-xs">
+                              <p className="font-medium text-blue-800">15:41:15 - Départ</p>
+                              <p className="text-blue-600">Coureur #251</p>
+                            </div>
+                            <div className="p-2 bg-yellow-50 border border-yellow-200 rounded text-xs">
+                              <p className="font-medium text-yellow-800">15:40:02 - Correction</p>
+                              <p className="text-yellow-600">Temps ajusté #245</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Record Management */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Edit className="h-5 w-5" />
+                        Gestion des records
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold">1</div>
+                            <div>
+                              <p className="font-medium text-sm">Jean Dupont</p>
+                              <p className="text-xs text-muted-foreground">Temps: 01:23:45</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                              Modifier temps
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 px-3 text-xs">
+                              Disqualifier
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gray-400 text-white rounded-full flex items-center justify-center text-sm font-bold">2</div>
+                            <div>
+                              <p className="font-medium text-sm">Marie Martin</p>
+                              <p className="text-xs text-muted-foreground">Temps: 01:25:12</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                              Modifier temps
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 px-3 text-xs">
+                              Disqualifier
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-orange-400 text-white rounded-full flex items-center justify-center text-sm font-bold">3</div>
+                            <div>
+                              <p className="font-medium text-sm">Pierre Bernard</p>
+                              <p className="text-xs text-muted-foreground">Temps: 01:26:33</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button variant="outline" size="sm" className="h-8 px-3 text-xs">
+                              Modifier temps
+                            </Button>
+                            <Button variant="ghost" size="sm" className="h-8 px-3 text-xs">
+                              Disqualifier
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Manual Adjustments */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <AlertCircle className="h-5 w-5" />
+                        Ajustements manuels
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">Correction de temps</h4>
+                          <div className="space-y-2">
+                            <Input placeholder="Numéro de coureur" className="h-9" />
+                            <Input placeholder="Nouveau temps (HH:MM:SS)" className="h-9" />
+                            <Button variant="outline" size="sm" className="w-full">
+                              Appliquer correction
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="space-y-3">
+                          <h4 className="font-medium text-sm">Ajustement de position</h4>
+                          <div className="space-y-2">
+                            <Input placeholder="Numéro de coureur" className="h-9" />
+                            <Input placeholder="Nouvelle position" className="h-9" />
+                            <Button variant="outline" size="sm" className="w-full">
+                              Modifier classement
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 </div>
               ) : (
                 <Card>
                   <CardContent className="p-12 text-center">
-                    <Timer className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-xl font-semibold mb-2">Aucun événement en cours</h3>
-                    <p className="text-muted-foreground">
-                      Le contrôle live apparaîtra ici lorsque vos événements seront en cours.
+                    <Timer className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="text-lg font-medium mb-2">Aucun événement en cours</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Le suivi live apparaîtra ici lorsque vos événements seront en cours.
                     </p>
                   </CardContent>
                 </Card>
