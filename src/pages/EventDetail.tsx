@@ -238,7 +238,7 @@ const EventDetail = () => {
                         </div>
                         {selectedStage?.id === stage.id && (
                           <Button size="sm" className="w-full mt-3" asChild>
-                            <Link to={`/events/${event.id}/stages/${stage.id}/register`}>
+                            <Link to={`/events/${event.id}/register`}>
                               Participer à cette épreuve
                             </Link>
                           </Button>
