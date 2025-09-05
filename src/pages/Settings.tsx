@@ -4,13 +4,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Eye, EyeOff, Mail, Lock, User, Shield, Bell, Palette } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, Shield, Bell, Palette, Monitor, Sun, Moon } from "lucide-react";
 import Navigation from "@/components/Navigation";
 import { accountAPI, authAPI, userInformationsAPI } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
 import { Switch } from "@/components/ui/switch";
+import { useTheme } from "@/hooks/useTheme";
 
 const Settings = () => {
+  const { theme, setTheme } = useTheme();
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -150,12 +152,12 @@ const Settings = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 page-content">
+      <div className="min-h-screen bg-background page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="max-w-4xl mx-auto">
             <div className="mb-8">
               <h1 className="text-3xl font-bold mb-2">Paramètres</h1>
-              <p className="text-gray-600">Gérez vos préférences et paramètres de compte</p>
+              <p className="text-muted-foreground">Gérez vos préférences et paramètres de compte</p>
             </div>
 
             <Tabs defaultValue="profile" className="w-full">
@@ -421,22 +423,64 @@ const Settings = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div>
                         <Label className="text-base">Thème</Label>
-                        <p className="text-sm text-gray-600 mb-2">Choisissez votre thème préféré</p>
+                        <p className="text-sm text-muted-foreground mb-4">
+                          Choisissez votre thème préféré pour l'interface
+                        </p>
                         <div className="grid grid-cols-3 gap-4">
-                          <div className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <div className="w-full h-20 bg-white border rounded mb-2"></div>
-                            <p className="text-sm font-medium">Clair</p>
+                          <div 
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                              theme === "light" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                            }`}
+                            onClick={() => setTheme("light")}
+                          >
+                            <div className="w-full h-20 bg-white border rounded mb-3 flex items-center justify-center">
+                              <Sun className="h-8 w-8 text-yellow-500" />
+                            </div>
+                            <p className="text-sm font-medium text-center">Clair</p>
+                            <p className="text-xs text-muted-foreground text-center mt-1">Mode jour</p>
                           </div>
-                          <div className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <div className="w-full h-20 bg-gray-900 rounded mb-2"></div>
-                            <p className="text-sm font-medium">Sombre</p>
+                          <div 
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                              theme === "dark" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                            }`}
+                            onClick={() => setTheme("dark")}
+                          >
+                            <div className="w-full h-20 bg-gray-900 border rounded mb-3 flex items-center justify-center">
+                              <Moon className="h-8 w-8 text-blue-400" />
+                            </div>
+                            <p className="text-sm font-medium text-center">Sombre</p>
+                            <p className="text-xs text-muted-foreground text-center mt-1">Mode nuit</p>
                           </div>
-                          <div className="p-4 border rounded-lg cursor-pointer hover:bg-gray-50">
-                            <div className="w-full h-20 bg-gradient-to-br from-white to-gray-900 rounded mb-2"></div>
-                            <p className="text-sm font-medium">Auto</p>
+                          <div 
+                            className={`p-4 border-2 rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                              theme === "system" ? "border-primary bg-primary/5" : "border-border hover:border-primary/50"
+                            }`}
+                            onClick={() => setTheme("system")}
+                          >
+                            <div className="w-full h-20 bg-gradient-to-br from-white to-gray-900 border rounded mb-3 flex items-center justify-center">
+                              <Monitor className="h-8 w-8 text-gray-600" />
+                            </div>
+                            <p className="text-sm font-medium text-center">Système</p>
+                            <p className="text-xs text-muted-foreground text-center mt-1">Automatique</p>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="pt-4 border-t">
+                        <div className="flex items-center justify-between">
+                          <div className="space-y-0.5">
+                            <Label className="text-base">Thème actuel</Label>
+                            <p className="text-sm text-muted-foreground">
+                              {theme === "light" && "Mode clair activé"}
+                              {theme === "dark" && "Mode sombre activé"}
+                              {theme === "system" && "Suit les préférences du système"}
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium capitalize">{theme}</p>
                           </div>
                         </div>
                       </div>
