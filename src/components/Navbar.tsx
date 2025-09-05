@@ -67,7 +67,7 @@ const Navbar = () => {
           : "bg-white/90 backdrop-blur-sm shadow-sm"
       )}
     >
-      <div className="container flex items-center justify-between px-4 sm:px-6">
+      <div className="container max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-4 lg:px-6 xl:px-8">
         <a 
           href="#" 
           className="flex items-center space-x-2 flex-shrink-0"
@@ -80,28 +80,28 @@ const Navbar = () => {
           <img 
             src="/lovable-uploads/ea09aba0-54c8-4977-ac16-dc239a0a7184.png" 
             alt="Spixer Logo" 
-            className="h-12 sm:h-14 md:h-16" 
+            className="h-10 sm:h-12 lg:h-14" 
           />
         </a>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8">
+        <nav className="hidden xl:flex items-center space-x-4 2xl:space-x-6">
           <Link 
             to="/" 
-            className="nav-link text-sm xl:text-base"
+            className="nav-link text-sm 2xl:text-base"
           >
             Accueil
           </Link>
-          <Link to="/events" className="nav-link text-sm xl:text-base">Événements</Link>
-          <Link to="/clubs" className="nav-link text-sm xl:text-base">Clubs</Link>
-          <Link to="/contact" className="nav-link text-sm xl:text-base">Contact</Link>
+          <Link to="/events" className="nav-link text-sm 2xl:text-base">Événements</Link>
+          <Link to="/clubs" className="nav-link text-sm 2xl:text-base">Clubs</Link>
+          <Link to="/contact" className="nav-link text-sm 2xl:text-base">Contact</Link>
           
           {!user ? (
-            <div className="flex items-center space-x-3">
-              <Link to="/login" className="bg-primary hover:bg-primary/90 text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
-                Se connecter
+            <div className="flex items-center space-x-2 xl:space-x-3">
+              <Link to="/login" className="bg-primary hover:bg-primary/90 text-white px-3 xl:px-4 py-2 rounded-full text-xs xl:text-sm font-medium transition-colors whitespace-nowrap">
+                Connexion
               </Link>
-              <Link to="/login" className="border border-primary text-primary hover:bg-primary hover:text-white px-4 py-2 rounded-full text-sm font-medium transition-colors">
+              <Link to="/login" className="border border-primary text-primary hover:bg-primary hover:text-white px-3 xl:px-4 py-2 rounded-full text-xs xl:text-sm font-medium transition-colors whitespace-nowrap">
                 S'inscrire
               </Link>
             </div>
@@ -159,7 +159,7 @@ const Navbar = () => {
 
         {/* Mobile menu button */}
         <button 
-          className="lg:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors" 
+          className="xl:hidden flex items-center justify-center w-10 h-10 rounded-lg hover:bg-gray-100 transition-colors" 
           onClick={toggleMenu}
           aria-label={isMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
@@ -169,7 +169,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation Overlay */}
       <div className={cn(
-        "fixed inset-0 z-40 lg:hidden transition-all duration-300 ease-in-out",
+        "fixed inset-0 z-40 xl:hidden transition-all duration-300 ease-in-out",
         isMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"
       )}>
         {/* Backdrop */}
@@ -180,7 +180,7 @@ const Navbar = () => {
         
         {/* Menu Panel */}
         <div className={cn(
-          "absolute top-0 right-0 h-full w-80 max-w-[85vw] bg-white shadow-xl transition-transform duration-300 ease-in-out flex flex-col",
+          "absolute top-0 right-0 h-full w-72 sm:w-80 max-w-[85vw] bg-white shadow-xl transition-transform duration-300 ease-in-out flex flex-col",
           isMenuOpen ? "translate-x-0" : "translate-x-full"
         )}>
           {/* Mobile Menu Header */}
