@@ -680,7 +680,7 @@ export const serverAPI = {
 export const healthAPI = {
   check: async (): Promise<{ message: string; version?: string; status: 'healthy' | 'unhealthy' }> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/v1/health`);
+      const response = await fetch('https://api.spixer.fr');
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}`);
       }
