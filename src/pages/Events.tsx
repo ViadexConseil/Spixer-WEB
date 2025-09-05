@@ -64,84 +64,85 @@ const Events = () => {
       <div className="min-h-screen bg-background page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Hero Section */}
-          <div className="text-center mb-12 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium">
-              <Calendar className="w-4 h-4" />
+          <div className="text-center mb-8 sm:mb-12 space-y-4 sm:space-y-6">
+            <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 rounded-full text-primary text-xs sm:text-sm font-medium">
+              <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
               Événements Sportifs
             </div>
             
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold px-4 sm:px-0">
               Tous les événements
             </h1>
             
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg sm:text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-4 sm:px-0">
               Découvrez tous les événements sportifs à venir et passés avec chronométrage intelligent
             </p>
 
           {/* Quick Stats - Only show real data */}
-          <div className="flex flex-wrap justify-center gap-8 mt-8">
+          <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 mt-6 sm:mt-8">
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary mb-1">{events.length}</div>
-              <div className="text-sm text-muted-foreground">Événements disponibles</div>
+              <div className="text-xl sm:text-2xl font-bold text-primary mb-1">{events.length}</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Événements disponibles</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-secondary mb-1">
+              <div className="text-xl sm:text-2xl font-bold text-secondary mb-1">
                 {new Set(events.map(e => e.organiser_email)).size}
               </div>
-              <div className="text-sm text-muted-foreground">Organisateurs</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">Organisateurs</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-primary mb-1">
+              <div className="text-xl sm:text-2xl font-bold text-primary mb-1">
                 {events.filter(e => {
                   const eventDate = new Date(e.start_time);
                   return eventDate > new Date();
                 }).length}
               </div>
-              <div className="text-sm text-muted-foreground">À venir</div>
+              <div className="text-xs sm:text-sm text-muted-foreground">À venir</div>
             </div>
           </div>
           </div>
 
           {/* Enhanced Filters */}
-          <div className="bg-card rounded-3xl shadow-xl border p-8 mb-12">
-            <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-              <div className="flex flex-col sm:flex-row gap-4 flex-1 w-full">
+          <div className="bg-card rounded-2xl sm:rounded-3xl shadow-xl border p-4 sm:p-6 md:p-8 mb-8 sm:mb-12">
+            <div className="flex flex-col lg:flex-row gap-4 sm:gap-6 items-stretch lg:items-center justify-between">
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-1 w-full">
                 <div className="relative flex-1">
-                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-5 h-5" />
+                  <Search className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 sm:w-5 sm:h-5" />
                   <Input
-                    placeholder="Rechercher par nom, ville, organisateur..."
+                    placeholder="Rechercher par nom, ville..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-12 h-12 rounded-xl border-muted-foreground/20 focus:border-primary/50"
+                    className="pl-10 sm:pl-12 h-10 sm:h-12 rounded-lg sm:rounded-xl border-muted-foreground/20 focus:border-primary/50 text-sm sm:text-base"
                   />
                 </div>
                 <Button 
                   variant="outline" 
-                  className="flex items-center gap-2 h-12 rounded-xl px-6 border-primary/20 hover:bg-primary/5"
+                  className="flex items-center gap-2 h-10 sm:h-12 rounded-lg sm:rounded-xl px-4 sm:px-6 border-primary/20 hover:bg-primary/5 text-sm sm:text-base"
                 >
-                  <Filter className="w-4 h-4" />
-                  Filtres avancés
+                  <Filter className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Filtres avancés</span>
+                  <span className="sm:hidden">Filtres</span>
                 </Button>
               </div>
               
-              <div className="flex gap-3">
+              <div className="flex gap-2 sm:gap-3">
                 <Button
                   variant={viewMode === 'list' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('list')}
-                  className="flex items-center gap-2 rounded-xl"
+                  className="flex items-center gap-1 sm:gap-2 rounded-lg sm:rounded-xl px-3 sm:px-4 h-10 sm:h-12 text-xs sm:text-sm"
                 >
-                  <List className="w-4 h-4" />
-                  Liste
+                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Liste</span>
                 </Button>
                 <Button
                   variant={viewMode === 'map' ? 'default' : 'outline'}
                   size="sm"
                   onClick={() => setViewMode('map')}
-                  className="flex items-center gap-2 rounded-xl"
+                  className="flex items-center gap-1 sm:gap-2 rounded-lg sm:rounded-xl px-3 sm:px-4 h-10 sm:h-12 text-xs sm:text-sm"
                 >
-                  <Map className="w-4 h-4" />
-                  Carte
+                  <Map className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Carte</span>
                 </Button>
               </div>
             </div>
@@ -149,7 +150,7 @@ const Events = () => {
 
           {/* Event List */}
           {viewMode === 'list' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {filteredEvents.map((event, index) => {
                 const status = getStatusBadge(event.start_time);
                 const imageUrl = event.images?.[0] || event.image_url || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png";

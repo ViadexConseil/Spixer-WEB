@@ -44,33 +44,33 @@ const QuickActions = () => {
   ];
 
   return (
-    <section className="py-12">
-      <div className="container px-4">
-        <div className="text-center mb-8">
-          <h2 className="text-2xl font-bold mb-2">Que voulez-vous faire ?</h2>
-          <p className="text-muted-foreground">Choisissez une action pour commencer</p>
+    <section className="py-8 sm:py-12">
+      <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="text-center mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold mb-2">Que voulez-vous faire ?</h2>
+          <p className="text-sm sm:text-base text-muted-foreground">Choisissez une action pour commencer</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {actions.map((action) => (
             <Card key={action.href} className="group hover:shadow-md transition-all duration-200 cursor-pointer">
-              <CardContent className="p-6">
+              <CardContent className="p-4 sm:p-6">
                 <Link to={action.href} className="block">
-                  <div className={`w-12 h-12 rounded-xl ${action.color} flex items-center justify-center mb-4`}>
-                    <action.icon className="h-6 w-6" />
+                  <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl ${action.color} flex items-center justify-center mb-3 sm:mb-4`}>
+                    <action.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
                   
-                  <h3 className="font-semibold mb-2 group-hover:text-primary transition-colors">
+                  <h3 className="text-sm sm:text-base font-semibold mb-2 group-hover:text-primary transition-colors">
                     {action.title}
                   </h3>
                   
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">
                     {action.description}
                   </p>
                   
-                  <div className="flex items-center text-sm text-primary group-hover:translate-x-1 transition-transform">
+                  <div className="flex items-center text-xs sm:text-sm text-primary group-hover:translate-x-1 transition-transform">
                     Commencer
-                    <ArrowRight className="h-4 w-4 ml-1" />
+                    <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 ml-1" />
                   </div>
                 </Link>
               </CardContent>

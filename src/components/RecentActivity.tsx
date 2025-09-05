@@ -39,24 +39,25 @@ const RecentActivity = () => {
   }
 
   return (
-    <section className="py-12">
-      <div className="container px-4">
-        <div className="flex items-center justify-between mb-6">
+    <section className="py-8 sm:py-12">
+      <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
           <div>
-            <h2 className="text-2xl font-bold mb-2">Événements récents</h2>
-            <p className="text-muted-foreground">Les derniers événements ajoutés</p>
+            <h2 className="text-xl sm:text-2xl font-bold mb-2">Événements récents</h2>
+            <p className="text-sm sm:text-base text-muted-foreground">Les derniers événements ajoutés</p>
           </div>
           
-          <Button variant="outline" asChild>
+          <Button variant="outline" asChild className="self-start sm:self-auto">
             <Link to="/events">
-              Voir tout
+              <span className="hidden sm:inline">Voir tout</span>
+              <span className="sm:hidden">Tout voir</span>
               <ArrowRight className="h-4 w-4 ml-2" />
             </Link>
           </Button>
         </div>
 
         {recentEvents.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {recentEvents.map((event) => {
               const imageUrl = event.images?.[0] || event.image_url || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png";
               
@@ -68,38 +69,40 @@ const RecentActivity = () => {
                       alt={event.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
-                    <div className="absolute top-3 right-3">
+                    <div className="absolute top-2 sm:top-3 right-2 sm:right-3">
                       {getStatusBadge(event)}
                     </div>
                   </div>
                   
-                  <CardHeader className="pb-3">
-                    <CardTitle className="text-lg group-hover:text-primary transition-colors line-clamp-2">
+                  <CardHeader className="pb-3 p-4 sm:p-6">
+                    <CardTitle className="text-base sm:text-lg group-hover:text-primary transition-colors line-clamp-2">
                       {event.name}
                     </CardTitle>
                   </CardHeader>
                   
-                  <CardContent className="pt-0 space-y-3">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(event.start_time).toLocaleDateString('fr-FR', { 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}
+                  <CardContent className="pt-0 space-y-3 px-4 sm:px-6 pb-4 sm:pb-6">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                      <Calendar className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="truncate">
+                        {new Date(event.start_time).toLocaleDateString('fr-FR', { 
+                          year: 'numeric', 
+                          month: 'short', 
+                          day: 'numeric' 
+                        })}
+                      </span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <MapPin className="h-4 w-4" />
-                      {event.city}, {event.country}
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                      <MapPin className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="truncate">{event.city}, {event.country}</span>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Users className="h-4 w-4" />
-                      Organisé par {event.organiser_email.split('@')[0]}
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
+                      <Users className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                      <span className="truncate">Organisé par {event.organiser_email.split('@')[0]}</span>
                     </div>
 
-                    <Button className="w-full mt-4" variant="outline" asChild>
+                    <Button className="w-full mt-4 text-xs sm:text-sm" variant="outline" asChild>
                       <Link to={`/events/${event.id}`}>
                         Voir détails
                       </Link>

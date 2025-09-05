@@ -39,18 +39,18 @@ const StatsOverview = () => {
   ];
 
   return (
-    <section className="py-8 border-b">
-      <div className="container px-4">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+    <section className="py-6 sm:py-8 border-b">
+      <div className="container px-4 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {stats.map((stat) => (
             <div key={stat.label} className="text-center">
-              <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg bg-muted mb-3`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              <div className={`inline-flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-muted mb-2 sm:mb-3`}>
+                <stat.icon className={`h-5 w-5 sm:h-6 sm:w-6 ${stat.color}`} />
               </div>
               
               <div className="space-y-1">
-                <div className="text-2xl font-bold">{stat.value}</div>
-                <div className="text-sm text-muted-foreground">{stat.label}</div>
+                <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground px-1">{stat.label}</div>
               </div>
             </div>
           ))}
