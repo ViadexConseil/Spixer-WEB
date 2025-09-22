@@ -159,7 +159,7 @@ const Profil = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card className="hover-lift">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -204,24 +204,6 @@ const Profil = () => {
               </CardContent>
             </Card>
 
-            <Card className="hover-lift">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="w-5 h-5" />
-                  Paramètres
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Gérez votre profil et vos préférences
-                </p>
-                <Button variant="outline" className="w-full" asChild>
-                  <Link to="/settings">
-                    Modifier le profil
-                  </Link>
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
