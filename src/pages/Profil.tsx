@@ -76,7 +76,7 @@ const Profil = () => {
   }
 
   // Use the name field from auth/me endpoint, fallback to first_name + last_name, then username, then email
-  const displayName = user.name || 
+  const displayName = user.username || 
     (user.first_name || user.last_name ? 
       `${user.first_name || ''} ${user.last_name || ''}`.trim() : 
       user.username) || 
