@@ -325,33 +325,44 @@ const OrganizerDashboard = () => {
                 <CardHeader>
                   <CardTitle>Étapes ({stages.length})</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Événement</TableHead>
-                        <TableHead>Nom</TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead>Distance</TableHead>
-                        <TableHead>Prix</TableHead>
-                        <TableHead>Statut</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {stages.map((stage) => (
-                        <TableRow key={stage.id}>
-                          <TableCell className="font-mono text-xs">{stage.id}</TableCell>
-                          <TableCell className="text-sm">{stage.event_name}</TableCell>
-                          <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} />
-                          <EditableCell type="stage" id={stage.id} field="description" value={stage.description} onUpdate={updateField} />
-                          <EditableCell type="stage" id={stage.id} field="distance" value={stage.distance} onUpdate={updateField} />
-                          <EditableCell type="stage" id={stage.id} field="price" value={stage.price} onUpdate={updateField} />
-                          <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} />
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                <CardContent className="space-y-6">
+                  {events.map((event) => {
+                    const eventStages = stages.filter(stage => stage.event_id === event.id);
+                    if (eventStages.length === 0) return null;
+                    
+                    return (
+                      <div key={event.id} className="space-y-4">
+                        <div className="border-l-4 border-primary pl-4">
+                          <h3 className="text-lg font-semibold">{event.name}</h3>
+                          <p className="text-sm text-muted-foreground">{eventStages.length} étape(s)</p>
+                        </div>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>ID</TableHead>
+                              <TableHead>Nom</TableHead>
+                              <TableHead>Description</TableHead>
+                              <TableHead>Distance</TableHead>
+                              <TableHead>Prix</TableHead>
+                              <TableHead>Statut</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {eventStages.map((stage) => (
+                              <TableRow key={stage.id}>
+                                <TableCell className="font-mono text-xs">{stage.id}</TableCell>
+                                <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} />
+                                <EditableCell type="stage" id={stage.id} field="description" value={stage.description} onUpdate={updateField} />
+                                <EditableCell type="stage" id={stage.id} field="distance" value={stage.distance} onUpdate={updateField} />
+                                <EditableCell type="stage" id={stage.id} field="price" value={stage.price} onUpdate={updateField} />
+                                <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} />
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    );
+                  })}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -361,33 +372,44 @@ const OrganizerDashboard = () => {
                 <CardHeader>
                   <CardTitle>Inscriptions ({registrations.length})</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Événement</TableHead>
-                        <TableHead>Étape</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Dossard</TableHead>
-                        <TableHead>Statut</TableHead>
-                        <TableHead>Date inscription</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {registrations.map((registration) => (
-                        <TableRow key={registration.id}>
-                          <TableCell className="font-mono text-xs">{registration.id}</TableCell>
-                          <TableCell className="text-sm">{registration.event_name}</TableCell>
-                          <TableCell className="text-sm">{registration.stage_name}</TableCell>
-                          <TableCell className="text-sm">{registration.user_email}</TableCell>
-                          <EditableCell type="registration" id={registration.id} field="bib_number" value={registration.bib_number} onUpdate={updateField} />
-                          <EditableCell type="registration" id={registration.id} field="status" value={registration.status} onUpdate={updateField} />
-                          <TableCell className="text-sm">{registration.created_at}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                <CardContent className="space-y-6">
+                  {stages.map((stage) => {
+                    const stageRegistrations = registrations.filter(reg => reg.stage_id === stage.id);
+                    if (stageRegistrations.length === 0) return null;
+                    
+                    return (
+                      <div key={stage.id} className="space-y-4">
+                        <div className="border-l-4 border-secondary pl-4">
+                          <h3 className="text-lg font-semibold">{stage.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {stage.event_name} • {stageRegistrations.length} inscription(s)
+                          </p>
+                        </div>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>ID</TableHead>
+                              <TableHead>Email</TableHead>
+                              <TableHead>Dossard</TableHead>
+                              <TableHead>Statut</TableHead>
+                              <TableHead>Date inscription</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {stageRegistrations.map((registration) => (
+                              <TableRow key={registration.id}>
+                                <TableCell className="font-mono text-xs">{registration.id}</TableCell>
+                                <TableCell className="text-sm">{registration.user_email}</TableCell>
+                                <EditableCell type="registration" id={registration.id} field="bib_number" value={registration.bib_number} onUpdate={updateField} />
+                                <EditableCell type="registration" id={registration.id} field="status" value={registration.status} onUpdate={updateField} />
+                                <TableCell className="text-sm">{registration.created_at}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    );
+                  })}
                 </CardContent>
               </Card>
             </TabsContent>
@@ -397,31 +419,44 @@ const OrganizerDashboard = () => {
                 <CardHeader>
                   <CardTitle>Classements ({rankings.length})</CardTitle>
                 </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Événement</TableHead>
-                        <TableHead>Étape</TableHead>
-                        <TableHead>Position</TableHead>
-                        <TableHead>Temps</TableHead>
-                        <TableHead>Email participant</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {rankings.map((ranking) => (
-                        <TableRow key={ranking.id}>
-                          <TableCell className="font-mono text-xs">{ranking.id}</TableCell>
-                          <TableCell className="text-sm">{ranking.event_name}</TableCell>
-                          <TableCell className="text-sm">{ranking.stage_name}</TableCell>
-                          <EditableCell type="ranking" id={ranking.id} field="position" value={ranking.position} onUpdate={updateField} />
-                          <EditableCell type="ranking" id={ranking.id} field="time" value={ranking.time} onUpdate={updateField} />
-                          <TableCell className="text-sm">{ranking.user_email}</TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                <CardContent className="space-y-6">
+                  {stages.map((stage) => {
+                    const stageRankings = rankings.filter(rank => rank.stage_id === stage.id);
+                    if (stageRankings.length === 0) return null;
+                    
+                    return (
+                      <div key={stage.id} className="space-y-4">
+                        <div className="border-l-4 border-accent pl-4">
+                          <h3 className="text-lg font-semibold">{stage.name}</h3>
+                          <p className="text-sm text-muted-foreground">
+                            {stage.event_name} • {stageRankings.length} classement(s)
+                          </p>
+                        </div>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead>ID</TableHead>
+                              <TableHead>Position</TableHead>
+                              <TableHead>Temps</TableHead>
+                              <TableHead>Email participant</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {stageRankings
+                              .sort((a, b) => (a.position || 999) - (b.position || 999))
+                              .map((ranking) => (
+                              <TableRow key={ranking.id}>
+                                <TableCell className="font-mono text-xs">{ranking.id}</TableCell>
+                                <EditableCell type="ranking" id={ranking.id} field="position" value={ranking.position} onUpdate={updateField} />
+                                <EditableCell type="ranking" id={ranking.id} field="time" value={ranking.time} onUpdate={updateField} />
+                                <TableCell className="text-sm">{ranking.user_email}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    );
+                  })}
                 </CardContent>
               </Card>
             </TabsContent>
