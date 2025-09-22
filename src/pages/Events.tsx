@@ -19,12 +19,39 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
-import { useEvents } from "@/hooks/useEvents";
+import { eventsAPI, Event } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 const Events = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [searchTerm, setSearchTerm] = useState('');
-  const { events, loading, error, refetch } = useEvents();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchEvents = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const fetchedEvents = await eventsAPI.list();
+      setEvents(fetchedEvents);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+      setError(errorMessage);
+      console.error('Error fetching events:', err);
+      toast({
+        title: "Erreur de chargement",
+        description: "Impossible de charger les événements.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchEvents();
+  }, []);
 
   const filteredEvents = events.filter(event => 
     event.name.toLowerCase().includes(searchTerm.toLowerCase()) ||

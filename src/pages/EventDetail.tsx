@@ -55,21 +55,33 @@ const EventDetail = () => {
     const fetchStageRankings = async () => {
       if (!selectedStage) return;
       
-      setLoadingRankings(true);
+      // Avoid full loading state on refetch for a smoother UX
+      if (!stageRankings.length) {
+        setLoadingRankings(true);
+      }
       
       try {
         const rankings = await rankingsAPI.getByStage(selectedStage.id);
         setStageRankings(rankings);
       } catch (error) {
         console.error("Erreur lors du chargement des classements:", error);
-        setStageRankings([]);
+        // Do not clear rankings on refetch error, keep stale data
       } finally {
         setLoadingRankings(false);
       }
     };
 
     fetchStageRankings();
-  }, [selectedStage]);
+
+    // Set up polling if the stage is live
+    const stageStatus = selectedStage ? getStageStatus(selectedStage) : null;
+    if (stageStatus && stageStatus.text === "En cours") {
+      const intervalId = setInterval(fetchStageRankings, 8000); // Poll every 8 seconds
+
+      // Cleanup interval on component unmount or when stage changes
+      return () => clearInterval(intervalId);
+    }
+  }, [selectedStage, id]);
 
   const getStageStatus = (stage: Stage): { text: string; class: string; showRankings: boolean } => {
     const now = new Date();

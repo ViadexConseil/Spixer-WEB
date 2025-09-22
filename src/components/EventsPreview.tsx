@@ -6,11 +6,38 @@ import { Calendar, MapPin, Users, ArrowRight, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { fr } from 'date-fns/locale';
-import { useEvents } from '@/hooks/useEvents';
+import { useState, useEffect } from 'react';
+import { eventsAPI, Event } from '@/services/api';
+import { toast } from '@/hooks/use-toast';
 
 export const EventsPreview: React.FC = () => {
-  const { events: allEvents, loading, error } = useEvents();
+  const [allEvents, setAllEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const fetchedEvents = await eventsAPI.list();
+        setAllEvents(fetchedEvents);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Erreur inconnue';
+        setError(errorMessage);
+        console.error('Error fetching events:', err);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les événements.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   // Show only the next 3 upcoming events
   const events = allEvents

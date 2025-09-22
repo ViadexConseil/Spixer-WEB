@@ -1,9 +1,22 @@
 import React from "react";
 import { TrendingUp, Users, Calendar, Trophy } from "lucide-react";
-import { useEvents } from "@/hooks/useEvents";
+import { useState, useEffect } from "react";
+import { eventsAPI, Event } from "@/services/api";
 
 const StatsOverview = () => {
-  const { events } = useEvents();
+  const [events, setEvents] = useState<Event[]>([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await eventsAPI.list();
+        setEvents(fetchedEvents);
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    };
+    fetchEvents();
+  }, []);
 
   // Only show real data from the API
   const stats = [

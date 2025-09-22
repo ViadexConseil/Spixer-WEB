@@ -4,10 +4,33 @@ import { Calendar, MapPin, Users, Clock, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { useEvents } from "@/hooks/useEvents";
+import { useState, useEffect } from "react";
+import { eventsAPI, Event } from "@/services/api";
+import { toast } from "@/hooks/use-toast";
 
 const RecentActivity = () => {
-  const { events, loading } = useEvents();
+  const [events, setEvents] = useState<Event[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        setLoading(true);
+        const fetchedEvents = await eventsAPI.list();
+        setEvents(fetchedEvents);
+      } catch (err) {
+        console.error('Error fetching events:', err);
+        toast({
+          title: "Erreur de chargement",
+          description: "Impossible de charger les activités récentes.",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
   
   // Get only the 3 most recent events
   const recentEvents = events
