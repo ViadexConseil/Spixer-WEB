@@ -73,7 +73,7 @@ const Profil = () => {
     );
   }
 
-  const displayName = user.name || 
+  const displayName = user.username || 
     (user.first_name || user.last_name ? 
       `${user.first_name || ''} ${user.last_name || ''}`.trim() : 
       user.username) || 
