@@ -5,61 +5,45 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { organizerAPI, eventsAPI, stagesAPI, registrationsAPI, rankingsAPI } from "@/services/api";
+import type { Event as ApiEvent, Stage as ApiStage, Registration as ApiRegistration, Ranking as ApiRanking } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
-// FIX: Define interfaces for the data structures to make the component type-safe.
-interface Event {
-  id: number | string;
-  name: string;
-  description: string;
-  start_time: string;
-  end_time: string;
-  city: string;
-  country: string;
-  postal_code: string;
+// Extended interfaces for display purposes
+interface Event extends ApiEvent {
+  // API Event already has all needed fields
 }
 
-interface Stage {
-  id: number | string;
-  event_id: number | string;
-  name: string;
-  description: string;
-  distance: number;
-  price: number;
-  status: string;
-  event_name?: string; // Added for display
+interface Stage extends ApiStage {
+  event_name?: string;
+  // For compatibility with editable fields that might not exist in API
+  distance?: number;
+  price?: number;
+  status?: string;
 }
 
-interface Registration {
-  id: number | string;
-  stage_id: number | string;
-  user_email: string;
-  bib_number: number | null;
-  status: string;
-  created_at: string;
-  event_name?: string; // Added for display
-  stage_name?: string; // Added for display
+interface Registration extends ApiRegistration {
+  // API Registration already has event_name and stage_name
+  // For compatibility with editable fields that might not exist in API
+  bib_number?: number | null;
 }
 
-interface Ranking {
-  id: number | string;
-  stage_id: number | string;
-  user_email: string;
-  position: number | null;
-  time: string | null;
-  event_name?: string; // Added for display
-  stage_name?: string; // Added for display
+interface Ranking extends ApiRanking {
+  // API Ranking already has event_name and stage_name
+  // Map API field to component expected field
+  position?: number | null;
+  time?: string | null;
 }
 
-// FIX: Define a props interface for the EditableCell component.
+// Define a props interface for the EditableCell component.
 interface EditableCellProps {
   type: 'event' | 'stage' | 'registration' | 'ranking';
-  id: number | string;
+  id: string;
   field: string;
   value: string | number | null;
-  onUpdate: (type: EditableCellProps['type'], id: number | string, field: string, value: string | number) => Promise<void>;
+  onUpdate: (type: EditableCellProps['type'], id: string, field: string, value: string | number) => Promise<void>;
   isSaving?: boolean;
 }
 
@@ -128,6 +112,16 @@ const OrganizerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<Record<string, boolean>>({});
 
+  // Add state for collapsible sections
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (sectionId: string) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
   const loadData = useCallback(async () => {
     try {
       setLoading(true);
@@ -137,16 +131,22 @@ const OrganizerDashboard = () => {
         setEvents([]); setStages([]); setRegistrations([]); setRankings([]); return;
       }
       setEvents(eventsData);
-      const eventMap = new Map(eventsData.map((e: Event) => [e.id, e]));
+      const eventMap = new Map(eventsData.map((e: ApiEvent) => [e.id, e]));
 
-      const stagePromises = eventsData.map((event: Event) => stagesAPI.getByEvent(event.id));
+      const stagePromises = eventsData.map((event: ApiEvent) => stagesAPI.getByEvent(event.id));
       const stagesByEventResults = await Promise.allSettled(stagePromises);
       
-      // FIX: Correctly handle PromiseSettledResult by checking status before accessing value.
-      // Use flatMap to filter and map in one step, satisfying TypeScript.
+      // Handle PromiseSettledResult and map API fields to component fields
       const allStages = stagesByEventResults
         .flatMap(result => (result.status === 'fulfilled' && result.value) ? result.value : [])
-        .map((stage: Stage) => ({ ...stage, event_name: eventMap.get(stage.event_id)?.name || 'N/A' }));
+        .map((stage: ApiStage) => ({ 
+          ...stage, 
+          event_name: eventMap.get(stage.event_id)?.name || 'N/A',
+          // Add compatibility fields if they don't exist
+          distance: (stage as any).distance || 0,
+          price: (stage as any).price || 0,
+          status: (stage as any).status || 'active'
+        }));
       setStages(allStages);
 
       if (allStages.length === 0) {
@@ -164,17 +164,32 @@ const OrganizerDashboard = () => {
 
       const allRegistrations = regResults
         .flatMap(result => (result.status === 'fulfilled' && result.value) ? result.value : [])
-        .map((reg: Registration) => {
+        .map((reg: ApiRegistration) => {
           const stage = stageMap.get(reg.stage_id);
-          return { ...reg, stage_name: stage?.name || 'N/A', event_name: stage?.event_name || 'N/A' };
+          return { 
+            ...reg, 
+            // API already has stage_name and event_name, but add fallbacks
+            stage_name: reg.stage_name || stage?.name || 'N/A', 
+            event_name: reg.event_name || stage?.event_name || 'N/A',
+            // Add compatibility field
+            bib_number: (reg as any).bib_number || null
+          };
         });
       setRegistrations(allRegistrations);
       
       const allRankings = rankResults
         .flatMap(result => (result.status === 'fulfilled' && result.value) ? result.value : [])
-        .map((rank: Ranking) => {
+        .map((rank: ApiRanking) => {
           const stage = stageMap.get(rank.stage_id);
-          return { ...rank, stage_name: stage?.name || 'N/A', event_name: stage?.event_name || 'N/A' };
+          return { 
+            ...rank, 
+            // API already has stage_name and event_name, but add fallbacks
+            stage_name: rank.stage_name || stage?.name || 'N/A', 
+            event_name: rank.event_name || stage?.event_name || 'N/A',
+            // Map API fields to component expected fields
+            position: rank.rank_position || null,
+            time: (rank as any).time || null
+          };
         });
       setRankings(allRankings);
 
@@ -194,8 +209,8 @@ const OrganizerDashboard = () => {
     loadData();
   }, [hasRole, loadData, toast]);
 
-  // FIX: Add types to the function parameters.
-  const updateField = useCallback(async (type: EditableCellProps['type'], id: number | string, field: string, value: string | number) => {
+  // Fix: Add types to the function parameters with correct type
+  const updateField = useCallback(async (type: EditableCellProps['type'], id: string, field: string, value: string | number) => {
     const key = `${type}-${id}-${field}`;
     setSaving(prev => ({ ...prev, [key]: true }));
     
@@ -224,8 +239,20 @@ const OrganizerDashboard = () => {
     }
   }, [toast]);
 
-  // ... (the JSX remains largely the same, but will now pass type checking)
-  // The rest of the component's JSX from the previous answer is correct.
+  // Group data by parent entities
+  const eventGroups = events.reduce((acc, event) => {
+    acc[event.id] = { event, stages: stages.filter(s => s.event_id === event.id) };
+    return acc;
+  }, {} as Record<string, { event: Event; stages: Stage[] }>);
+
+  const stageGroups = stages.reduce((acc, stage) => {
+    acc[stage.id] = { 
+      stage, 
+      registrations: registrations.filter(r => r.stage_id === stage.id),
+      rankings: rankings.filter(r => r.stage_id === stage.id)
+    };
+    return acc;
+  }, {} as Record<string, { stage: Stage; registrations: Registration[]; rankings: Ranking[] }>);
 
   if (!hasRole('organizer')) {
     return (
@@ -277,92 +304,209 @@ const OrganizerDashboard = () => {
               <Card>
                 <CardHeader><CardTitle>Événements ({events.length})</CardTitle></CardHeader>
                 <CardContent>
-                  <Table>
-                    <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Nom</TableHead><TableHead>Description</TableHead><TableHead>Début</TableHead><TableHead>Fin</TableHead><TableHead>Ville</TableHead></TableRow></TableHeader>
-                    <TableBody>
-                      {events.map((event) => (
-                        <TableRow key={event.id}>
-                          <TableCell className="font-mono text-xs">{event.id}</TableCell>
-                          <EditableCell type="event" id={event.id} field="name" value={event.name} onUpdate={updateField} isSaving={saving[`event-${event.id}-name`]} />
-                          <EditableCell type="event" id={event.id} field="description" value={event.description} onUpdate={updateField} isSaving={saving[`event-${event.id}-description`]} />
-                          <EditableCell type="event" id={event.id} field="start_time" value={event.start_time} onUpdate={updateField} isSaving={saving[`event-${event.id}-start_time`]} />
-                          <EditableCell type="event" id={event.id} field="end_time" value={event.end_time} onUpdate={updateField} isSaving={saving[`event-${event.id}-end_time`]} />
-                          <EditableCell type="event" id={event.id} field="city" value={event.city} onUpdate={updateField} isSaving={saving[`event-${event.id}-city`]} />
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
+                  <div className="space-y-4">
+                    {Object.values(eventGroups).map(({ event, stages: eventStages }) => (
+                      <Collapsible
+                        key={event.id}
+                        open={!collapsedSections[`event-${event.id}`]}
+                        onOpenChange={() => toggleSection(`event-${event.id}`)}
+                      >
+                        <CollapsibleTrigger className="w-full">
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`event-${event.id}`] ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                              <h3 className="font-medium">{event.name}</h3>
+                              <span className="text-sm text-muted-foreground">({eventStages.length} étapes)</span>
+                            </div>
+                            <span className="text-xs font-mono text-muted-foreground">{event.id}</span>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-2">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Nom</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Début</TableHead>
+                                <TableHead>Fin</TableHead>
+                                <TableHead>Ville</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              <TableRow key={event.id}>
+                                <TableCell className="font-mono text-xs">{event.id}</TableCell>
+                                <EditableCell type="event" id={event.id} field="name" value={event.name} onUpdate={updateField} isSaving={saving[`event-${event.id}-name`]} />
+                                <EditableCell type="event" id={event.id} field="description" value={event.description} onUpdate={updateField} isSaving={saving[`event-${event.id}-description`]} />
+                                <EditableCell type="event" id={event.id} field="start_time" value={event.start_time} onUpdate={updateField} isSaving={saving[`event-${event.id}-start_time`]} />
+                                <EditableCell type="event" id={event.id} field="end_time" value={event.end_time} onUpdate={updateField} isSaving={saving[`event-${event.id}-end_time`]} />
+                                <EditableCell type="event" id={event.id} field="city" value={event.city} onUpdate={updateField} isSaving={saving[`event-${event.id}-city`]} />
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ))}
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
             
             <TabsContent value="stages">
-                <Card>
-                    <CardHeader><CardTitle>Étapes ({stages.length})</CardTitle></CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Événement</TableHead><TableHead>Nom</TableHead><TableHead>Distance</TableHead><TableHead>Prix</TableHead><TableHead>Statut</TableHead></TableRow></TableHeader>
+              <Card>
+                <CardHeader><CardTitle>Étapes par événement ({stages.length})</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Object.values(eventGroups).map(({ event, stages: eventStages }) => (
+                      <Collapsible
+                        key={`stages-${event.id}`}
+                        open={!collapsedSections[`stages-${event.id}`]}
+                        onOpenChange={() => toggleSection(`stages-${event.id}`)}
+                      >
+                        <CollapsibleTrigger className="w-full">
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`stages-${event.id}`] ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                              <h3 className="font-medium">{event.name}</h3>
+                              <span className="text-sm text-muted-foreground">({eventStages.length} étapes)</span>
+                            </div>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-2">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Nom</TableHead>
+                                <TableHead>Description</TableHead>
+                                <TableHead>Début</TableHead>
+                                <TableHead>Fin</TableHead>
+                              </TableRow>
+                            </TableHeader>
                             <TableBody>
-                                {stages.map((stage) => (
-                                    <TableRow key={stage.id}>
-                                        <TableCell className="font-mono text-xs">{stage.id}</TableCell>
-                                        <TableCell className="text-sm">{stage.event_name}</TableCell>
-                                        <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-name`]}/>
-                                        <EditableCell type="stage" id={stage.id} field="distance" value={stage.distance} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-distance`]}/>
-                                        <EditableCell type="stage" id={stage.id} field="price" value={stage.price} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-price`]}/>
-                                        <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-status`]}/>
-                                    </TableRow>
-                                ))}
+                              {eventStages.map((stage) => (
+                                <TableRow key={stage.id}>
+                                  <TableCell className="font-mono text-xs">{stage.id}</TableCell>
+                                  <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-name`]} />
+                                  <EditableCell type="stage" id={stage.id} field="description" value={stage.description} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-description`]} />
+                                  <EditableCell type="stage" id={stage.id} field="start_time" value={stage.start_time} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-start_time`]} />
+                                  <EditableCell type="stage" id={stage.id} field="end_time" value={stage.end_time} onUpdate={updateField} isSaving={saving[`stage-${stage.id}-end_time`]} />
+                                </TableRow>
+                              ))}
                             </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                          </Table>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
             
             <TabsContent value="registrations">
-                <Card>
-                    <CardHeader><CardTitle>Inscriptions ({registrations.length})</CardTitle></CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Événement</TableHead><TableHead>Étape</TableHead><TableHead>Email</TableHead><TableHead>Dossard</TableHead><TableHead>Statut</TableHead></TableRow></TableHeader>
+              <Card>
+                <CardHeader><CardTitle>Inscriptions par étape ({registrations.length})</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Object.values(stageGroups)
+                      .filter(({ registrations: stageRegs }) => stageRegs.length > 0)
+                      .map(({ stage, registrations: stageRegs }) => (
+                      <Collapsible
+                        key={`registrations-${stage.id}`}
+                        open={!collapsedSections[`registrations-${stage.id}`]}
+                        onOpenChange={() => toggleSection(`registrations-${stage.id}`)}
+                      >
+                        <CollapsibleTrigger className="w-full">
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`registrations-${stage.id}`] ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                              <h3 className="font-medium">{stage.name}</h3>
+                              <span className="text-sm text-muted-foreground">({stageRegs.length} inscriptions)</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{stage.event_name}</span>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-2">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Dossard</TableHead>
+                                <TableHead>Statut</TableHead>
+                                <TableHead>Date</TableHead>
+                              </TableRow>
+                            </TableHeader>
                             <TableBody>
-                                {registrations.map((reg) => (
-                                    <TableRow key={reg.id}>
-                                        <TableCell className="font-mono text-xs">{reg.id}</TableCell>
-                                        <TableCell className="text-sm">{reg.event_name}</TableCell>
-                                        <TableCell className="text-sm">{reg.stage_name}</TableCell>
-                                        <TableCell className="text-sm">{reg.user_email}</TableCell>
-                                        <EditableCell type="registration" id={reg.id} field="bib_number" value={reg.bib_number} onUpdate={updateField} isSaving={saving[`registration-${reg.id}-bib_number`]}/>
-                                        <EditableCell type="registration" id={reg.id} field="status" value={reg.status} onUpdate={updateField} isSaving={saving[`registration-${reg.id}-status`]}/>
-                                    </TableRow>
-                                ))}
+                              {stageRegs.map((reg) => (
+                                <TableRow key={reg.id}>
+                                  <TableCell className="font-mono text-xs">{reg.id}</TableCell>
+                                  <TableCell className="text-sm">{reg.user_email}</TableCell>
+                                  <EditableCell type="registration" id={reg.id} field="bib_number" value={reg.bib_number} onUpdate={updateField} isSaving={saving[`registration-${reg.id}-bib_number`]} />
+                                  <EditableCell type="registration" id={reg.id} field="status" value={reg.status} onUpdate={updateField} isSaving={saving[`registration-${reg.id}-status`]} />
+                                  <TableCell className="text-xs text-muted-foreground">{new Date(reg.created_at).toLocaleDateString()}</TableCell>
+                                </TableRow>
+                              ))}
                             </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                          </Table>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
 
             <TabsContent value="rankings">
-                <Card>
-                    <CardHeader><CardTitle>Classements ({rankings.length})</CardTitle></CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader><TableRow><TableHead>ID</TableHead><TableHead>Événement</TableHead><TableHead>Étape</TableHead><TableHead>Email</TableHead><TableHead>Position</TableHead><TableHead>Temps</TableHead></TableRow></TableHeader>
+              <Card>
+                <CardHeader><CardTitle>Classements par étape ({rankings.length})</CardTitle></CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {Object.values(stageGroups)
+                      .filter(({ rankings: stageRankings }) => stageRankings.length > 0)
+                      .map(({ stage, rankings: stageRankings }) => (
+                      <Collapsible
+                        key={`rankings-${stage.id}`}
+                        open={!collapsedSections[`rankings-${stage.id}`]}
+                        onOpenChange={() => toggleSection(`rankings-${stage.id}`)}
+                      >
+                        <CollapsibleTrigger className="w-full">
+                          <div className="flex items-center justify-between p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`rankings-${stage.id}`] ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                              <h3 className="font-medium">{stage.name}</h3>
+                              <span className="text-sm text-muted-foreground">({stageRankings.length} classements)</span>
+                            </div>
+                            <span className="text-xs text-muted-foreground">{stage.event_name}</span>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="mt-2">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>ID</TableHead>
+                                <TableHead>Email</TableHead>
+                                <TableHead>Position</TableHead>
+                                <TableHead>Temps</TableHead>
+                              </TableRow>
+                            </TableHeader>
                             <TableBody>
-                                {rankings.map((rank) => (
-                                    <TableRow key={rank.id}>
-                                        <TableCell className="font-mono text-xs">{rank.id}</TableCell>
-                                        <TableCell className="text-sm">{rank.event_name}</TableCell>
-                                        <TableCell className="text-sm">{rank.stage_name}</TableCell>
-                                        <TableCell className="text-sm">{rank.user_email}</TableCell>
-                                        <EditableCell type="ranking" id={rank.id} field="position" value={rank.position} onUpdate={updateField} isSaving={saving[`ranking-${rank.id}-position`]}/>
-                                        <EditableCell type="ranking" id={rank.id} field="time" value={rank.time} onUpdate={updateField} isSaving={saving[`ranking-${rank.id}-time`]}/>
-                                    </TableRow>
-                                ))}
+                              {stageRankings.map((rank) => (
+                                <TableRow key={rank.id}>
+                                  <TableCell className="font-mono text-xs">{rank.id}</TableCell>
+                                  <TableCell className="text-sm">{rank.user_email}</TableCell>
+                                  <EditableCell type="ranking" id={rank.id} field="position" value={rank.position} onUpdate={updateField} isSaving={saving[`ranking-${rank.id}-position`]} />
+                                  <EditableCell type="ranking" id={rank.id} field="time" value={rank.time} onUpdate={updateField} isSaving={saving[`ranking-${rank.id}-time`]} />
+                                </TableRow>
+                              ))}
                             </TableBody>
-                        </Table>
-                    </CardContent>
-                </Card>
+                          </Table>
+                        </CollapsibleContent>
+                      </Collapsible>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </TabsContent>
           </Tabs>
         </div>
