@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Loader2 } from "lucide-react";
+import { Save, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { organizerAPI, eventsAPI, stagesAPI, registrationsAPI, rankingsAPI, serverAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,6 +19,8 @@ const OrganizerDashboard = () => {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState({});
+  const [expandedEvents, setExpandedEvents] = useState({});
+  const [expandedStages, setExpandedStages] = useState({});
 
   useEffect(() => {
     if (!hasRole('organizer')) {
@@ -49,6 +51,15 @@ const OrganizerDashboard = () => {
       setStages(allStages);
       setRegistrations(allRegistrations);
       setRankings(allRankings);
+      
+      // Initialize all sections as expanded by default
+      const eventIds = {};
+      eventsData.forEach(event => eventIds[event.id] = true);
+      setExpandedEvents(eventIds);
+      
+      const stageIds = {};
+      allStages.forEach(stage => stageIds[stage.id] = true);
+      setExpandedStages(stageIds);
       
     } catch (error) {
       console.error('Error loading data:', error);
@@ -181,6 +192,20 @@ const OrganizerDashboard = () => {
     } finally {
       setSaving(prev => ({ ...prev, [key]: false }));
     }
+  };
+
+  const toggleEventExpansion = (eventId) => {
+    setExpandedEvents(prev => ({
+      ...prev,
+      [eventId]: !prev[eventId]
+    }));
+  };
+
+  const toggleStageExpansion = (stageId) => {
+    setExpandedStages(prev => ({
+      ...prev,
+      [stageId]: !prev[stageId]
+    }));
   };
 
   const EditableCell = ({ type, id, field, value, onUpdate }) => {
@@ -344,12 +369,21 @@ const OrganizerDashboard = () => {
                         
                         return (
                           <React.Fragment key={event.id}>
-                            <TableRow className="bg-muted/50">
+                            <TableRow 
+                              className="bg-muted/50 cursor-pointer hover:bg-muted/70"
+                              onClick={() => toggleEventExpansion(event.id)}
+                            >
                               <TableCell colSpan={6} className="font-semibold text-primary">
-                                📅 {event.name} ({eventStages.length} étape{eventStages.length > 1 ? 's' : ''})
+                                <div className="flex items-center gap-2">
+                                  {expandedEvents[event.id] ? 
+                                    <ChevronDown className="w-4 h-4" /> : 
+                                    <ChevronRight className="w-4 h-4" />
+                                  }
+                                  📅 {event.name} ({eventStages.length} étape{eventStages.length > 1 ? 's' : ''})
+                                </div>
                               </TableCell>
                             </TableRow>
-                            {eventStages.map((stage) => (
+                            {expandedEvents[event.id] && eventStages.map((stage) => (
                               <TableRow key={stage.id}>
                                 <TableCell className="font-mono text-xs">{stage.id}</TableCell>
                                 <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} />
@@ -359,9 +393,11 @@ const OrganizerDashboard = () => {
                                 <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} />
                               </TableRow>
                             ))}
-                            <TableRow>
-                              <TableCell colSpan={6} className="h-2"></TableCell>
-                            </TableRow>
+                            {expandedEvents[event.id] && (
+                              <TableRow>
+                                <TableCell colSpan={6} className="h-2"></TableCell>
+                              </TableRow>
+                            )}
                           </React.Fragment>
                         );
                       })}
@@ -394,12 +430,21 @@ const OrganizerDashboard = () => {
                         
                         return (
                           <React.Fragment key={stage.id}>
-                            <TableRow className="bg-muted/50">
+                            <TableRow 
+                              className="bg-muted/50 cursor-pointer hover:bg-muted/70"
+                              onClick={() => toggleStageExpansion(stage.id)}
+                            >
                               <TableCell colSpan={5} className="font-semibold text-secondary-foreground">
-                                🏃 {stage.name} • {stage.event_name} ({stageRegistrations.length} inscription{stageRegistrations.length > 1 ? 's' : ''})
+                                <div className="flex items-center gap-2">
+                                  {expandedStages[stage.id] ? 
+                                    <ChevronDown className="w-4 h-4" /> : 
+                                    <ChevronRight className="w-4 h-4" />
+                                  }
+                                  🏃 {stage.name} • {stage.event_name} ({stageRegistrations.length} inscription{stageRegistrations.length > 1 ? 's' : ''})
+                                </div>
                               </TableCell>
                             </TableRow>
-                            {stageRegistrations.map((registration) => (
+                            {expandedStages[stage.id] && stageRegistrations.map((registration) => (
                               <TableRow key={registration.id}>
                                 <TableCell className="font-mono text-xs">{registration.id}</TableCell>
                                 <TableCell className="text-sm">{registration.user_email}</TableCell>
@@ -408,9 +453,11 @@ const OrganizerDashboard = () => {
                                 <TableCell className="text-sm">{registration.created_at}</TableCell>
                               </TableRow>
                             ))}
-                            <TableRow>
-                              <TableCell colSpan={5} className="h-2"></TableCell>
-                            </TableRow>
+                            {expandedStages[stage.id] && (
+                              <TableRow>
+                                <TableCell colSpan={5} className="h-2"></TableCell>
+                              </TableRow>
+                            )}
                           </React.Fragment>
                         );
                       })}
@@ -442,12 +489,21 @@ const OrganizerDashboard = () => {
                         
                         return (
                           <React.Fragment key={stage.id}>
-                            <TableRow className="bg-muted/50">
+                            <TableRow 
+                              className="bg-muted/50 cursor-pointer hover:bg-muted/70"
+                              onClick={() => toggleStageExpansion(stage.id)}
+                            >
                               <TableCell colSpan={4} className="font-semibold text-accent-foreground">
-                                🏆 {stage.name} • {stage.event_name} ({stageRankings.length} classement{stageRankings.length > 1 ? 's' : ''})
+                                <div className="flex items-center gap-2">
+                                  {expandedStages[stage.id] ? 
+                                    <ChevronDown className="w-4 h-4" /> : 
+                                    <ChevronRight className="w-4 h-4" />
+                                  }
+                                  🏆 {stage.name} • {stage.event_name} ({stageRankings.length} classement{stageRankings.length > 1 ? 's' : ''})
+                                </div>
                               </TableCell>
                             </TableRow>
-                            {stageRankings
+                            {expandedStages[stage.id] && stageRankings
                               .sort((a, b) => (a.position || 999) - (b.position || 999))
                               .map((ranking) => (
                               <TableRow key={ranking.id}>
@@ -457,9 +513,11 @@ const OrganizerDashboard = () => {
                                 <TableCell className="text-sm">{ranking.user_email}</TableCell>
                               </TableRow>
                             ))}
-                            <TableRow>
-                              <TableCell colSpan={4} className="h-2"></TableCell>
-                            </TableRow>
+                            {expandedStages[stage.id] && (
+                              <TableRow>
+                                <TableCell colSpan={4} className="h-2"></TableCell>
+                              </TableRow>
+                            )}
                           </React.Fragment>
                         );
                       })}
