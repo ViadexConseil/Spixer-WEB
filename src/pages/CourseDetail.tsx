@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { Calendar, MapPin, Users, Share2, Heart, Trophy, Video, Info, Map } from "lucide-react";
+import { Calendar, MapPin, Users, Share2, Heart, Trophy, Video, Info, Map, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -8,6 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import { eventsAPI, stagesAPI, rankingsAPI, Event, Stage, Ranking } from "@/services/api";
 import { toast } from "@/hooks/use-toast";
+import { useLiveRankings } from "@/hooks/useLiveRankings";
+import { LiveRankingsList } from "@/components/LiveRankingsList";
 
 const CourseDetail = () => {
   const { id } = useParams();
@@ -16,6 +18,22 @@ const CourseDetail = () => {
   const [stages, setStages] = useState<Stage[]>([]);
   const [rankings, setRankings] = useState<Ranking[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Check if event is currently live
+  const isLive = useMemo(() => {
+    if (!event) return false;
+    const now = new Date();
+    const startTime = new Date(event.start_time);
+    const endTime = new Date(event.end_time);
+    return startTime <= now && now <= endTime;
+  }, [event]);
+
+  // Use live rankings for live events
+  const { 
+    rankings: liveRankings, 
+    loading: liveRankingsLoading, 
+    error: liveRankingsError 
+  } = useLiveRankings(isLive && id ? [id] : []);
 
   useEffect(() => {
     const fetchCourseData = async () => {
@@ -30,7 +48,7 @@ const CourseDetail = () => {
         const stagesData = await stagesAPI.getByEvent(id);
         setStages(stagesData);
 
-        // Fetch rankings for all stages and combine them
+        // Fetch initial rankings for all stages (only for non-live events)
         if (stagesData.length > 0) {
           const allRankings = await Promise.all(
             stagesData.map(stage => rankingsAPI.getByStage(stage.id))
@@ -268,35 +286,55 @@ const CourseDetail = () => {
           <TabsContent value="classement">
             <Card>
               <CardHeader>
-                <CardTitle>Classement</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="w-5 h-5" />
+                  Classement
+                  {isLive && (
+                    <div className="flex items-center gap-1 ml-auto">
+                      <Sparkles className="w-4 h-4 text-red-500" />
+                      <span className="text-sm font-medium text-red-600">EN DIRECT</span>
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                    </div>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                {rankings.length > 0 ? (
-                  <div className="space-y-4">
-                    {rankings.map((runner) => (
-                      <div key={runner.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-4">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
-                            runner.rank_position === 1 ? 'bg-yellow-500' :
-                            runner.rank_position === 2 ? 'bg-gray-400' :
-                            runner.rank_position === 3 ? 'bg-amber-600' : 'bg-gray-300'
-                          }`}>
-                            {runner.rank_position}
-                          </div>
-                          <div>
-                            <div className="font-semibold">{runner.user_email}</div>
-                            <div className="text-sm text-gray-600">{runner.stage_name}</div>
+                {isLive ? (
+                  // Live rankings with animations
+                  <LiveRankingsList
+                    rankings={liveRankings[id] || []}
+                    loading={liveRankingsLoading[id] || false}
+                    error={liveRankingsError[id] || null}
+                  />
+                ) : (
+                  // Static rankings for non-live events
+                  rankings.length > 0 ? (
+                    <div className="space-y-4">
+                      {rankings.map((runner) => (
+                        <div key={runner.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                          <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${
+                              runner.rank_position === 1 ? 'bg-yellow-500' :
+                              runner.rank_position === 2 ? 'bg-gray-400' :
+                              runner.rank_position === 3 ? 'bg-amber-600' : 'bg-gray-300'
+                            }`}>
+                              {runner.rank_position}
+                            </div>
+                            <div>
+                              <div className="font-semibold">{runner.user_email}</div>
+                              <div className="text-sm text-gray-600">{runner.stage_name}</div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-10">
-                    <Trophy className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-semibold">Classement non disponible</h3>
-                    <p className="text-gray-600 text-sm">Les résultats seront affichés ici une fois disponibles.</p>
-                  </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-10">
+                      <Trophy className="w-12 h-12 mx-auto text-gray-300 mb-4" />
+                      <h3 className="text-lg font-semibold">Classement non disponible</h3>
+                      <p className="text-gray-600 text-sm">Les résultats seront affichés ici une fois disponibles.</p>
+                    </div>
+                  )
                 )}
               </CardContent>
             </Card>
