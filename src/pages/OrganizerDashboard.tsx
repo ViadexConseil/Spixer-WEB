@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Save, Loader2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { Save, Loader2, ChevronDown, ChevronRight } from "lucide-react";
 import { organizerAPI, eventsAPI, stagesAPI, registrationsAPI, rankingsAPI, serverAPI } from "@/services/api";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,6 +20,7 @@ const OrganizerDashboard = () => {
   const [rankings, setRankings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState({});
+  const [collapsedSections, setCollapsedSections] = useState({});
 
   useEffect(() => {
     if (!hasRole('organizer')) {
@@ -232,6 +234,13 @@ const OrganizerDashboard = () => {
     );
   };
 
+  const toggleSection = (sectionId) => {
+    setCollapsedSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
   if (!hasRole('organizer')) {
     return (
       <>
@@ -331,36 +340,49 @@ const OrganizerDashboard = () => {
                     if (eventStages.length === 0) return null;
                     
                     return (
-                      <div key={event.id} className="space-y-4">
-                        <div className="border-l-4 border-primary pl-4">
-                          <h3 className="text-lg font-semibold">{event.name}</h3>
-                          <p className="text-sm text-muted-foreground">{eventStages.length} étape(s)</p>
-                        </div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>ID</TableHead>
-                              <TableHead>Nom</TableHead>
-                              <TableHead>Description</TableHead>
-                              <TableHead>Distance</TableHead>
-                              <TableHead>Prix</TableHead>
-                              <TableHead>Statut</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {eventStages.map((stage) => (
-                              <TableRow key={stage.id}>
-                                <TableCell className="font-mono text-xs">{stage.id}</TableCell>
-                                <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} />
-                                <EditableCell type="stage" id={stage.id} field="description" value={stage.description} onUpdate={updateField} />
-                                <EditableCell type="stage" id={stage.id} field="distance" value={stage.distance} onUpdate={updateField} />
-                                <EditableCell type="stage" id={stage.id} field="price" value={stage.price} onUpdate={updateField} />
-                                <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} />
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
+                      <Collapsible key={event.id} defaultOpen={true}>
+                        <CollapsibleTrigger asChild>
+                          <div className="border-l-4 border-primary pl-4 cursor-pointer hover:bg-muted/50 rounded-r p-3 -ml-1 transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`stages-${event.id}`] ? (
+                                <ChevronRight className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                              <h3 className="text-lg font-semibold">{event.name}</h3>
+                            </div>
+                            <p className="text-sm text-muted-foreground ml-6">{eventStages.length} étape(s)</p>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
+                          <div className="mt-4">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>ID</TableHead>
+                                  <TableHead>Nom</TableHead>
+                                  <TableHead>Description</TableHead>
+                                  <TableHead>Distance</TableHead>
+                                  <TableHead>Prix</TableHead>
+                                  <TableHead>Statut</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {eventStages.map((stage) => (
+                                  <TableRow key={stage.id}>
+                                    <TableCell className="font-mono text-xs">{stage.id}</TableCell>
+                                    <EditableCell type="stage" id={stage.id} field="name" value={stage.name} onUpdate={updateField} />
+                                    <EditableCell type="stage" id={stage.id} field="description" value={stage.description} onUpdate={updateField} />
+                                    <EditableCell type="stage" id={stage.id} field="distance" value={stage.distance} onUpdate={updateField} />
+                                    <EditableCell type="stage" id={stage.id} field="price" value={stage.price} onUpdate={updateField} />
+                                    <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} />
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   })}
                 </CardContent>
@@ -378,36 +400,49 @@ const OrganizerDashboard = () => {
                     if (stageRegistrations.length === 0) return null;
                     
                     return (
-                      <div key={stage.id} className="space-y-4">
-                        <div className="border-l-4 border-secondary pl-4">
-                          <h3 className="text-lg font-semibold">{stage.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {stage.event_name} • {stageRegistrations.length} inscription(s)
-                          </p>
-                        </div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>ID</TableHead>
-                              <TableHead>Email</TableHead>
-                              <TableHead>Dossard</TableHead>
-                              <TableHead>Statut</TableHead>
-                              <TableHead>Date inscription</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {stageRegistrations.map((registration) => (
-                              <TableRow key={registration.id}>
-                                <TableCell className="font-mono text-xs">{registration.id}</TableCell>
-                                <TableCell className="text-sm">{registration.user_email}</TableCell>
-                                <EditableCell type="registration" id={registration.id} field="bib_number" value={registration.bib_number} onUpdate={updateField} />
-                                <EditableCell type="registration" id={registration.id} field="status" value={registration.status} onUpdate={updateField} />
-                                <TableCell className="text-sm">{registration.created_at}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
+                      <Collapsible key={stage.id} defaultOpen={true}>
+                        <CollapsibleTrigger asChild>
+                          <div className="border-l-4 border-secondary pl-4 cursor-pointer hover:bg-muted/50 rounded-r p-3 -ml-1 transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`registrations-${stage.id}`] ? (
+                                <ChevronRight className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                              <h3 className="text-lg font-semibold">{stage.name}</h3>
+                            </div>
+                            <p className="text-sm text-muted-foreground ml-6">
+                              {stage.event_name} • {stageRegistrations.length} inscription(s)
+                            </p>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
+                          <div className="mt-4">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>ID</TableHead>
+                                  <TableHead>Email</TableHead>
+                                  <TableHead>Dossard</TableHead>
+                                  <TableHead>Statut</TableHead>
+                                  <TableHead>Date inscription</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {stageRegistrations.map((registration) => (
+                                  <TableRow key={registration.id}>
+                                    <TableCell className="font-mono text-xs">{registration.id}</TableCell>
+                                    <TableCell className="text-sm">{registration.user_email}</TableCell>
+                                    <EditableCell type="registration" id={registration.id} field="bib_number" value={registration.bib_number} onUpdate={updateField} />
+                                    <EditableCell type="registration" id={registration.id} field="status" value={registration.status} onUpdate={updateField} />
+                                    <TableCell className="text-sm">{registration.created_at}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   })}
                 </CardContent>
@@ -425,36 +460,49 @@ const OrganizerDashboard = () => {
                     if (stageRankings.length === 0) return null;
                     
                     return (
-                      <div key={stage.id} className="space-y-4">
-                        <div className="border-l-4 border-accent pl-4">
-                          <h3 className="text-lg font-semibold">{stage.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {stage.event_name} • {stageRankings.length} classement(s)
-                          </p>
-                        </div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>ID</TableHead>
-                              <TableHead>Position</TableHead>
-                              <TableHead>Temps</TableHead>
-                              <TableHead>Email participant</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {stageRankings
-                              .sort((a, b) => (a.position || 999) - (b.position || 999))
-                              .map((ranking) => (
-                              <TableRow key={ranking.id}>
-                                <TableCell className="font-mono text-xs">{ranking.id}</TableCell>
-                                <EditableCell type="ranking" id={ranking.id} field="position" value={ranking.position} onUpdate={updateField} />
-                                <EditableCell type="ranking" id={ranking.id} field="time" value={ranking.time} onUpdate={updateField} />
-                                <TableCell className="text-sm">{ranking.user_email}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
+                      <Collapsible key={stage.id} defaultOpen={true}>
+                        <CollapsibleTrigger asChild>
+                          <div className="border-l-4 border-accent pl-4 cursor-pointer hover:bg-muted/50 rounded-r p-3 -ml-1 transition-colors">
+                            <div className="flex items-center gap-2">
+                              {collapsedSections[`rankings-${stage.id}`] ? (
+                                <ChevronRight className="h-4 w-4" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4" />
+                              )}
+                              <h3 className="text-lg font-semibold">{stage.name}</h3>
+                            </div>
+                            <p className="text-sm text-muted-foreground ml-6">
+                              {stage.event_name} • {stageRankings.length} classement(s)
+                            </p>
+                          </div>
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="animate-accordion-down data-[state=closed]:animate-accordion-up">
+                          <div className="mt-4">
+                            <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  <TableHead>ID</TableHead>
+                                  <TableHead>Position</TableHead>
+                                  <TableHead>Temps</TableHead>
+                                  <TableHead>Email participant</TableHead>
+                                </TableRow>
+                              </TableHeader>
+                              <TableBody>
+                                {stageRankings
+                                  .sort((a, b) => (a.position || 999) - (b.position || 999))
+                                  .map((ranking) => (
+                                  <TableRow key={ranking.id}>
+                                    <TableCell className="font-mono text-xs">{ranking.id}</TableCell>
+                                    <EditableCell type="ranking" id={ranking.id} field="position" value={ranking.position} onUpdate={updateField} />
+                                    <EditableCell type="ranking" id={ranking.id} field="time" value={ranking.time} onUpdate={updateField} />
+                                    <TableCell className="text-sm">{ranking.user_email}</TableCell>
+                                  </TableRow>
+                                ))}
+                              </TableBody>
+                            </Table>
+                          </div>
+                        </CollapsibleContent>
+                      </Collapsible>
                     );
                   })}
                 </CardContent>
