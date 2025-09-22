@@ -197,7 +197,7 @@ const Profil = () => {
                   }
                 </p>
                 <Button variant="outline" className="w-full" asChild>
-                  <Link to={eventsCount > 0 ? "/organizer-dashboard" : "/create-event"}>
+                  <Link to={eventsCount > 0 ? "/organizer" : "/create-event"}>
                     {eventsCount > 0 ? "Gérer mes événements" : "Créer un événement"}
                   </Link>
                 </Button>
