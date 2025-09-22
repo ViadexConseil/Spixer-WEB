@@ -219,8 +219,21 @@ export const removeAuthToken = (): void => {
   localStorage.removeItem('spixer_token');
 };
 
+import { cacheService } from './cache';
+import { toast } from '@/hooks/use-toast';
+
 // API helper function
 const apiCall = async <T>(endpoint: string, options: RequestInit = {}): Promise<T> => {
+  const method = options.method || 'GET';
+
+  // 1. Check cache for GET requests
+  if (method === 'GET') {
+    const cachedData = cacheService.get<T>(endpoint);
+    if (cachedData) {
+      return cachedData;
+    }
+  }
+
   const token = getAuthToken();
   
   const config: RequestInit = {
@@ -233,15 +246,42 @@ const apiCall = async <T>(endpoint: string, options: RequestInit = {}): Promise<
   };
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
+
+  // 2. Handle rate limiting
+  if (response.status === 429) {
+    toast({
+      title: 'Trop de requêtes',
+      description: 'Vous avez atteint la limite de requêtes. Veuillez réessayer dans quelques instants.',
+      variant: 'destructive',
+    });
+  }
   
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    // Handle API error structure: { "error": { "message": "<reason>" } }
     const errorMessage = errorData.error?.message || errorData.message || `HTTP ${response.status}: ${response.statusText}`;
     throw new Error(errorMessage);
   }
 
-  return response.json();
+  // 3. Parse JSON response
+  const data = await response.json().catch(() => ({}));
+
+  // 4. Update cache for GET requests
+  if (method === 'GET') {
+    cacheService.set(endpoint, data);
+  } else if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
+    // 5. Invalidate cache for mutations
+    // This is a simple strategy: invalidate the main list and the specific item.
+    const endpointParts = endpoint.split('/');
+    if (endpointParts.length > 2) {
+      const resourceListEndpoint = `/${endpointParts[1]}/${endpointParts[2]}`; // e.g., /v1/events
+      cacheService.invalidate(resourceListEndpoint);
+      // also invalidate endpoints with query params
+      cacheService.invalidate(`${resourceListEndpoint}?include=images`);
+    }
+    cacheService.invalidate(endpoint);
+  }
+
+  return data as T;
 };
 
 // Authentication API
