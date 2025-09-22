@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { 
   Search, 
@@ -20,8 +20,6 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import { useEvents } from "@/hooks/useEvents";
-import { useLiveRankings } from "@/hooks/useLiveRankings";
-import { LiveRankingsCard } from "@/components/LiveRankingsCard";
 
 const Events = () => {
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
@@ -33,34 +31,9 @@ const Events = () => {
     event.city.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Identify live events (currently happening)
-  const liveEvents = useMemo(() => {
-    const now = new Date();
-    return filteredEvents.filter(event => {
-      const startTime = new Date(event.start_time);
-      const endTime = new Date(event.end_time);
-      return startTime <= now && now <= endTime;
-    });
-  }, [filteredEvents]);
-
-  const liveEventIds = useMemo(() => 
-    liveEvents.map(event => event.id), 
-    [liveEvents]
-  );
-
-  // Use live rankings hook only for live events
-  const { rankings, loading: rankingsLoading, error: rankingsError } = useLiveRankings(liveEventIds);
-
-  const getStatusBadge = (dateString: string, endTime?: string) => {
+  const getStatusBadge = (dateString: string) => {
     const eventDate = new Date(dateString);
-    const eventEndDate = endTime ? new Date(endTime) : null;
     const now = new Date();
-    
-    // Check if event is currently live
-    if (eventEndDate && eventDate <= now && now <= eventEndDate) {
-      return { text: "EN DIRECT", class: "bg-gradient-to-r from-red-500 to-red-600 text-white animate-pulse shadow-lg" };
-    }
-    
     const daysDiff = Math.ceil((eventDate.getTime() - now.getTime()) / (1000 * 3600 * 24));
     
     if (daysDiff < 0) return { text: "Terminé", class: "bg-gray-500 text-white" };
@@ -179,12 +152,8 @@ const Events = () => {
           {viewMode === 'list' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
               {filteredEvents.map((event, index) => {
-                const status = getStatusBadge(event.start_time, event.end_time);
+                const status = getStatusBadge(event.start_time);
                 const imageUrl = event.images?.[0] || event.image_url || "/lovable-uploads/d8c8f0dd-a457-4a2d-b79b-5a64a0fd5515.png";
-                const isLive = liveEventIds.includes(event.id);
-                const eventRankings = rankings[event.id] || [];
-                const rankingsAreLoading = rankingsLoading[event.id] || false;
-                const eventRankingsError = rankingsError[event.id];
                 
                 return (
                   <Card 
@@ -247,22 +216,12 @@ const Events = () => {
                         </div>
                       </div>
                       
-                      {/* Live Rankings for live events */}
-                      {isLive && (
-                        <LiveRankingsCard
-                          eventId={event.id}
-                          rankings={eventRankings}
-                          loading={rankingsAreLoading}
-                          error={eventRankingsError}
-                        />
-                      )}
-
                       <Button 
                         className="w-full rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 group/btn" 
                         asChild
                       >
                         <Link to={`/events/${event.id}`}>
-                          {isLive ? 'Suivre en direct' : 'Découvrir l\'événement'}
+                          Découvrir l'événement
                           <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" />
                         </Link>
                       </Button>
