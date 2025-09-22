@@ -325,29 +325,30 @@ const OrganizerDashboard = () => {
                 <CardHeader>
                   <CardTitle>Étapes ({stages.length})</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {events.map((event) => {
-                    const eventStages = stages.filter(stage => stage.event_id === event.id);
-                    if (eventStages.length === 0) return null;
-                    
-                    return (
-                      <div key={event.id} className="space-y-4">
-                        <div className="border-l-4 border-primary pl-4">
-                          <h3 className="text-lg font-semibold">{event.name}</h3>
-                          <p className="text-sm text-muted-foreground">{eventStages.length} étape(s)</p>
-                        </div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>ID</TableHead>
-                              <TableHead>Nom</TableHead>
-                              <TableHead>Description</TableHead>
-                              <TableHead>Distance</TableHead>
-                              <TableHead>Prix</TableHead>
-                              <TableHead>Statut</TableHead>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Nom</TableHead>
+                        <TableHead>Description</TableHead>
+                        <TableHead>Distance</TableHead>
+                        <TableHead>Prix</TableHead>
+                        <TableHead>Statut</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {events.map((event) => {
+                        const eventStages = stages.filter(stage => stage.event_id === event.id);
+                        if (eventStages.length === 0) return null;
+                        
+                        return (
+                          <React.Fragment key={event.id}>
+                            <TableRow className="bg-muted/50">
+                              <TableCell colSpan={6} className="font-semibold text-primary">
+                                📅 {event.name} ({eventStages.length} étape{eventStages.length > 1 ? 's' : ''})
+                              </TableCell>
                             </TableRow>
-                          </TableHeader>
-                          <TableBody>
                             {eventStages.map((stage) => (
                               <TableRow key={stage.id}>
                                 <TableCell className="font-mono text-xs">{stage.id}</TableCell>
@@ -358,11 +359,14 @@ const OrganizerDashboard = () => {
                                 <EditableCell type="stage" id={stage.id} field="status" value={stage.status} onUpdate={updateField} />
                               </TableRow>
                             ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    );
-                  })}
+                            <TableRow>
+                              <TableCell colSpan={6} className="h-2"></TableCell>
+                            </TableRow>
+                          </React.Fragment>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -372,30 +376,29 @@ const OrganizerDashboard = () => {
                 <CardHeader>
                   <CardTitle>Inscriptions ({registrations.length})</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {stages.map((stage) => {
-                    const stageRegistrations = registrations.filter(reg => reg.stage_id === stage.id);
-                    if (stageRegistrations.length === 0) return null;
-                    
-                    return (
-                      <div key={stage.id} className="space-y-4">
-                        <div className="border-l-4 border-secondary pl-4">
-                          <h3 className="text-lg font-semibold">{stage.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {stage.event_name} • {stageRegistrations.length} inscription(s)
-                          </p>
-                        </div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>ID</TableHead>
-                              <TableHead>Email</TableHead>
-                              <TableHead>Dossard</TableHead>
-                              <TableHead>Statut</TableHead>
-                              <TableHead>Date inscription</TableHead>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Dossard</TableHead>
+                        <TableHead>Statut</TableHead>
+                        <TableHead>Date inscription</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {stages.map((stage) => {
+                        const stageRegistrations = registrations.filter(reg => reg.stage_id === stage.id);
+                        if (stageRegistrations.length === 0) return null;
+                        
+                        return (
+                          <React.Fragment key={stage.id}>
+                            <TableRow className="bg-muted/50">
+                              <TableCell colSpan={5} className="font-semibold text-secondary-foreground">
+                                🏃 {stage.name} • {stage.event_name} ({stageRegistrations.length} inscription{stageRegistrations.length > 1 ? 's' : ''})
+                              </TableCell>
                             </TableRow>
-                          </TableHeader>
-                          <TableBody>
                             {stageRegistrations.map((registration) => (
                               <TableRow key={registration.id}>
                                 <TableCell className="font-mono text-xs">{registration.id}</TableCell>
@@ -405,11 +408,14 @@ const OrganizerDashboard = () => {
                                 <TableCell className="text-sm">{registration.created_at}</TableCell>
                               </TableRow>
                             ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    );
-                  })}
+                            <TableRow>
+                              <TableCell colSpan={5} className="h-2"></TableCell>
+                            </TableRow>
+                          </React.Fragment>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -419,29 +425,28 @@ const OrganizerDashboard = () => {
                 <CardHeader>
                   <CardTitle>Classements ({rankings.length})</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
-                  {stages.map((stage) => {
-                    const stageRankings = rankings.filter(rank => rank.stage_id === stage.id);
-                    if (stageRankings.length === 0) return null;
-                    
-                    return (
-                      <div key={stage.id} className="space-y-4">
-                        <div className="border-l-4 border-accent pl-4">
-                          <h3 className="text-lg font-semibold">{stage.name}</h3>
-                          <p className="text-sm text-muted-foreground">
-                            {stage.event_name} • {stageRankings.length} classement(s)
-                          </p>
-                        </div>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>ID</TableHead>
-                              <TableHead>Position</TableHead>
-                              <TableHead>Temps</TableHead>
-                              <TableHead>Email participant</TableHead>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>ID</TableHead>
+                        <TableHead>Position</TableHead>
+                        <TableHead>Temps</TableHead>
+                        <TableHead>Email participant</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {stages.map((stage) => {
+                        const stageRankings = rankings.filter(rank => rank.stage_id === stage.id);
+                        if (stageRankings.length === 0) return null;
+                        
+                        return (
+                          <React.Fragment key={stage.id}>
+                            <TableRow className="bg-muted/50">
+                              <TableCell colSpan={4} className="font-semibold text-accent-foreground">
+                                🏆 {stage.name} • {stage.event_name} ({stageRankings.length} classement{stageRankings.length > 1 ? 's' : ''})
+                              </TableCell>
                             </TableRow>
-                          </TableHeader>
-                          <TableBody>
                             {stageRankings
                               .sort((a, b) => (a.position || 999) - (b.position || 999))
                               .map((ranking) => (
@@ -452,11 +457,14 @@ const OrganizerDashboard = () => {
                                 <TableCell className="text-sm">{ranking.user_email}</TableCell>
                               </TableRow>
                             ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    );
-                  })}
+                            <TableRow>
+                              <TableCell colSpan={4} className="h-2"></TableCell>
+                            </TableRow>
+                          </React.Fragment>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
                 </CardContent>
               </Card>
             </TabsContent>
