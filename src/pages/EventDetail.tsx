@@ -108,7 +108,7 @@ const EventDetail = () => {
     };
 
     fetchLiveRankings(); // Fetch immediately when stage goes live
-    const interval = setInterval(fetchLiveRankings, 7000); // Poll every 7 seconds
+    const interval = setInterval(fetchLiveRankings, 1000); // Poll every 7 seconds
 
     return () => clearInterval(interval);
   }, [isStageLive, selectedStage]);
