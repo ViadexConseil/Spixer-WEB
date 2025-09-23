@@ -189,7 +189,7 @@ const CreateEvent = () => {
                 <div className="space-y-2">
                   <Label htmlFor="date">Date *</Label>
                   <div className="relative">
-                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input 
                       id="date" 
                       type="datetime-local" 
@@ -206,7 +206,7 @@ const CreateEvent = () => {
                 <div className="space-y-2">
                   <Label htmlFor="city">Ville *</Label>
                   <div className="relative">
-                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
                     <Input 
                       id="city" 
                       placeholder="Paris" 
@@ -250,9 +250,9 @@ const CreateEvent = () => {
               
               <div className="space-y-2">
                 <Label htmlFor="image">Image de couverture</Label>
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                  <p className="text-sm text-gray-600">
+                <div className="border-2 border-dashed border-border rounded-lg p-6 text-center">
+                  <Upload className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+                  <p className="text-sm text-muted-foreground">
                     Glissez-déposez une image ou cliquez pour sélectionner
                   </p>
                   <Input type="file" accept="image/*" className="hidden" />
@@ -272,10 +272,10 @@ const CreateEvent = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <Upload className="mx-auto h-16 w-16 text-gray-400 mb-4" />
+              <div className="border-2 border-dashed border-border rounded-lg p-8 text-center">
+                <Upload className="mx-auto h-16 w-16 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">Importer un fichier OnePlan</h3>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-sm text-muted-foreground mb-4">
                   Formats acceptés: .oneplan, .json
                 </p>
                 <Button variant="outline">
@@ -283,9 +283,9 @@ const CreateEvent = () => {
                 </Button>
               </div>
               
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-semibold text-blue-900 mb-2">Qu'est-ce qu'OnePlan ?</h4>
-                <p className="text-sm text-blue-800">
+              <div className="bg-muted p-4 rounded-lg">
+                <h4 className="font-semibold text-foreground mb-2">Qu'est-ce qu'OnePlan ?</h4>
+                <p className="text-sm text-muted-foreground">
                   OnePlan vous permet de définir précisément les zones de départ, 
                   d'arrivée, de ravitaillement et autres points logistiques de votre course.
                 </p>
@@ -317,7 +317,7 @@ const CreateEvent = () => {
                   <Card key={stage.id} className="border">
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start mb-4">
-                        <h4 className="text-sm font-semibold text-gray-700">Épreuve {index + 1}</h4>
+                        <h4 className="text-sm font-semibold text-muted-foreground">Épreuve {index + 1}</h4>
                         {stages.length > 1 && (
                           <Button 
                             size="sm" 
@@ -383,8 +383,8 @@ const CreateEvent = () => {
               </div>
               
               {stages.every(stage => !stage.name.trim()) && (
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-muted p-4 rounded-lg">
+                  <p className="text-sm text-muted-foreground">
                     <strong>Info:</strong> Si aucune épreuve n'est configurée, une épreuve par défaut sera automatiquement créée avec le nom de votre événement.
                   </p>
                 </div>
@@ -403,7 +403,7 @@ const CreateEvent = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-lg">
+              <div className="bg-muted p-6 rounded-lg">
                 <h3 className="text-xl font-bold mb-4">Marathon de votre ville</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
@@ -433,7 +433,7 @@ const CreateEvent = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 page-content">
+      <div className="min-h-screen bg-background page-content">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
