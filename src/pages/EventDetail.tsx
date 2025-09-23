@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Navigation from "@/components/Navigation";
 import { eventsAPI, stagesAPI, rankingsAPI, Event, Stage, Ranking } from "@/services/api";
+import { cacheService } from "@/services/cache";
 import { toast } from "@/hooks/use-toast";
 
 const EventDetail = () => {
@@ -82,6 +83,8 @@ const EventDetail = () => {
 
     const fetchLiveRankings = async () => {
       try {
+        // Invalidate cache to ensure fresh data for live updates
+        cacheService.invalidate(`/v1/stages/${selectedStage.id}/rankings`);
         const rankings = await rankingsAPI.getByStage(selectedStage.id);
         setStageRankings(rankings);
       } catch (error) {
