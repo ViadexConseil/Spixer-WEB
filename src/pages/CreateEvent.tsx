@@ -442,7 +442,7 @@ const CreateEvent = () => {
         </div>
 
         {/* Progress Steps */}
-        <div className="bg-white rounded-2xl shadow-elegant p-6 mb-8">
+        <div className="bg-card rounded-2xl shadow-elegant p-6 mb-8">
           <div className="flex items-center justify-between">
             {steps.map((step, index) => (
               <div key={step.id} className="flex items-center">
