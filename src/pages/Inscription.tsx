@@ -213,7 +213,7 @@ const Inscription = () => {
   return (
     <>
       <Navigation />
-      <div className="min-h-screen bg-gray-50 page-content">
+      <div className="min-h-screen bg-background page-content">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Back button */}
           <Button 
@@ -227,7 +227,7 @@ const Inscription = () => {
 
           {/* Course info header */}
           {event && (
-            <div className="bg-white rounded-2xl shadow-elegant overflow-hidden mb-8">
+            <div className="bg-card rounded-2xl shadow-elegant overflow-hidden mb-8">
               <div className="relative h-32 md:h-40">
                 <img 
                   src={event.images?.[0] || event.image_url || "/lovable-uploads/77a7ef3b-a09f-4099-8c96-d468f4ded307.png"} 
@@ -255,15 +255,15 @@ const Inscription = () => {
             <Card>
               <CardHeader>
                 <CardTitle className="text-2xl text-center">Inscription à la course</CardTitle>
-                <p className="text-center text-gray-600">
+                <p className="text-center text-muted-foreground">
                   Remplissez le formulaire ci-dessous pour vous inscrire
                 </p>
                 
                 {/* Registration deadline info */}
                 {event?.registration_end_time && (
-                  <div className="mt-4 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200">
+                  <div className="mt-4 p-3 rounded-lg bg-muted border border-border">
                     <div className="text-center">
-                      <span className="text-sm font-medium text-blue-800">
+                      <span className="text-sm font-medium text-primary">
                         Limite d'inscription: {new Date(event.registration_end_time).toLocaleString('fr-FR')}
                       </span>
                     </div>
@@ -371,7 +371,7 @@ const Inscription = () => {
                         </SelectContent>
                       </Select>
                     ) : (
-                      <div className="p-3 bg-gray-100 rounded-md text-gray-700">
+                      <div className="p-3 bg-muted rounded-md text-foreground">
                         Course principale - {event?.name}
                       </div>
                     )}
@@ -413,8 +413,8 @@ const Inscription = () => {
                   </div>
 
                   {/* Terms and conditions */}
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-sm text-gray-600">
+                  <div className="bg-muted p-4 rounded-lg">
+                    <p className="text-sm text-muted-foreground">
                       En vous inscrivant, vous acceptez les conditions générales et le règlement de la course.
                       Le paiement sera traité dans une prochaine étape.
                     </p>
