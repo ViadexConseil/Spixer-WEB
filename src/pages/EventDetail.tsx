@@ -13,6 +13,7 @@ import { toast } from "@/hooks/use-toast";
 const EventDetail = () => {
   const { id } = useParams();
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isStageLive, setIsStageLive] = useState(false);
   const [event, setEvent] = useState<Event | null>(null);
   const [stages, setStages] = useState<Stage[]>([]);
   const [selectedStage, setSelectedStage] = useState<Stage | null>(null);
@@ -72,14 +73,28 @@ const EventDetail = () => {
     fetchStageRankings();
   }, [selectedStage]);
 
-  // Live ranking updates every 5 seconds if stage is live
   useEffect(() => {
-    if (!selectedStage) return;
-    
-    const stageStatus = getStageStatus(selectedStage);
-    const isLive = stageStatus.text === "En cours";
-    
-    if (!isLive) return;
+    if (!selectedStage) {
+      setIsStageLive(false);
+      return;
+    }
+
+    const checkStatus = () => {
+      const status = getStageStatus(selectedStage);
+      setIsStageLive(status.text === "En cours");
+    };
+
+    checkStatus(); // Check immediately on selection
+    const interval = setInterval(checkStatus, 1000); // Check every second
+
+    return () => clearInterval(interval);
+  }, [selectedStage]);
+
+  // Live ranking updates every 7 seconds if stage is live
+  useEffect(() => {
+    if (!isStageLive || !selectedStage) {
+      return;
+    }
 
     const fetchLiveRankings = async () => {
       try {
@@ -92,10 +107,11 @@ const EventDetail = () => {
       }
     };
 
-    const interval = setInterval(fetchLiveRankings, 5000);
-    
+    fetchLiveRankings(); // Fetch immediately when stage goes live
+    const interval = setInterval(fetchLiveRankings, 7000); // Poll every 7 seconds
+
     return () => clearInterval(interval);
-  }, [selectedStage]);
+  }, [isStageLive, selectedStage]);
 
   const getStageStatus = (stage: Stage): { text: string; class: string; showRankings: boolean } => {
     const now = new Date();
