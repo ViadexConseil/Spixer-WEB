@@ -71,6 +71,29 @@ const EventDetail = () => {
     fetchStageRankings();
   }, [selectedStage]);
 
+  // Live ranking updates every 5 seconds if stage is live
+  useEffect(() => {
+    if (!selectedStage) return;
+    
+    const stageStatus = getStageStatus(selectedStage);
+    const isLive = stageStatus.text === "En cours";
+    
+    if (!isLive) return;
+
+    const fetchLiveRankings = async () => {
+      try {
+        const rankings = await rankingsAPI.getByStage(selectedStage.id);
+        setStageRankings(rankings);
+      } catch (error) {
+        console.error("Erreur lors de la mise à jour du classement en direct:", error);
+      }
+    };
+
+    const interval = setInterval(fetchLiveRankings, 5000);
+    
+    return () => clearInterval(interval);
+  }, [selectedStage]);
+
   const getStageStatus = (stage: Stage): { text: string; class: string; showRankings: boolean } => {
     const now = new Date();
     const startTime = new Date(stage.start_time);
