@@ -348,7 +348,7 @@ const EventDetail = () => {
                                     {runner.rank_position !== 1 && runner.rank_position}
                                   </div>
                                   <div>
-                                    <div className="font-semibold text-foreground">{runner.username}</div>
+                                    <div className="font-semibold text-foreground">{runner.user_username}</div>
                                     <div className="text-sm text-muted-foreground">
                                       Position {runner.rank_position}
                                     </div>
